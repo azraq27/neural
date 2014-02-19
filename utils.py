@@ -4,6 +4,7 @@ Many of these are imported into the root-level of the package to make accessing 
 import neural
 from notify import notify
 import os,subprocess
+import datetime
 
 def flatten(nested_list):
 	'''converts a list-of-lists to a single flat list'''
@@ -57,3 +58,8 @@ def run(command,products=None,working_directory='.'):
 		if(neural.verbose):
 			notify('Running %s...' % command[0])
 		return subprocess.check_output(command)
+
+def log(fname,msg):
+	''' generic logging function '''
+	with open(fname,'a') as f:
+		f.write(datetime.datetime.now().strftime('%m-%d-%Y %H:%M:\n') + msg + '\n')
