@@ -5,6 +5,7 @@ neuroimaging data in python a little easier'''
 
 import afni
 import eprime
+import dicom
 
 version = 0.2
 
