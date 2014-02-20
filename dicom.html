@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>neural.dicom - Functions to interact with DICOM images &mdash; NeurAL 0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="NeurAL 0.3 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-neural.dicom">
+<span id="neural-dicom-functions-to-interact-with-dicom-images"></span><h1>neural.dicom - Functions to interact with DICOM images<a class="headerlink" href="#module-neural.dicom" title="Permalink to this headline">¶</a></h1>
+<p>methods to analyze DICOM format images</p>
+<dl class="class">
+<dt id="neural.dicom.DicomInfo">
+<em class="property">class </em><tt class="descclassname">neural.dicom.</tt><tt class="descname">DicomInfo</tt><big>(</big><em>frames=</em><span class="optional">[</span><span class="optional">]</span>, <em>sex_info={}</em>, <em>slice_times=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#DicomInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.DicomInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>container for header information from DICOM file</p>
+<p>Header frames are dictionaries with the following values:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Addr:</th><td class="field-body">tuple of (group,element) tags in hex</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Label:</th><td class="field-body">description</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Offset:</th><td class="field-body">offset of data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Size:</th><td class="field-body">size of data</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Value:</th><td class="field-body">data value</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="neural.dicom.DicomInfo.addr">
+<tt class="descname">addr</tt><big>(</big><em>address</em><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#DicomInfo.addr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.DicomInfo.addr" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns dictionary with frame information for given address (a tuple of two hex numbers)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neural.dicom.DicomInfo.label">
+<tt class="descname">label</tt><big>(</big><em>label</em><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#DicomInfo.label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.DicomInfo.label" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns dictionary with frame information for a given text label</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.dicom.info">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">info</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a DicomInfo object containing the header information in <tt class="docutils literal"><span class="pre">filename</span></tt></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/dicom.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Bill Gross.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>
