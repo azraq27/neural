@@ -51,6 +51,7 @@ clean:
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	cd $(BUILDDIR)/html; git add .; git commit -m "rebuilt docs"; git push origin gh-pages
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 

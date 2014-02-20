@@ -19,10 +19,9 @@ def flatten(nested_list):
 class run_in:
 	'''temporarily changes into another directory
 	
-	Example:
-	
-	with run_in('another_directory'):
-		do_some_stuff_there()
+	Example::	
+		with run_in('another_directory'):
+			do_some_stuff_there()
 	'''
 	def __init__(self,working_directory):
 		self.working_directory = working_directory
