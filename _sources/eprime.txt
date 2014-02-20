@@ -1,0 +1,5 @@
+epi.eprime - E-Prime logfile parsing
+======================================
+
+.. automodule:: epi.eprime
+	:members:

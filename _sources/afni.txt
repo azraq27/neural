@@ -1,0 +1,5 @@
+epi.afni - Wrapper methods for AFNI functions
+===============================================
+
+.. automodule:: epi.afni
+	:members:

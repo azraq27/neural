@@ -1,0 +1,5 @@
+epi.utils - Generic helper utilities
+======================================
+
+.. automodule:: epi.utils
+	:members:
