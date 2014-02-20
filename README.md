@@ -1,10 +1,7 @@
-neural
-======
-
-NeuroAL - a neuroimaging analysis library (in Python)
+NeuroAL - a neuroimaging analysis library
 -------------------------------------------------------
 
-Documentation and examples: http://azraq27.github.com/neural
+_Documentation and examples:_ http://azraq27.github.com/neural
 
 This library contains helper functions for doing analyses on fMRI data in Python.
 
