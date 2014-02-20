@@ -249,16 +249,14 @@ and return the filename as a string.</p>
 or list of strings, it will try to make nifti copies of all datasets listed 
 and then delete the original version if successful. AFNI datasets should be specified
 with the <tt class="docutils literal"><span class="pre">+view</span></tt>.</p>
-<dl class="docutils">
-<dt>Example usage::</dt>
-<dd><dl class="first last docutils">
-<dt>with temp_afni_copy(&#8216;dataset.nii.gz&#8217;) as dset_afni:</dt>
-<dd>do_something_with_a_dset(dset_afni)</dd>
-<dt>with temp_afni_copy(&#8216;dataset.nii.gz&#8217;,&#8217;output_dataset+orig&#8217;) as dset_afni:</dt>
-<dd>do_something_with_a_dset(dset_afni,output=&#8217;output_dataset&#8217;)</dd>
-</dl>
-</dd>
-</dl>
+<p>Example usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">temp_afni_copy</span><span class="p">(</span><span class="s">&#39;dataset.nii.gz&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dset_afni</span><span class="p">:</span>
+        <span class="n">do_something_with_a_dset</span><span class="p">(</span><span class="n">dset_afni</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">temp_afni_copy</span><span class="p">(</span><span class="s">&#39;dataset.nii.gz&#39;</span><span class="p">,</span><span class="s">&#39;output_dataset+orig&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dset_afni</span><span class="p">:</span>
+        <span class="n">do_something_with_a_dset</span><span class="p">(</span><span class="n">dset_afni</span><span class="p">,</span><span class="n">output</span><span class="o">=</span><span class="s">&#39;output_dataset&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
