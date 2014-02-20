@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>epi.utils - Generic helper utilities &mdash; NeurAL 0.3 documentation</title>
+    <title>neural.utils - Generic helper utilities &mdash; NeurAL 0.3 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="NeurAL 0.3 documentation" href="index.html" />
-    <link rel="prev" title="epi.eprime - E-Prime logfile parsing" href="eprime.html" /> 
+    <link rel="prev" title="neural.eprime - E-Prime logfile parsing" href="eprime.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,7 +34,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="eprime.html" title="epi.eprime - E-Prime logfile parsing"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
       </ul>
@@ -45,8 +48,55 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="epi-utils-generic-helper-utilities">
-<h1>epi.utils - Generic helper utilities<a class="headerlink" href="#epi-utils-generic-helper-utilities" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="neural-utils-generic-helper-utilities">
+<h1>neural.utils - Generic helper utilities<a class="headerlink" href="#neural-utils-generic-helper-utilities" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-neural.utils"></span><p>This module contains generic helper functions</p>
+<p>Many of these are imported into the root-level of the package to make accessing them easier</p>
+<dl class="function">
+<dt id="neural.utils.flatten">
+<tt class="descclassname">neural.utils.</tt><tt class="descname">flatten</tt><big>(</big><em>nested_list</em><big>)</big><a class="reference internal" href="_modules/neural/utils.html#flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.utils.flatten" title="Permalink to this definition">¶</a></dt>
+<dd><p>converts a list-of-lists to a single flat list</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.utils.log">
+<tt class="descclassname">neural.utils.</tt><tt class="descname">log</tt><big>(</big><em>fname</em>, <em>msg</em><big>)</big><a class="reference internal" href="_modules/neural/utils.html#log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.utils.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>generic logging function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.utils.run">
+<tt class="descclassname">neural.utils.</tt><tt class="descname">run</tt><big>(</big><em>command</em>, <em>products=None</em>, <em>working_directory='.'</em><big>)</big><a class="reference internal" href="_modules/neural/utils.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.utils.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>wrapper to run external programs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Command:</th><td class="field-body">list containing command and parameters 
+(formatted the same as subprocess; must contain only strings)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Products:</th><td class="field-body">string or list of files that are the products of this command
+if all products exist, the command will not be run, and False returned</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Working_directory:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">will chdir to this directory</td>
+</tr>
+</tbody>
+</table>
+<p>Returns stdout of command</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="neural.utils.run_in">
+<em class="property">class </em><tt class="descclassname">neural.utils.</tt><tt class="descname">run_in</tt><big>(</big><em>working_directory</em><big>)</big><a class="reference internal" href="_modules/neural/utils.html#run_in"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.utils.run_in" title="Permalink to this definition">¶</a></dt>
+<dd><p>temporarily changes into another directory</p>
+<p>Example:</p>
+<dl class="docutils">
+<dt>with run_in(&#8216;another_directory&#8217;):</dt>
+<dd>do_some_stuff_there()</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
@@ -57,7 +107,7 @@
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="eprime.html"
-                        title="previous chapter">epi.eprime - E-Prime logfile parsing</a></p>
+                        title="previous chapter">neural.eprime - E-Prime logfile parsing</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/utils.txt"
@@ -87,7 +137,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="eprime.html" title="epi.eprime - E-Prime logfile parsing"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
              >previous</a> |</li>
         <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
       </ul>

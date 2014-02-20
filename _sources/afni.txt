@@ -1,5 +1,5 @@
-epi.afni - Wrapper methods for AFNI functions
+neural.afni - Wrapper methods for AFNI functions
 ===============================================
 
-.. automodule:: epi.afni
+.. automodule:: neural.afni
 	:members:

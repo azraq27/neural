@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>neural.eprime &mdash; NeurAL 0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="NeurAL 0.3 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">NeurAL 0.3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for neural.eprime</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;Provides functions to parse the text-file logs produced by E-Prime experiments&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="read_header"><a class="viewcode-back" href="../../eprime.html#neural.eprime.read_header">[docs]</a><span class="k">def</span> <span class="nf">read_header</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; returns a dictionary of values in the header of the given file &#39;&#39;&#39;</span>
+	<span class="n">header</span> <span class="o">=</span> <span class="p">{}</span>
+	<span class="n">in_header</span> <span class="o">=</span> <span class="bp">False</span>
+	<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">&#39;rU&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+		<span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)]</span>
+		<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">line</span><span class="o">==</span><span class="s">&quot;*** Header Start ***&quot;</span><span class="p">:</span>
+				<span class="n">in_header</span><span class="o">=</span><span class="bp">True</span>
+				<span class="k">continue</span>
+			<span class="k">if</span> <span class="n">line</span><span class="o">==</span><span class="s">&quot;*** Header End ***&quot;</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">header</span>
+			<span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)</span>
+			<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+				<span class="n">header</span><span class="p">[</span><span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="parse_frames"><a class="viewcode-back" href="../../eprime.html#neural.eprime.parse_frames">[docs]</a><span class="k">def</span> <span class="nf">parse_frames</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; quick and dirty eprime txt file parsing - doesn\&#39;t account for nesting </span>
+<span class="sd">	</span>
+<span class="sd">	**Example usage**::</span>
+<span class="sd">	</span>
+<span class="sd">		for frame in neural.eprime.parse_frames(&quot;experiment-1.txt&quot;):</span>
+<span class="sd">			trial_type = frame[&#39;TrialSlide.Tag&#39;]</span>
+<span class="sd">			trial_rt = float(frame[&#39;TrialSlide.RT&#39;])</span>
+<span class="sd">			print &#39;%s: %fms&#39; % (trial_type,trial_rt)</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">&#39;rU&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+		<span class="n">frame</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)]</span>
+		<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s">&#39;*** LogFrame Start ***&#39;</span><span class="p">:</span>
+				<span class="n">frame</span> <span class="o">=</span> <span class="p">{}</span>
+			<span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s">&#39;*** LogFrame End ***&#39;</span><span class="p">:</span>
+				<span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+				<span class="k">yield</span> <span class="n">frame</span>
+			<span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)</span>
+			<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+				<span class="n">frame</span><span class="p">[</span><span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+	<span class="c">#return frames</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">NeurAL 0.3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Bill Gross.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

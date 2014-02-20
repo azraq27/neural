@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>epi.afni - Wrapper methods for AFNI functions &mdash; NeurAL 0.3 documentation</title>
+    <title>neural.afni - Wrapper methods for AFNI functions &mdash; NeurAL 0.3 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="NeurAL 0.3 documentation" href="index.html" />
-    <link rel="next" title="epi.eprime - E-Prime logfile parsing" href="eprime.html" />
+    <link rel="next" title="neural.eprime - E-Prime logfile parsing" href="eprime.html" />
     <link rel="prev" title="Welcome to NeurAL’s documentation!" href="index.html" /> 
   </head>
   <body>
@@ -35,7 +35,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="eprime.html" title="epi.eprime - E-Prime logfile parsing"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to NeurAL’s documentation!"
@@ -49,8 +52,228 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="epi-afni-wrapper-methods-for-afni-functions">
-<h1>epi.afni - Wrapper methods for AFNI functions<a class="headerlink" href="#epi-afni-wrapper-methods-for-afni-functions" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="neural-afni-wrapper-methods-for-afni-functions">
+<h1>neural.afni - Wrapper methods for AFNI functions<a class="headerlink" href="#neural-afni-wrapper-methods-for-afni-functions" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-neural.afni"></span><p>wrapper functions for common AFNI tasks</p>
+<dl class="class">
+<dt id="neural.afni.Decon">
+<em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">Decon</tt><a class="reference internal" href="_modules/neural/afni.html#Decon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.Decon" title="Permalink to this definition">¶</a></dt>
+<dd><p>wrapper for AFNI 3dDeconvolve command</p>
+<dl class="docutils">
+<dt>Properties:</dt>
+<dd><table class="first docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">input_dset:</th><td class="field-body">list of input datasets</td>
+</tr>
+<tr class="field-even field"><th class="field-name">stim_files:</th><td class="field-body">dictionary where keys are used as stimulus labels
+and the values are taken as 1D files</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">stim_times:</th><td class="field-body">same as stim_files, but used as a stim_times file</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">stim_times_model:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">default model to use for each stim_times</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">stim_base:</th><td class="field-body">list of names of stimuli (defined either in stim_files or 
+stim_times) that should be considered in the baseline instead
+of full model</td>
+</tr>
+<tr class="field-even field"><th class="field-name">stim_am1:</th><td class="field-body">list of names of stimuli defined in stim_times that should
+use the <tt class="docutils literal"><span class="pre">-stim_times_AM1</span></tt> model</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">stim_am2:</th><td class="field-body">list of names of stimuli defined in stim_times that should
+use the <tt class="docutils literal"><span class="pre">-stim_times_AM2</span></tt> model</td>
+</tr>
+<tr class="field-even field"><th class="field-name">glts:</th><td class="field-body">dictionary where keys are GLT labels, and the value
+is a symbolic statement</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">mask:</th><td class="field-body">either a mask file, or &#8220;auto&#8221;, which will use &#8220;-automask&#8221;</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Options that are obvious:</dt>
+<dd>nfirst (default: 3), censor_file, polort (default: &#8216;A&#8217;), tout, vout, rout, prefix</dd>
+</dl>
+<p>opts            = list of extra things to put in the command</p>
+<p><strong>Example:</strong>:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="n">decon</span> <span class="o">=</span> <span class="n">neural</span><span class="o">.</span><span class="n">afni</span><span class="o">.</span><span class="n">Decon</span><span class="p">()</span>
+<span class="n">decon</span><span class="o">.</span><span class="n">input_dsets</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;dset_run1.nii.gz&#39;</span><span class="p">,</span> <span class="s">&#39;dset_run2.nii.gz&#39;</span><span class="p">]</span>
+<span class="n">decon</span><span class="o">.</span><span class="n">censor_file</span> <span class="o">=</span> <span class="s">&#39;subject_censor.1D&#39;</span>
+<span class="n">decon</span><span class="o">.</span><span class="n">stim_files</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;motion_1&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[0]&#39;</span><span class="p">,</span>
+        <span class="s">&#39;motion_2&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[1]&#39;</span><span class="p">,</span>
+        <span class="s">&#39;motion_3&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[2]&#39;</span><span class="p">,</span>
+        <span class="s">&#39;motion_4&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[3]&#39;</span><span class="p">,</span>
+        <span class="s">&#39;motion_5&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[4]&#39;</span><span class="p">,</span>
+        <span class="s">&#39;motion_6&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[5]&#39;</span>
+<span class="p">}</span>
+<span class="n">decon</span><span class="o">.</span><span class="n">stim_base</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;motion_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">)]</span>
+<span class="n">decon</span><span class="o">.</span><span class="n">stim_times</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;stim_a&#39;</span><span class="p">:</span> <span class="s">&#39;stim_a.stimtimes&#39;</span><span class="p">,</span>
+        <span class="s">&#39;stim_b&#39;</span><span class="p">:</span> <span class="s">&#39;stim_b.stimtimes&#39;</span><span class="p">,</span>
+        <span class="s">&#39;stim_c&#39;</span><span class="p">:</span> <span class="s">&#39;stim_c.stimtimes&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">decon</span><span class="o">.</span><span class="n">glts</span> <span class="o">=</span><span class="p">{</span>
+        <span class="s">&#39;a-b&#39;</span><span class="p">:</span> <span class="s">&#39;1*stim_a + -1*stim_b&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ab-c&#39;</span><span class="p">:</span> <span class="s">&#39;0.5*stim_a + 0.5*stim_b + -1*stim_c&#39;</span>
+<span class="p">}</span>
+<span class="n">decon</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;subject_decon.nii.gz&#39;</span>
+<span class="n">decon</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="neural.afni.Decon.command_list">
+<tt class="descname">command_list</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/neural/afni.html#Decon.command_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.Decon.command_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the 3dDeconvolve command as a list</p>
+<p>The list returned can be run by passing it into a subprocess-like command
+(e.g., neural.utils.run())</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neural.afni.Decon.command_string">
+<tt class="descname">command_string</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/neural/afni.html#Decon.command_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.Decon.command_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the 3dDeconvolve command as as string</p>
+<p>This command can then be run in something like a shell script</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neural.afni.Decon.run">
+<tt class="descname">run</tt><big>(</big><em>working_directory='.'</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#Decon.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.Decon.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs 3dDeconvolve through the neural.utils.run shortcut</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="neural.afni.DsetInfo">
+<em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">DsetInfo</tt><a class="reference internal" href="_modules/neural/afni.html#DsetInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.DsetInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains organized output from <tt class="docutils literal"><span class="pre">3dinfo</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.afni_copy">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">afni_copy</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#afni_copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.afni_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a <tt class="docutils literal"><span class="pre">+orig</span></tt> copy of the given dataset and returns the filename as a string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.cdf">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">cdf</tt><big>(</big><em>dset</em>, <em>p</em>, <em>subbrick=0</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.cdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>converts <em>p</em>-values to the appropriate statistic for the specified subbrick</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.dset_info">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">dset_info</tt><big>(</big><em>dset</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#dset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.dset_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs <tt class="docutils literal"><span class="pre">3dinfo</span></tt> and returns a <a class="reference internal" href="#neural.afni.DsetInfo" title="neural.afni.DsetInfo"><tt class="xref py py-class docutils literal"><span class="pre">DsetInfo</span></tt></a> object containing the results</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.nifti_copy">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">nifti_copy</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#nifti_copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.nifti_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a <tt class="docutils literal"><span class="pre">.nii.gz</span></tt> copy of the given dataset and returns the filename as a string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.prefix">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">prefix</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#prefix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>strips common fMRI dataset suffixes from filenames</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.qwarp_align">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">qwarp_align</tt><big>(</big><em>dset_from</em>, <em>dset_to</em>, <em>skull_strip=True</em>, <em>affine_suffix='_aff'</em>, <em>qwarp_suffix='_qwarp'</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#qwarp_align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.qwarp_align" title="Permalink to this definition">¶</a></dt>
+<dd><p>aligns <tt class="docutils literal"><span class="pre">dset_from</span></tt> to <tt class="docutils literal"><span class="pre">dset_to</span></tt> using 3dQwarp</p>
+<p>Will run <tt class="docutils literal"><span class="pre">3dSkullStrip</span></tt> (unless <tt class="docutils literal"><span class="pre">skull_strip</span></tt> is <tt class="docutils literal"><span class="pre">False</span></tt>), <tt class="docutils literal"><span class="pre">3dUnifize</span></tt>,
+<tt class="docutils literal"><span class="pre">3dAllineate</span></tt>, and then <tt class="docutils literal"><span class="pre">3dQwarp</span></tt>. This method will add suffixes to the input
+dataset for the intermediate files (e.g., <tt class="docutils literal"><span class="pre">_ss</span></tt>, <tt class="docutils literal"><span class="pre">_u</span></tt>). If those files already
+exist, it will assume they were intelligently named, and use them as is</p>
+<p>The output affine dataset and 1D, as well as the output of qwarp are named by adding
+the given suffixes (<tt class="docutils literal"><span class="pre">affine_suffix</span></tt> and <tt class="docutils literal"><span class="pre">qwarp_suffix</span></tt>) to the <tt class="docutils literal"><span class="pre">dset_from</span></tt> file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.qwarp_apply">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">qwarp_apply</tt><big>(</big><em>dset_from</em>, <em>dset_warp</em>, <em>affine=None</em>, <em>warp_suffix='_warp'</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#qwarp_apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.qwarp_apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>applies the transform from a previous qwarp</p>
+<p>Uses the warp parameters from the dataset listed in 
+<tt class="docutils literal"><span class="pre">dset_warp</span></tt> (usually the dataset name ends in <tt class="docutils literal"><span class="pre">_WARP</span></tt>) 
+to the dataset <tt class="docutils literal"><span class="pre">dset_from</span></tt>. If a <tt class="docutils literal"><span class="pre">.1D</span></tt> file is given
+in the <tt class="docutils literal"><span class="pre">affine</span></tt> parameter, it will be applied simultaneously
+with the qwarp.</p>
+<p>Output dataset with have the <tt class="docutils literal"><span class="pre">warp_suffix</span></tt> suffix added to its name</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.subbrick">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">subbrick</tt><big>(</big><em>dset</em>, <em>label</em>, <em>coef=False</em>, <em>tstat=False</em>, <em>fstat=False</em>, <em>rstat=False</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#subbrick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.subbrick" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a string referencing the given subbrick within a dset</p>
+<p>This method reads the header of the dataset <tt class="docutils literal"><span class="pre">dset</span></tt>, finds the subbrick whose
+label matches <tt class="docutils literal"><span class="pre">label</span></tt> and returns a string of type <tt class="docutils literal"><span class="pre">dataset[X]</span></tt>, which can
+be used by most AFNI programs to refer to a subbrick within a file</p>
+<p>The options coef, tstat, fstat, and rstat will add the suffix that is
+appended to the label by 3dDeconvolve</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Coef:</th><td class="field-body">&#8220;#0_Coef&#8221;</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Tstat:</th><td class="field-body">&#8220;#0_Tstat&#8221;</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Fstat:</th><td class="field-body">&#8220;_Fstat&#8221;</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Rstat:</th><td class="field-body">&#8220;_R^2&#8221;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.suffix">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">suffix</tt><big>(</big><em>filename</em>, <em>suffix</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#suffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a filenames with <tt class="docutils literal"><span class="pre">suffix</span></tt> inserted before the dataset suffix</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="neural.afni.temp_afni_copy">
+<em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">temp_afni_copy</tt><big>(</big><em>in_dset</em>, <em>out_dsets=None</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#temp_afni_copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.temp_afni_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>used within a <tt class="docutils literal"><span class="pre">with</span></tt> block, will create a temporary <tt class="docutils literal"><span class="pre">+orig</span></tt> copy of dataset</p>
+<p>When invoked in a <tt class="docutils literal"><span class="pre">with</span></tt> block, will make a <tt class="docutils literal"><span class="pre">+orig</span></tt> copy of the given dataset
+and return the filename as a string.</p>
+<p>On exiting the block, it will delete the <tt class="docutils literal"><span class="pre">+orig</span></tt> copy. If out_dsets is a string
+or list of strings, it will try to make nifti copies of all datasets listed 
+and then delete the original version if successful. AFNI datasets should be specified
+with the <tt class="docutils literal"><span class="pre">+view</span></tt>.</p>
+<dl class="docutils">
+<dt>Example usage::</dt>
+<dd><dl class="first last docutils">
+<dt>with temp_afni_copy(&#8216;dataset.nii.gz&#8217;) as dset_afni:</dt>
+<dd>do_something_with_a_dset(dset_afni)</dd>
+<dt>with temp_afni_copy(&#8216;dataset.nii.gz&#8217;,&#8217;output_dataset+orig&#8217;) as dset_afni:</dt>
+<dd>do_something_with_a_dset(dset_afni,output=&#8217;output_dataset&#8217;)</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.thresh_at">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">thresh_at</tt><big>(</big><em>dset</em>, <em>p</em>, <em>subbrick=0</em>, <em>positive_only=False</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#thresh_at"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.thresh_at" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a string containing an inline <tt class="docutils literal"><span class="pre">3dcalc</span></tt> command that thresholds the 
+given dataset at the specified <em>p</em>-value</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.afni.voxel_count">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">voxel_count</tt><big>(</big><em>dset</em>, <em>subbrick=0</em>, <em>p=None</em>, <em>positive_only=False</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#voxel_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.voxel_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the number of non-zero voxels, or number of voxels exceeding the given <em>p</em>-value threshold</p>
+</dd></dl>
+
 </div>
 
 
@@ -64,7 +287,7 @@
                         title="previous chapter">Welcome to NeurAL&#8217;s documentation!</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="eprime.html"
-                        title="next chapter">epi.eprime - E-Prime logfile parsing</a></p>
+                        title="next chapter">neural.eprime - E-Prime logfile parsing</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/afni.txt"
@@ -94,7 +317,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="eprime.html" title="epi.eprime - E-Prime logfile parsing"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to NeurAL’s documentation!"

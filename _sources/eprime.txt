@@ -1,5 +1,5 @@
-epi.eprime - E-Prime logfile parsing
+neural.eprime - E-Prime logfile parsing
 ======================================
 
-.. automodule:: epi.eprime
+.. automodule:: neural.eprime
 	:members:

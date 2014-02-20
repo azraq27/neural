@@ -1,0 +1,479 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>neural.afni &mdash; NeurAL 0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="NeurAL 0.3 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">NeurAL 0.3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for neural.afni</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39; wrapper functions for common AFNI tasks &#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">re</span><span class="o">,</span><span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">neural</span>
+
+<span class="k">def</span> <span class="nf">_dset_raw_info</span><span class="p">(</span><span class="n">dset</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; returns raw output from running ``3dinfo`` &#39;&#39;&#39;</span>
+	<span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&#39;3dinfo&#39;</span><span class="p">,</span><span class="s">&#39;-verb&#39;</span><span class="p">,</span><span class="n">dset</span><span class="p">])</span>
+
+<div class="viewcode-block" id="DsetInfo"><a class="viewcode-back" href="../../afni.html#neural.afni.DsetInfo">[docs]</a><span class="k">class</span> <span class="nc">DsetInfo</span><span class="p">:</span>
+	<span class="sd">&#39;&#39;&#39; contains organized output from ``3dinfo`` &#39;&#39;&#39;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">subbricks</span> <span class="o">=</span> <span class="p">[]</span>
+	
+	<span class="k">def</span> <span class="nf">subbrick_labeled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">label</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subbricks</span><span class="p">)):</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subbricks</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&#39;label&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">label</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">i</span>
+		<span class="k">raise</span> <span class="ne">LookupError</span>
+</div>
+<div class="viewcode-block" id="dset_info"><a class="viewcode-back" href="../../afni.html#neural.afni.dset_info">[docs]</a><span class="k">def</span> <span class="nf">dset_info</span><span class="p">(</span><span class="n">dset</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; runs ``3dinfo`` and returns a :class:`DsetInfo` object containing the results &#39;&#39;&#39;</span>
+	<span class="n">info</span> <span class="o">=</span> <span class="n">DsetInfo</span><span class="p">()</span>
+	<span class="n">sub_info</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">r&#39;At sub-brick #(\d+) </span><span class="se">\&#39;</span><span class="s">([^</span><span class="se">\&#39;</span><span class="s">]+)</span><span class="se">\&#39;</span><span class="s"> datum type is (\w+).*(\n.*statcode = (\w+);  statpar = (.*)|)&#39;</span><span class="p">,</span><span class="n">_dset_raw_info</span><span class="p">(</span><span class="n">dset</span><span class="p">))</span>
+	<span class="k">for</span> <span class="n">brick</span> <span class="ow">in</span> <span class="n">sub_info</span><span class="p">:</span>
+		<span class="n">info</span><span class="o">.</span><span class="n">subbricks</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+			<span class="s">&#39;label&#39;</span><span class="p">:</span> <span class="n">brick</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+			<span class="s">&#39;datum&#39;</span><span class="p">:</span> <span class="n">brick</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+			<span class="s">&#39;stat&#39;</span><span class="p">:</span> <span class="n">brick</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+			<span class="s">&#39;params&#39;</span><span class="p">:</span> <span class="n">brick</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+		<span class="p">})</span>
+	<span class="n">info</span><span class="o">.</span><span class="n">reps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">subbricks</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">info</span>
+</div>
+<div class="viewcode-block" id="subbrick"><a class="viewcode-back" href="../../afni.html#neural.afni.subbrick">[docs]</a><span class="k">def</span> <span class="nf">subbrick</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="n">label</span><span class="p">,</span><span class="n">coef</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">tstat</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">fstat</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">rstat</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; returns a string referencing the given subbrick within a dset</span>
+<span class="sd">	</span>
+<span class="sd">	This method reads the header of the dataset ``dset``, finds the subbrick whose</span>
+<span class="sd">	label matches ``label`` and returns a string of type ``dataset[X]``, which can</span>
+<span class="sd">	be used by most AFNI programs to refer to a subbrick within a file</span>
+<span class="sd">	</span>
+<span class="sd">	The options coef, tstat, fstat, and rstat will add the suffix that is</span>
+<span class="sd">	appended to the label by 3dDeconvolve</span>
+<span class="sd">	</span>
+<span class="sd">	:coef:	&quot;#0_Coef&quot;</span>
+<span class="sd">	:tstat:	&quot;#0_Tstat&quot;</span>
+<span class="sd">	:fstat: &quot;_Fstat&quot;</span>
+<span class="sd">	:rstat: &quot;_R^2&quot;</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	
+	<span class="k">if</span> <span class="n">coef</span><span class="p">:</span>
+		<span class="n">label</span> <span class="o">+=</span> <span class="s">&quot;#0_Coef&quot;</span>
+	<span class="k">elif</span> <span class="n">tstat</span><span class="p">:</span>
+		<span class="n">label</span> <span class="o">+=</span> <span class="s">&quot;#0_Tstat&quot;</span>
+	<span class="k">elif</span> <span class="n">fstat</span><span class="p">:</span>
+		<span class="n">label</span> <span class="o">+=</span> <span class="s">&quot;_Fstat&quot;</span>
+	<span class="k">elif</span> <span class="n">rstat</span><span class="p">:</span>
+		<span class="n">label</span> <span class="o">+=</span> <span class="s">&quot;_R^2&quot;</span>
+	
+	<span class="n">info</span> <span class="o">=</span> <span class="n">dset_info</span><span class="p">(</span><span class="n">dset</span><span class="p">)</span>
+	<span class="n">i</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">subbrick_labeled</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+	<span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">[</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="cdf"><a class="viewcode-back" href="../../afni.html#neural.afni.cdf">[docs]</a><span class="k">def</span> <span class="nf">cdf</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">subbrick</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; converts *p*-values to the appropriate statistic for the specified subbrick &#39;&#39;&#39;</span>
+	<span class="n">info</span> <span class="o">=</span> <span class="n">dset_info</span><span class="p">(</span><span class="n">dset</span><span class="p">)</span>
+	<span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;cdf&#39;</span><span class="p">,</span><span class="s">&#39;-p2t&#39;</span><span class="p">,</span><span class="n">info</span><span class="o">.</span><span class="n">subbricks</span><span class="p">[</span><span class="n">subbrick</span><span class="p">][</span><span class="s">&#39;stat&#39;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)]</span> <span class="o">+</span> <span class="n">info</span><span class="o">.</span><span class="n">subbricks</span><span class="p">[</span><span class="n">subbrick</span><span class="p">][</span><span class="s">&#39;params&#39;</span><span class="p">]</span>
+	<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="thresh_at"><a class="viewcode-back" href="../../afni.html#neural.afni.thresh_at">[docs]</a><span class="k">def</span> <span class="nf">thresh_at</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">subbrick</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">positive_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; returns a string containing an inline ``3dcalc`` command that thresholds the </span>
+<span class="sd">		given dataset at the specified *p*-value &#39;&#39;&#39;</span>
+	<span class="n">t</span> <span class="o">=</span> <span class="n">cdf</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">subbrick</span><span class="p">)</span>
+	<span class="n">expr</span> <span class="o">=</span> <span class="s">&#39;astep(a,</span><span class="si">%f</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="n">t</span>
+	<span class="k">if</span> <span class="n">positive_only</span><span class="p">:</span>
+		<span class="n">expr</span> <span class="o">=</span> <span class="s">&#39;step(a-</span><span class="si">%f</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="n">t</span>
+	<span class="k">return</span> <span class="s">&#39;3dcalc( -a</span><span class="si">%d</span><span class="s"> </span><span class="si">%s</span><span class="s"> -expr </span><span class="si">%s</span><span class="s"> )&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">subbrick</span><span class="p">,</span><span class="n">dset</span><span class="p">,</span><span class="n">expr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="voxel_count"><a class="viewcode-back" href="../../afni.html#neural.afni.voxel_count">[docs]</a><span class="k">def</span> <span class="nf">voxel_count</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="n">subbrick</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">p</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">positive_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; returns the number of non-zero voxels, or number of voxels exceeding the given *p*-value threshold &#39;&#39;&#39;</span>
+	<span class="k">if</span> <span class="n">p</span><span class="p">:</span>
+		<span class="n">dset</span> <span class="o">=</span> <span class="n">thresh_at</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">subbrick</span><span class="p">,</span><span class="n">positive_only</span><span class="p">)</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">dset</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">[</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="n">subbrick</span><span class="p">)</span>
+	<span class="k">print</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;3dBrickStat&#39;</span><span class="p">,</span><span class="s">&#39;-slow&#39;</span><span class="p">,</span><span class="s">&#39;-sum&#39;</span><span class="p">,</span><span class="n">dset</span><span class="p">])</span>
+	<span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&#39;3dBrickStat&#39;</span><span class="p">,</span><span class="s">&#39;-slow&#39;</span><span class="p">,</span><span class="s">&#39;-sum&#39;</span><span class="p">,</span><span class="n">dset</span><span class="p">]))</span>
+</div>
+<span class="n">_afni_suffix_regex</span> <span class="o">=</span> <span class="s">r&quot;((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\d+\])?$&quot;</span>
+
+<div class="viewcode-block" id="prefix"><a class="viewcode-back" href="../../afni.html#neural.afni.prefix">[docs]</a><span class="k">def</span> <span class="nf">prefix</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; strips common fMRI dataset suffixes from filenames &#39;&#39;&#39;</span>
+	<span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">_afni_suffix_regex</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="suffix"><a class="viewcode-back" href="../../afni.html#neural.afni.suffix">[docs]</a><span class="k">def</span> <span class="nf">suffix</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">suffix</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; returns a filenames with ``suffix`` inserted before the dataset suffix &#39;&#39;&#39;</span>
+	<span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">_afni_suffix_regex</span><span class="p">,</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">\g&lt;1&gt;&quot;</span> <span class="o">%</span> <span class="n">suffix</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="afni_copy"><a class="viewcode-back" href="../../afni.html#neural.afni.afni_copy">[docs]</a><span class="k">def</span> <span class="nf">afni_copy</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; creates a ``+orig`` copy of the given dataset and returns the filename as a string &#39;&#39;&#39;</span>
+	<span class="n">afni_filename</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">+orig&quot;</span> <span class="o">%</span> <span class="n">prefix</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">afni_filename</span> <span class="o">+</span> <span class="s">&quot;.HEAD&quot;</span><span class="p">):</span>
+		<span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s">&#39;3dcalc&#39;</span><span class="p">,</span><span class="s">&#39;-a&#39;</span><span class="p">,</span><span class="n">filename</span><span class="p">,</span><span class="s">&#39;-expr&#39;</span><span class="p">,</span><span class="s">&#39;a&#39;</span><span class="p">,</span><span class="s">&#39;-prefix&#39;</span><span class="p">,</span><span class="n">prefix</span><span class="p">(</span><span class="n">filename</span><span class="p">)])</span>
+	<span class="k">return</span> <span class="n">afni_filename</span>
+</div>
+<div class="viewcode-block" id="nifti_copy"><a class="viewcode-back" href="../../afni.html#neural.afni.nifti_copy">[docs]</a><span class="k">def</span> <span class="nf">nifti_copy</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39; creates a ``.nii.gz`` copy of the given dataset and returns the filename as a string &#39;&#39;&#39;</span>
+	<span class="n">nifti_filename</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;.nii.gz&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">nifti_filename</span><span class="p">):</span>
+		<span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s">&#39;3dcalc&#39;</span><span class="p">,</span><span class="s">&#39;-a&#39;</span><span class="p">,</span><span class="n">filename</span><span class="p">,</span><span class="s">&#39;-expr&#39;</span><span class="p">,</span><span class="s">&#39;a&#39;</span><span class="p">,</span><span class="s">&#39;-prefix&#39;</span><span class="p">,</span><span class="n">nifti_filename</span><span class="p">])</span>
+	<span class="k">return</span> <span class="n">nifti_filename</span>
+</div>
+<div class="viewcode-block" id="temp_afni_copy"><a class="viewcode-back" href="../../afni.html#neural.afni.temp_afni_copy">[docs]</a><span class="k">class</span> <span class="nc">temp_afni_copy</span><span class="p">:</span>
+	<span class="sd">&#39;&#39;&#39; used within a ``with`` block, will create a temporary ``+orig`` copy of dataset</span>
+<span class="sd">	</span>
+<span class="sd">	When invoked in a ``with`` block, will make a ``+orig`` copy of the given dataset</span>
+<span class="sd">	and return the filename as a string.</span>
+<span class="sd">	</span>
+<span class="sd">	On exiting the block, it will delete the ``+orig`` copy. If out_dsets is a string</span>
+<span class="sd">	or list of strings, it will try to make nifti copies of all datasets listed </span>
+<span class="sd">	and then delete the original version if successful. AFNI datasets should be specified</span>
+<span class="sd">	with the ``+view``.</span>
+<span class="sd">	</span>
+<span class="sd">	Example usage::</span>
+<span class="sd">		with temp_afni_copy(&#39;dataset.nii.gz&#39;) as dset_afni:</span>
+<span class="sd">			do_something_with_a_dset(dset_afni)</span>
+<span class="sd">		</span>
+<span class="sd">		with temp_afni_copy(&#39;dataset.nii.gz&#39;,&#39;output_dataset+orig&#39;) as dset_afni:</span>
+<span class="sd">			do_something_with_a_dset(dset_afni,output=&#39;output_dataset&#39;)</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">in_dset</span><span class="p">,</span><span class="n">out_dsets</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">in_dset</span> <span class="o">=</span> <span class="n">in_dset</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">out_dsets</span> <span class="o">=</span> <span class="n">out_dsets</span>
+
+	<span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">afni_filenames</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_dset</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span>
+			<span class="k">for</span> <span class="n">dset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_dset</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">afni_filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">afni_copy</span><span class="p">(</span><span class="n">dset</span><span class="p">))</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">afni_filenames</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">afni_filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">afni_copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_dset</span><span class="p">))</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">afni_filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+	<span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">afni_filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">afni_filenames</span><span class="p">:</span>	
+			<span class="k">for</span> <span class="n">dset</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">afni_filename</span> <span class="o">+</span> <span class="s">&#39;.*&#39;</span><span class="p">):</span>
+				<span class="k">try</span><span class="p">:</span>
+					<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dset</span><span class="p">)</span>
+				<span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+					<span class="k">pass</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_dsets</span><span class="p">:</span>
+			<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dsets</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">out_dsets</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dsets</span><span class="p">]</span>
+			<span class="k">for</span> <span class="n">out_dset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_dsets</span><span class="p">:</span>
+				<span class="n">nifti_dset</span> <span class="o">=</span> <span class="n">nifti_copy</span><span class="p">(</span><span class="n">out_dset</span><span class="p">)</span>
+				<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">nifti_dset</span><span class="p">):</span>
+					<span class="k">for</span> <span class="n">dset</span> <span class="ow">in</span> <span class="p">[</span><span class="n">out_dset</span><span class="p">,</span><span class="n">out_dset</span><span class="o">+</span><span class="s">&#39;.HEAD&#39;</span><span class="p">]:</span>
+						<span class="k">try</span><span class="p">:</span>
+							<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dset</span><span class="p">)</span>
+						<span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+							<span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="Decon"><a class="viewcode-back" href="../../afni.html#neural.afni.Decon">[docs]</a><span class="k">class</span> <span class="nc">Decon</span><span class="p">:</span>
+	<span class="sd">&#39;&#39;&#39;wrapper for AFNI 3dDeconvolve command</span>
+<span class="sd">	</span>
+<span class="sd">	Properties:</span>
+<span class="sd">		:input_dset:		list of input datasets</span>
+<span class="sd">		:stim_files:		dictionary where keys are used as stimulus labels</span>
+<span class="sd">					  		and the values are taken as 1D files</span>
+<span class="sd">		:stim_times:		same as stim_files, but used as a stim_times file</span>
+<span class="sd">		:stim_times_model:	default model to use for each stim_times</span>
+<span class="sd">		:stim_base:			list of names of stimuli (defined either in stim_files or </span>
+<span class="sd">							stim_times) that should be considered in the baseline instead</span>
+<span class="sd">							of full model</span>
+<span class="sd">		:stim_am1:			list of names of stimuli defined in stim_times that should</span>
+<span class="sd">							use the ``-stim_times_AM1`` model</span>
+<span class="sd">		:stim_am2:			list of names of stimuli defined in stim_times that should</span>
+<span class="sd">							use the ``-stim_times_AM2`` model</span>
+<span class="sd">		:glts:				dictionary where keys are GLT labels, and the value</span>
+<span class="sd">					  		is a symbolic statement</span>
+<span class="sd">		:mask:				either a mask file, or &quot;auto&quot;, which will use &quot;-automask&quot;</span>
+<span class="sd">		</span>
+<span class="sd">		Options that are obvious:</span>
+<span class="sd">			nfirst (default: 3), censor_file, polort (default: &#39;A&#39;), tout, vout, rout, prefix</span>
+<span class="sd">			</span>
+<span class="sd">		opts		= list of extra things to put in the command</span>
+<span class="sd">		</span>
+<span class="sd">		**Example:**::</span>
+<span class="sd">		</span>
+<span class="sd">			decon = neural.afni.Decon()</span>
+<span class="sd">			decon.input_dsets = [&#39;dset_run1.nii.gz&#39;, &#39;dset_run2.nii.gz&#39;]</span>
+<span class="sd">			decon.censor_file = &#39;subject_censor.1D&#39;</span>
+<span class="sd">			decon.stim_files = {</span>
+<span class="sd">				&#39;motion_1&#39;: &#39;motion_file.1D[0]&#39;,</span>
+<span class="sd">				&#39;motion_2&#39;: &#39;motion_file.1D[1]&#39;,</span>
+<span class="sd">				&#39;motion_3&#39;: &#39;motion_file.1D[2]&#39;,</span>
+<span class="sd">				&#39;motion_4&#39;: &#39;motion_file.1D[3]&#39;,</span>
+<span class="sd">				&#39;motion_5&#39;: &#39;motion_file.1D[4]&#39;,</span>
+<span class="sd">				&#39;motion_6&#39;: &#39;motion_file.1D[5]&#39;</span>
+<span class="sd">			}</span>
+<span class="sd">			decon.stim_base = [&#39;motion_%d&#39; % i for i in range(1,7)]</span>
+<span class="sd">			decon.stim_times = {</span>
+<span class="sd">				&#39;stim_a&#39;: &#39;stim_a.stimtimes&#39;,</span>
+<span class="sd">				&#39;stim_b&#39;: &#39;stim_b.stimtimes&#39;,</span>
+<span class="sd">				&#39;stim_c&#39;: &#39;stim_c.stimtimes&#39;,</span>
+<span class="sd">			}</span>
+<span class="sd">			decon.glts ={</span>
+<span class="sd">				&#39;a-b&#39;: &#39;1*stim_a + -1*stim_b&#39;,</span>
+<span class="sd">				&#39;ab-c&#39;: &#39;0.5*stim_a + 0.5*stim_b + -1*stim_c&#39;</span>
+<span class="sd">			}</span>
+<span class="sd">			decon.prefix = &#39;subject_decon.nii.gz&#39;</span>
+<span class="sd">			decon.run()</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">input_dsets</span><span class="o">=</span><span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">stim_files</span><span class="o">=</span><span class="p">{}</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">stim_times</span><span class="o">=</span><span class="p">{}</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">stim_times_model</span> <span class="o">=</span> <span class="s">&#39;GAM&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">stim_base</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">stim_am1</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">stim_am2</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">censor_file</span><span class="o">=</span><span class="bp">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">glts</span><span class="o">=</span><span class="p">{}</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">=</span><span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">nfirst</span> <span class="o">=</span> <span class="mi">3</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="s">&#39;auto&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">polort</span> <span class="o">=</span> <span class="s">&#39;A&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="bp">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">tout</span> <span class="o">=</span> <span class="bp">True</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">vout</span> <span class="o">=</span> <span class="bp">True</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rout</span> <span class="o">=</span> <span class="bp">True</span>
+	
+<div class="viewcode-block" id="Decon.command_list"><a class="viewcode-back" href="../../afni.html#neural.afni.Decon.command_list">[docs]</a>	<span class="k">def</span> <span class="nf">command_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;returns the 3dDeconvolve command as a list</span>
+<span class="sd">	</span>
+<span class="sd">		The list returned can be run by passing it into a subprocess-like command</span>
+<span class="sd">		(e.g., neural.utils.run())</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;3dDeconvolve&#39;</span><span class="p">]</span>
+
+		<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-jobs&#39;</span><span class="p">,</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()]</span>
+		<span class="n">cmd</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span>
+		<span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dsets</span><span class="p">)):</span>
+			<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-input&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_dsets</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-nodata&#39;</span><span class="p">]</span>
+		<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-censor&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">censor_file</span><span class="p">]</span>
+		<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-nfirst&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nfirst</span><span class="p">)]</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">:</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">==</span><span class="s">&#39;auto&#39;</span><span class="p">:</span>
+				<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-automask&#39;</span><span class="p">]</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-mask&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span>
+		<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-polort&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">polort</span><span class="p">)]</span>
+		
+		<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-num_stimts&#39;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_files</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_times</span><span class="p">)]</span>
+		
+		<span class="n">stim_num</span> <span class="o">=</span> <span class="mi">1</span>
+		<span class="k">for</span> <span class="n">stim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stim_files</span><span class="p">:</span>
+			<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-stim_file&#39;</span><span class="p">,</span><span class="n">stim_num</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_files</span><span class="p">[</span><span class="n">stim</span><span class="p">],</span><span class="s">&#39;-stim_label&#39;</span><span class="p">,</span><span class="n">stim_num</span><span class="p">,</span><span class="n">stim</span><span class="p">]</span>
+			<span class="k">if</span> <span class="n">stim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stim_base</span><span class="p">:</span>
+				<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-stim_base&#39;</span><span class="p">,</span><span class="n">stim_num</span><span class="p">]</span>
+			<span class="n">stim_num</span> <span class="o">+=</span> <span class="mi">1</span>
+		
+		<span class="k">for</span> <span class="n">stim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stim_times</span><span class="p">:</span>
+			<span class="n">opt</span> <span class="o">=</span> <span class="s">&#39;-stim_times&#39;</span>
+			<span class="k">if</span> <span class="n">stim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stim_am1</span><span class="p">:</span>
+				<span class="n">opt</span> <span class="o">=</span> <span class="s">&#39;-stim_times_AM1&#39;</span>
+			<span class="k">if</span> <span class="n">stim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stim_am2</span><span class="p">:</span>
+				<span class="n">opt</span> <span class="o">=</span> <span class="s">&#39;-stim_times_AM2&#39;</span>
+			<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="n">opt</span><span class="p">,</span><span class="n">stim_num</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_times</span><span class="p">[</span><span class="n">stim</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_times_model</span><span class="p">,</span><span class="s">&#39;-stim_label&#39;</span><span class="p">,</span><span class="n">stim_num</span><span class="p">,</span><span class="n">stim</span><span class="p">]</span>
+			<span class="k">if</span> <span class="n">stim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stim_base</span><span class="p">:</span>
+				<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-stim_base&#39;</span><span class="p">,</span><span class="n">stim_num</span><span class="p">]</span>
+			<span class="n">stim_num</span> <span class="o">+=</span> <span class="mi">1</span>
+		
+		<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-num_glt&#39;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">glts</span><span class="p">)]</span>
+		
+		<span class="n">glt_num</span> <span class="o">=</span> <span class="mi">1</span>
+		<span class="k">for</span> <span class="n">glt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">glts</span><span class="p">:</span>
+			<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-gltsym&#39;</span><span class="p">,</span><span class="s">&#39;SYM: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">glts</span><span class="p">[</span><span class="n">glt</span><span class="p">],</span><span class="s">&#39;-glt_label&#39;</span><span class="p">,</span><span class="n">glt_num</span><span class="p">,</span><span class="n">glt</span><span class="p">]</span>
+			<span class="n">glt_num</span> <span class="o">+=</span> <span class="mi">1</span>
+		
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tout</span><span class="p">:</span>
+			<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-tout&#39;</span><span class="p">]</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vout</span><span class="p">:</span>
+			<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-vout&#39;</span><span class="p">]</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rout</span><span class="p">:</span>
+			<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-rout&#39;</span><span class="p">]</span>
+		
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">:</span>
+			<span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;-bucket&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">]</span>
+		
+		<span class="k">return</span> <span class="n">cmd</span>
+	</div>
+<div class="viewcode-block" id="Decon.command_string"><a class="viewcode-back" href="../../afni.html#neural.afni.Decon.command_string">[docs]</a>	<span class="k">def</span> <span class="nf">command_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;returns the 3dDeconvolve command as as string</span>
+<span class="sd">		</span>
+<span class="sd">		This command can then be run in something like a shell script</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="k">return</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command_list</span><span class="p">())</span>
+	</div>
+<div class="viewcode-block" id="Decon.run"><a class="viewcode-back" href="../../afni.html#neural.afni.Decon.run">[docs]</a>	<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">working_directory</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;runs 3dDeconvolve through the neural.utils.run shortcut&#39;&#39;&#39;</span>
+		<span class="k">return</span> <span class="n">neural</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command_list</span><span class="p">(),</span><span class="n">working_directory</span><span class="o">=</span><span class="n">working_directory</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="qwarp_align"><a class="viewcode-back" href="../../afni.html#neural.afni.qwarp_align">[docs]</a><span class="k">def</span> <span class="nf">qwarp_align</span><span class="p">(</span><span class="n">dset_from</span><span class="p">,</span><span class="n">dset_to</span><span class="p">,</span><span class="n">skull_strip</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">affine_suffix</span><span class="o">=</span><span class="s">&#39;_aff&#39;</span><span class="p">,</span><span class="n">qwarp_suffix</span><span class="o">=</span><span class="s">&#39;_qwarp&#39;</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39;aligns ``dset_from`` to ``dset_to`` using 3dQwarp</span>
+<span class="sd">	</span>
+<span class="sd">	Will run ``3dSkullStrip`` (unless ``skull_strip`` is ``False``), ``3dUnifize``,</span>
+<span class="sd">	``3dAllineate``, and then ``3dQwarp``. This method will add suffixes to the input</span>
+<span class="sd">	dataset for the intermediate files (e.g., ``_ss``, ``_u``). If those files already</span>
+<span class="sd">	exist, it will assume they were intelligently named, and use them as is</span>
+<span class="sd">	</span>
+<span class="sd">	The output affine dataset and 1D, as well as the output of qwarp are named by adding</span>
+<span class="sd">	the given suffixes (``affine_suffix`` and ``qwarp_suffix``) to the ``dset_from`` file</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="n">dset_ss</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">dset</span><span class="p">:</span> <span class="n">suffix</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="s">&#39;_ns&#39;</span><span class="p">)</span>
+	<span class="n">dset_u</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">dset</span><span class="p">:</span> <span class="n">suffix</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span><span class="s">&#39;_u&#39;</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">skull_strip</span><span class="p">:</span>
+		<span class="n">dset_source</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">dset</span><span class="p">:</span> <span class="n">dset_ss</span><span class="p">(</span><span class="n">dset</span><span class="p">)</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">dset_source</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">dset</span><span class="p">:</span> <span class="n">dset</span>
+	
+	<span class="k">for</span> <span class="n">dset</span> <span class="ow">in</span> <span class="p">[</span><span class="n">dset_from</span><span class="p">,</span><span class="n">dset_to</span><span class="p">]:</span>
+		<span class="k">if</span> <span class="n">skull_strip</span><span class="p">:</span>
+			<span class="n">neural</span><span class="o">.</span><span class="n">run</span><span class="p">([</span>
+				<span class="s">&#39;3dSkullStrip&#39;</span><span class="p">,</span>
+				<span class="s">&#39;-input&#39;</span><span class="p">,</span> <span class="n">dset</span><span class="p">,</span>
+				<span class="s">&#39;-prefix&#39;</span><span class="p">,</span> <span class="n">dset_ss</span><span class="p">(</span><span class="n">dset</span><span class="p">),</span>
+				<span class="s">&#39;-niter&#39;</span><span class="p">,</span> <span class="s">&#39;400&#39;</span><span class="p">,</span>
+				<span class="s">&#39;-ld&#39;</span><span class="p">,</span> <span class="s">&#39;40&#39;</span>
+			<span class="p">],</span><span class="n">products</span><span class="o">=</span><span class="n">dset_ss</span><span class="p">(</span><span class="n">dset</span><span class="p">))</span>
+		
+		<span class="n">neural</span><span class="o">.</span><span class="n">run</span><span class="p">([</span>
+			<span class="s">&#39;3dUnifize&#39;</span><span class="p">,</span>
+			<span class="s">&#39;-prefix&#39;</span><span class="p">,</span> <span class="n">dset_u</span><span class="p">(</span><span class="n">dset_source</span><span class="p">(</span><span class="n">dset</span><span class="p">)),</span>
+			<span class="s">&#39;-input&#39;</span><span class="p">,</span> <span class="n">dset_source</span><span class="p">(</span><span class="n">dset</span><span class="p">)</span>
+		<span class="p">],</span><span class="n">products</span><span class="o">=</span><span class="p">[</span><span class="n">dset_u</span><span class="p">(</span><span class="n">dset_source</span><span class="p">(</span><span class="n">dset</span><span class="p">))])</span>
+	
+	<span class="n">dset_affine</span> <span class="o">=</span> <span class="n">suffix</span><span class="p">(</span><span class="n">dset_from</span><span class="p">,</span><span class="n">affine_suffix</span><span class="p">)</span>
+	<span class="n">dset_affine_1D</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">(</span><span class="n">dset_affine</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.1D&#39;</span>
+	<span class="n">dset_qwarp</span> <span class="o">=</span> <span class="n">suffix</span><span class="p">(</span><span class="n">dset_from</span><span class="p">,</span><span class="n">qwarp_suffix</span><span class="p">)</span>
+	
+	<span class="n">neural</span><span class="o">.</span><span class="n">run</span><span class="p">([</span>
+		<span class="s">&#39;3dAllineate&#39;</span><span class="p">,</span>
+		<span class="s">&#39;-prefix&#39;</span><span class="p">,</span> <span class="n">dset_affine</span><span class="p">,</span>
+		<span class="s">&#39;-base&#39;</span><span class="p">,</span> <span class="n">dset_u</span><span class="p">(</span><span class="n">dset_source</span><span class="p">(</span><span class="n">dset_to</span><span class="p">)),</span>
+		<span class="s">&#39;-source&#39;</span><span class="p">,</span> <span class="n">dset_u</span><span class="p">(</span><span class="n">dset_source</span><span class="p">(</span><span class="n">dset_from</span><span class="p">)),</span>
+<span class="c">#		&#39;-emask&#39;, lesion_mask(self.subject),</span>
+		<span class="s">&#39;-twopass&#39;</span><span class="p">,</span>
+		<span class="s">&#39;-cost&#39;</span><span class="p">,</span> <span class="s">&#39;lpa&#39;</span><span class="p">,</span>
+		<span class="s">&#39;-1Dmatrix_save&#39;</span><span class="p">,</span> <span class="n">dset_affine_1D</span><span class="p">,</span>
+		<span class="s">&#39;-autoweight&#39;</span><span class="p">,</span> 
+		<span class="s">&#39;-fineblur&#39;</span><span class="p">,</span> <span class="s">&#39;3&#39;</span><span class="p">,</span>
+		<span class="s">&#39;-cmass&#39;</span>
+	<span class="p">],</span><span class="n">products</span><span class="o">=</span><span class="n">dset_affine</span><span class="p">)</span>
+	
+	<span class="n">neural</span><span class="o">.</span><span class="n">run</span><span class="p">([</span>
+		<span class="s">&#39;3dQwarp&#39;</span><span class="p">,</span>
+		<span class="s">&#39;-prefix&#39;</span><span class="p">,</span> <span class="n">dset_qwarp</span><span class="p">,</span>
+<span class="c">#		&#39;-emask&#39;, lesion_mask(self.subject),</span>
+		<span class="s">&#39;-duplo&#39;</span><span class="p">,</span> <span class="s">&#39;-useweight&#39;</span><span class="p">,</span> <span class="s">&#39;-blur&#39;</span><span class="p">,</span> <span class="s">&#39;0&#39;</span><span class="p">,</span> <span class="s">&#39;3&#39;</span><span class="p">,</span>
+		<span class="s">&#39;-base&#39;</span><span class="p">,</span> <span class="n">dset_u</span><span class="p">(</span><span class="n">dset_source</span><span class="p">(</span><span class="n">dset_to</span><span class="p">)),</span>
+		<span class="s">&#39;-source&#39;</span><span class="p">,</span> <span class="n">dset_affine</span>
+	<span class="p">],</span><span class="n">products</span><span class="o">=</span><span class="n">dset_qwarp</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="qwarp_apply"><a class="viewcode-back" href="../../afni.html#neural.afni.qwarp_apply">[docs]</a><span class="k">def</span> <span class="nf">qwarp_apply</span><span class="p">(</span><span class="n">dset_from</span><span class="p">,</span><span class="n">dset_warp</span><span class="p">,</span><span class="n">affine</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">warp_suffix</span><span class="o">=</span><span class="s">&#39;_warp&#39;</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39;applies the transform from a previous qwarp</span>
+<span class="sd">	</span>
+<span class="sd">	Uses the warp parameters from the dataset listed in </span>
+<span class="sd">	``dset_warp`` (usually the dataset name ends in ``_WARP``) </span>
+<span class="sd">	to the dataset ``dset_from``. If a ``.1D`` file is given</span>
+<span class="sd">	in the ``affine`` parameter, it will be applied simultaneously</span>
+<span class="sd">	with the qwarp.</span>
+<span class="sd">	</span>
+<span class="sd">	Output dataset with have the ``warp_suffix`` suffix added to its name</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="n">warp</span> <span class="o">=</span> <span class="p">[</span><span class="n">dset_warp</span><span class="p">]</span>
+	<span class="k">if</span> <span class="n">affine</span><span class="p">:</span>
+		<span class="n">warp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">affine</span><span class="p">)</span>
+	<span class="n">neural</span><span class="o">.</span><span class="n">run</span><span class="p">([</span>
+		<span class="s">&#39;3dNwarpApply&#39;</span><span class="p">,</span>
+		<span class="s">&#39;-nwarp&#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">warp</span><span class="p">),</span>
+		<span class="s">&#39;-source&#39;</span><span class="p">,</span> <span class="n">dset_from</span><span class="p">,</span>
+		<span class="s">&#39;-master&#39;</span><span class="p">,</span><span class="s">&#39;WARP&#39;</span><span class="p">,</span>
+		<span class="s">&#39;-prefix&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="p">(</span><span class="n">dset_from</span><span class="p">,</span><span class="n">warp_suffix</span><span class="p">)</span>
+	<span class="p">],</span><span class="n">products</span><span class="o">=</span><span class="n">suffix</span><span class="p">(</span><span class="n">dset_from</span><span class="p">,</span><span class="n">warp_suffix</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">NeurAL 0.3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Bill Gross.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

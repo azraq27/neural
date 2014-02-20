@@ -1,5 +1,5 @@
-epi.utils - Generic helper utilities
+neural.utils - Generic helper utilities
 ======================================
 
-.. automodule:: epi.utils
+.. automodule:: neural.utils
 	:members:
