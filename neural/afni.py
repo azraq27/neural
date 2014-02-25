@@ -370,7 +370,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 	if mask:
 		warp_cmd += ['-emask', mask]
 	
-	neural.run(cmd,products=dset_qwarp)
+	neural.run(warp_cmd,products=dset_qwarp)
 
 def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp'):
 	'''applies the transform from a previous qwarp
