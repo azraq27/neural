@@ -303,7 +303,7 @@ class Decon:
 		'''runs 3dDeconvolve through the neural.utils.run shortcut'''
 		return neural.run(self.command_list(),working_directory=working_directory)
 
-def qwarp_align(dset_from,dset_to,skull_strip=True,affine_suffix='_aff',qwarp_suffix='_qwarp'):
+def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',qwarp_suffix='_qwarp'):
 	'''aligns ``dset_from`` to ``dset_to`` using 3dQwarp
 	
 	Will run ``3dSkullStrip`` (unless ``skull_strip`` is ``False``), ``3dUnifize``,
@@ -341,28 +341,36 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,affine_suffix='_aff',qwarp_su
 	dset_affine_1D = prefix(dset_affine) + '.1D'
 	dset_qwarp = suffix(dset_from,qwarp_suffix)
 	
-	neural.run([
+	all_cmd = [
 		'3dAllineate',
 		'-prefix', dset_affine,
 		'-base', dset_u(dset_source(dset_to)),
 		'-source', dset_u(dset_source(dset_from)),
-#		'-emask', lesion_mask(self.subject),
 		'-twopass',
 		'-cost', 'lpa',
 		'-1Dmatrix_save', dset_affine_1D,
 		'-autoweight', 
 		'-fineblur', '3',
 		'-cmass'
-	],products=dset_affine)
+	]
 	
-	neural.run([
+	if mask:
+		cmd += ['-emask', mask]
+	
+	neural.run(all_cmd,products=dset_affine)
+	
+	warp_cmd = [
 		'3dQwarp',
 		'-prefix', dset_qwarp,
-#		'-emask', lesion_mask(self.subject),
 		'-duplo', '-useweight', '-blur', '0', '3',
 		'-base', dset_u(dset_source(dset_to)),
 		'-source', dset_affine
-	],products=dset_qwarp)
+	]
+	
+	if mask:
+		cmd += ['-emask', mask]
+	
+	neural.run(cmd,products=dset_qwarp)
 
 def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp'):
 	'''applies the transform from a previous qwarp
