@@ -1,5 +1,5 @@
 ''' wrapper functions for common AFNI tasks '''
-import re,subprocess
+import re,subprocess,os
 import multiprocessing
 import neural
 
