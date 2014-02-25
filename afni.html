@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="NeurAL 0.3 documentation" href="index.html" />
-    <link rel="next" title="neural.eprime - E-Prime logfile parsing" href="eprime.html" />
+    <link rel="next" title="neural.dicom - Functions to interact with DICOM images" href="dicom.html" />
     <link rel="prev" title="Welcome to NeurAL’s documentation!" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
+          <a href="dicom.html" title="neural.dicom - Functions to interact with DICOM images"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to NeurAL’s documentation!"
@@ -186,7 +186,7 @@ is a symbolic statement</td>
 
 <dl class="function">
 <dt id="neural.afni.qwarp_align">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">qwarp_align</tt><big>(</big><em>dset_from</em>, <em>dset_to</em>, <em>skull_strip=True</em>, <em>affine_suffix='_aff'</em>, <em>qwarp_suffix='_qwarp'</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#qwarp_align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.qwarp_align" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">neural.afni.</tt><tt class="descname">qwarp_align</tt><big>(</big><em>dset_from</em>, <em>dset_to</em>, <em>skull_strip=True</em>, <em>mask=None</em>, <em>affine_suffix='_aff'</em>, <em>qwarp_suffix='_qwarp'</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#qwarp_align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.qwarp_align" title="Permalink to this definition">¶</a></dt>
 <dd><p>aligns <tt class="docutils literal"><span class="pre">dset_from</span></tt> to <tt class="docutils literal"><span class="pre">dset_to</span></tt> using 3dQwarp</p>
 <p>Will run <tt class="docutils literal"><span class="pre">3dSkullStrip</span></tt> (unless <tt class="docutils literal"><span class="pre">skull_strip</span></tt> is <tt class="docutils literal"><span class="pre">False</span></tt>), <tt class="docutils literal"><span class="pre">3dUnifize</span></tt>,
 <tt class="docutils literal"><span class="pre">3dAllineate</span></tt>, and then <tt class="docutils literal"><span class="pre">3dQwarp</span></tt>. This method will add suffixes to the input
@@ -286,8 +286,8 @@ given dataset at the specified <em>p</em>-value</p>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to NeurAL&#8217;s documentation!</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="eprime.html"
-                        title="next chapter">neural.eprime - E-Prime logfile parsing</a></p>
+  <p class="topless"><a href="dicom.html"
+                        title="next chapter">neural.dicom - Functions to interact with DICOM images</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/afni.txt"
@@ -320,7 +320,7 @@ given dataset at the specified <em>p</em>-value</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
+          <a href="dicom.html" title="neural.dicom - Functions to interact with DICOM images"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to NeurAL’s documentation!"
