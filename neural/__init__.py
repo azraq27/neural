@@ -11,3 +11,5 @@ version = 0.2
 
 #! flag to indicate whether most functions should be verbose or not
 verbose = True
+
+from utils import *
