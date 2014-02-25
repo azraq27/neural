@@ -315,7 +315,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 	the given suffixes (``affine_suffix`` and ``qwarp_suffix``) to the ``dset_from`` file
 	'''
 	dset_ss = lambda dset: os.path.split(suffix(dset,'_ns'))[1]
-	dset_u = lambda dset: os.path.split(suffix(dset,'_u')[1]
+	dset_u = lambda dset: os.path.split(suffix(dset,'_u'))[1]
 	if skull_strip:
 		dset_source = lambda dset: dset_ss(dset)
 	else:
