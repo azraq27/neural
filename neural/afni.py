@@ -2,9 +2,14 @@
 import re,subprocess,os
 import multiprocessing
 import neural
+import platform
 
 def _open_X11_ports():
-	tcp_ports = subprocess.check_output('lsof -i -n | awk \'$9 ~ /:60[0-9][0-9]$/ {split($9,a,":"); print a[length(a)]}\' | uniq',shell=True).strip().split('\n')
+	tcp_ports = []
+	if platform.system()=='Darwin':
+		tcp_ports = subprocess.check_output('lsof -i -n | awk \'$9 ~ /:60[0-9][0-9]$/ {split($9,a,":"); print a[length(a)]}\' | sort | uniq',shell=True).strip().split('\n')
+	if platform.system()=='Linux':
+		tcp_ports = subprocess.check_output('netstat -ntlp | awk \'$6=="LISTEN" && $4 ~ /:60[0-9][0-9]$/ {split($4,a,":"); print a[length(a)]}\' | sort | uniq',shell=True).strip().split('\n')
 	local_sockets = []
 	if os.path.exists('/tmp/.X11-unix/'): 
 		local_sockets = [x[1:] for x in os.listdir('/tmp/.X11-unix/')]
