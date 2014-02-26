@@ -372,7 +372,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 	
 	neural.run(warp_cmd,products=dset_qwarp)
 
-def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp'):
+def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP'):
 	'''applies the transform from a previous qwarp
 	
 	Uses the warp parameters from the dataset listed in 
@@ -390,7 +390,7 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp'):
 		'3dNwarpApply',
 		'-nwarp', ' '.join(warp),
 		'-source', dset_from,
-		'-master','WARP',
+		'-master',master,
 		'-prefix', suffix(dset_from,warp_suffix)
 	],products=suffix(dset_from,warp_suffix))
 
