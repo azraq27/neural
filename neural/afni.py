@@ -8,18 +8,19 @@ def _open_X11_ports():
 	local_sockets = []
 	if os.path.exists('/tmp/.X11-unix/'): 
 		local_sockets = [x[1:] for x in os.listdir('/tmp/.X11-unix/')]
-	print tcp_ports
-	print local_sockets
 	return ['localhost:%d' % (int(x)-6000) for x in tcp_ports] + [':%s' % x for x in local_sockets]
 	
 def open(dsets=[]):
 	''' hack-y style method to try to open an AFNI window with the directory or datasets given 
 	
 	if this function is useful, it should be made more stable/portable'''
-	open_ports = _open_X11_ports()
-	if len(open_ports)==0:
-		raise Exception('Couldn\'t find any open X11 ports')
-	subprocess.check_call('DISPLAY="%s" afni %s' % (open_ports[0],' '.join(dsets)),shell=True)
+	my_env = os.environ.copy()
+	if 'DISPLAY' not in my_env or my_env['DISPLAY']=='':
+		open_ports = _open_X11_ports()
+		if len(open_ports)==0:
+			raise Exception('Couldn\'t find any open X11 ports')
+		my_env['DISPLAY'] = open_ports[0]
+	subprocess.Popen(['afni'] + dsets, env=my_env)
 
 def _dset_raw_info(dset):
 	''' returns raw output from running ``3dinfo`` '''
