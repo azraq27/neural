@@ -5,7 +5,9 @@ import neural
 
 def _open_X11_ports():
 	tcp_ports = subprocess.check_output('lsof -i -n | awk \'$9 ~ /:60[0-9][0-9]$/ {split($9,a,":"); print a[length(a)]}\' | uniq',shell=True).strip().split('\n')
-	local_sockets = [x[1:] for x in os.listdir('/tmp/.X11-unix/')]
+	local_sockets = []
+	if os.path.exists('/tmp/.X11-unix/'): 
+		local_sockets = [x[1:] for x in os.listdir('/tmp/.X11-unix/')]
 	print tcp_ports
 	print local_sockets
 	return ['localhost:%d' % (int(x)-6000) for x in tcp_ports] + [':%s' % x for x in local_sockets]
