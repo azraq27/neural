@@ -209,6 +209,13 @@ with the qwarp.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="neural.afni.qwarp_invert">
+<tt class="descclassname">neural.afni.</tt><tt class="descname">qwarp_invert</tt><big>(</big><em>warp_param_dset</em>, <em>output_dset</em>, <em>affine_1Dfile=None</em><big>)</big><a class="headerlink" href="#neural.afni.qwarp_invert" title="Permalink to this definition">¶</a></dt>
+<dd><p>inverts a qwarp (defined in <tt class="docutils literal"><span class="pre">warp_param_dset</span></tt>) (and concatenates affine matrix <tt class="docutils literal"><span class="pre">affine_1Dfile</span></tt> if given)
+outputs the inverted warp + affine to <tt class="docutils literal"><span class="pre">output_dset</span></tt></p>
+</dd></dl>
+
+<dl class="function">
 <dt id="neural.afni.subbrick">
 <tt class="descclassname">neural.afni.</tt><tt class="descname">subbrick</tt><big>(</big><em>dset</em>, <em>label</em>, <em>coef=False</em>, <em>tstat=False</em>, <em>fstat=False</em>, <em>rstat=False</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#subbrick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.subbrick" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a string referencing the given subbrick within a dset</p>
