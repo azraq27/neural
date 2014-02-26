@@ -393,3 +393,13 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp'):
 		'-master','WARP',
 		'-prefix', suffix(dset_from,warp_suffix)
 	],products=suffix(dset_from,warp_suffix))
+
+def qwarp_invert(warp_param_dset,output_dset,affine_1Dfile=None):
+	'''inverts a qwarp (defined in ``warp_param_dset``) (and concatenates affine matrix ``affine_1Dfile`` if given)
+	outputs the inverted warp + affine to ``output_dset``'''
+	
+	cmd = ['3dNwarpCat','-prefix',output_dset,
+		   '-warp1','INV(%s)' % warp_param_dset]
+	if affine_1Dfile:
+		cmd += ['-warp2','INV(%s)' % affine_1Dfile]
+	neural.run(cmd,products=output_dset)
