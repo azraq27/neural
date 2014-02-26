@@ -3,6 +3,22 @@ import re,subprocess,os
 import multiprocessing
 import neural
 
+def _open_X11_ports():
+	tcp_ports = subprocess.check_output('lsof -i -n | awk \'$9 ~ /:60[0-9][0-9]$/ {split($9,a,":"); print a[length(a)]}\' | uniq',shell=True).strip().split('\n')
+	local_sockets = [x[1:] for x in os.listdir('/tmp/.X11-unix/')]
+	print tcp_ports
+	print local_sockets
+	return ['localhost:%d' % (int(x)-6000) for x in tcp_ports] + [':%s' % x for x in local_sockets]
+	
+def open(dsets=[]):
+	''' hack-y style method to try to open an AFNI window with the directory or datasets given 
+	
+	if this function is useful, it should be made more stable/portable'''
+	open_ports = _open_X11_ports()
+	if len(open_ports)==0:
+		raise Exception('Couldn\'t find any open X11 ports')
+	subprocess.check_call('DISPLAY="%s" afni %s' % (open_ports[0],' '.join(dsets)),shell=True)
+
 def _dset_raw_info(dset):
 	''' returns raw output from running ``3dinfo`` '''
 	return subprocess.check_output(['3dinfo','-verb',dset])
