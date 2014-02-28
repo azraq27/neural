@@ -106,8 +106,11 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False):
 		dset = thresh_at(dset,p,subbrick,positive_only)
 	else:
 		dset = '%s[%d]' % (dset,subbrick)
-	print ' '.join(['3dBrickStat','-slow','-sum',dset])
-	return int(subprocess.check_output(['3dBrickStat','-slow','-sum',dset]))
+	if positive_only:
+		opt = '-non-negative'
+	else:
+		opt = '-non-zero'
+	return int(subprocess.check_output(['3dBrickStat','-slow','-count',opt,dset]))
 
 _afni_suffix_regex = r"((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\d+\])?$"
 
