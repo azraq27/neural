@@ -146,7 +146,8 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False):
 	if p:
 		dset = thresh_at(dset,p,subbrick,positive_only)
 	else:
-		dset = '%s[%d]' % (dset,subbrick)
+		if not dset.startswith('3dcalc('):
+			dset = '%s[%d]' % (dset,subbrick)
 	if positive_only:
 		opt = '-non-negative'
 	else:
