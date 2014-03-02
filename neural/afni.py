@@ -32,9 +32,16 @@ def _dset_raw_info(dset):
 	return subprocess.check_output(['3dinfo','-verb',dset])
 
 class DsetInfo:
-	''' contains organized output from ``3dinfo`` '''
+	''' contains organized output from ``3dinfo`` 
+	
+	All lists are returned in RAI order (i.e., a list of 3 numbers refers to the R-L axis,
+	A-P axis, then I-S axis)'''
 	def __init__(self):
 		self.subbricks = []
+		self.voxel_size = []	#! size of voxel in mm, listed in LPI order
+		self.voxel_dims = []
+		self.spatial_from = []
+		self.spatial_to = []
 	
 	def subbrick_labeled(self,label):
 		for i in xrange(len(self.subbricks)):
@@ -45,6 +52,7 @@ class DsetInfo:
 def dset_info(dset):
 	''' runs ``3dinfo`` and returns a :class:`DsetInfo` object containing the results '''
 	info = DsetInfo()
+	# Subbrick info:
 	sub_info = re.findall(r'At sub-brick #(\d+) \'([^\']+)\' datum type is (\w+).*(\n.*statcode = (\w+);  statpar = (.*)|)',_dset_raw_info(dset))
 	for brick in sub_info:
 		info.subbricks.append({
@@ -54,6 +62,21 @@ def dset_info(dset):
 			'params': brick[5].split()
 		})
 	info.reps = len(info.subbricks)
+	# Dimensions:
+	
+	for axis in ['RL','AP','IS']:
+	    m = re.search(r'%s-to-%s extent:\s+([0-9-.]+) \[%s\] -to-\s+([0-9-.]+) \[%s\] -step-\s+([0-9-.]+) mm \[([0-9]+) voxels\]' % (axis[0],axis[1],axis[0],axis[1]),o)
+		if m:
+			info.spatial_from.append(float(m.group(1)))
+			info.spatial_to.append(float(m.group(2)))
+			info.voxel_size.append(float(m.group(3)))
+			info.voxel_dims.append(float(m.group(4)))
+	
+	# Other info..
+	details_regex = {
+		r'Identifier Code:\s+([^ ]+)': 'identifier',
+	}
+	
 	return info
 
 def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False):
