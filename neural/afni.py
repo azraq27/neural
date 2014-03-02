@@ -3,6 +3,7 @@ import re,subprocess,os
 import multiprocessing
 import neural
 import platform
+from operator import mul
 
 def _open_X11_ports():
 	tcp_ports = []
@@ -38,7 +39,8 @@ class DsetInfo:
 	A-P axis, then I-S axis)'''
 	def __init__(self):
 		self.subbricks = []
-		self.voxel_size = []	#! size of voxel in mm, listed in LPI order
+		self.voxel_size = []		#! size of voxel in mm, listed in LPI order
+		self.voxel_volume = None	#! volume of voxel in mm^3
 		self.voxel_dims = []
 		self.spatial_from = []
 		self.spatial_to = []
@@ -72,6 +74,8 @@ def dset_info(dset):
 			info.spatial_to.append(float(m.group(2)))
 			info.voxel_size.append(float(m.group(3)))
 			info.voxel_dims.append(float(m.group(4)))
+	if len(info.voxel_size)==3:
+		info.voxel_volume = reduce(mul,info.voxel_size)
 	
 	# Other info..
 	details_regex = {
