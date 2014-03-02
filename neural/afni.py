@@ -52,8 +52,9 @@ class DsetInfo:
 def dset_info(dset):
 	''' runs ``3dinfo`` and returns a :class:`DsetInfo` object containing the results '''
 	info = DsetInfo()
+	raw_info = _dset_raw_info(dset)
 	# Subbrick info:
-	sub_info = re.findall(r'At sub-brick #(\d+) \'([^\']+)\' datum type is (\w+).*(\n.*statcode = (\w+);  statpar = (.*)|)',_dset_raw_info(dset))
+	sub_info = re.findall(r'At sub-brick #(\d+) \'([^\']+)\' datum type is (\w+).*(\n.*statcode = (\w+);  statpar = (.*)|)',raw_info)
 	for brick in sub_info:
 		info.subbricks.append({
 			'label': brick[1],
@@ -65,7 +66,7 @@ def dset_info(dset):
 	# Dimensions:
 	
 	for axis in ['RL','AP','IS']:
-		m = re.search(r'%s-to-%s extent:\s+([0-9-.]+) \[%s\] -to-\s+([0-9-.]+) \[%s\] -step-\s+([0-9-.]+) mm \[([0-9]+) voxels\]' % (axis[0],axis[1],axis[0],axis[1]),o)
+		m = re.search(r'%s-to-%s extent:\s+([0-9-.]+) \[%s\] -to-\s+([0-9-.]+) \[%s\] -step-\s+([0-9-.]+) mm \[([0-9]+) voxels\]' % (axis[0],axis[1],axis[0],axis[1]),raw_info)
 		if m:
 			info.spatial_from.append(float(m.group(1)))
 			info.spatial_to.append(float(m.group(2)))
