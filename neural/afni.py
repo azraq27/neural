@@ -113,6 +113,19 @@ def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False):
 	i = info.subbrick_labeled(label)
 	return '%s[%d]' % (dset,i)
 
+def calc(dsets,expr):
+	''' returns a string of an inline 3dcalc expression
+	
+	``dsets`` can be a single string, or list of strings. Each string in ``dsets`` will
+	be labeled 'a','b','c', sequentially. The expression ``expr`` is used directly'''
+	if isinstance(dsets,basestring):
+		dsets = [dsets]
+	cmd = '3dcalc( '
+	for i in xrange(len(dsets)):
+		cmd += '-%s %s ' % (chr(97+i),dsets[i])
+	cmd += '-expr %s )' % expr
+	return cmd
+
 def cdf(dset,p,subbrick=0):
 	''' converts *p*-values to the appropriate statistic for the specified subbrick '''
 	info = dset_info(dset)
@@ -204,7 +217,7 @@ class temp_afni_copy:
 				except OSError:
 					pass
 		if self.out_dsets:
-			if isinstance(self.out_dsets,str):
+			if isinstance(self.out_dsets,basestring):
 				self.out_dsets = [self.out_dsets]
 			for out_dset in self.out_dsets:
 				nifti_dset = nifti_copy(out_dset)

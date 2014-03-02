@@ -47,7 +47,7 @@ def run(command,products=None,working_directory='.'):
 	'''
 	with run_in(working_directory):
 		if products:
-			if isinstance(products,str):
+			if isinstance(products,basestring):
 				products = [products]
 			if all([os.path.exists(x) for x in products]):
 				return False
