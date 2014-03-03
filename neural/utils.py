@@ -56,7 +56,21 @@ def run(command,products=None,working_directory='.'):
 		command = [str(x) for x in command]
 		if(neural.verbose):
 			notify('Running %s...' % command[0])
-		return subprocess.check_output(command)
+		out = None
+		try:
+			out = subprocess.check_output(command)
+		except subprocess.CalledProcessError, e:
+			notify('''ERROR: %s returned a non-zero status
+			----COMMAND------------
+			%s
+			-----------------------
+					
+			----OUTPUT-------------
+			%s
+			-----------------------
+			Return code: %d
+			''' % (command[0],' '.join(command),e.output,e.returncode))
+		return out
 
 def log(fname,msg):
 	''' generic logging function '''
