@@ -61,15 +61,17 @@ def run(command,products=None,working_directory='.'):
 			out = subprocess.check_output(command)
 		except subprocess.CalledProcessError, e:
 			notify('''ERROR: %s returned a non-zero status
-			----COMMAND------------
-			%s
-			-----------------------
+
+----COMMAND------------
+%s
+-----------------------
+
 					
-			----OUTPUT-------------
-			%s
-			-----------------------
-			Return code: %d
-			''' % (command[0],' '.join(command),e.output,e.returncode))
+----OUTPUT-------------
+%s
+-----------------------
+Return code: %d
+''' % (command[0],' '.join(command),e.output,e.returncode))
 		return out
 
 def log(fname,msg):
