@@ -111,6 +111,8 @@ def scan_dir(dirname,tags=None):
 				dinfo = info(fullname)
 				return_dict[fullname] = {}
 				for tag in tags:
-					return_dict[fullname][tag] = dinfo.addr(tag)
+					tag_value = dinfo.addr(tag)
+					if tag_value:
+						return_dict[fullname][tag] = tag_value['value']
 	
 	return return_dict
