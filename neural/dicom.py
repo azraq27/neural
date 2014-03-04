@@ -1,6 +1,6 @@
 '''methods to analyze DICOM format images'''
 
-import subprocess,re,os
+import subprocess,re,os,multiprocessing
 
 def is_dicom(filename):
 	'''returns Boolean of whether the given file has the DICOM magic number'''
@@ -74,8 +74,8 @@ def info(filename):
 def scan_dir(dirname,tags=None):
 	'''scans a directory tree and returns a dictionary with files and key DICOM tags
 	
-	return value is a dictionary where keys are absolute filenames and values
-	contains a dictionary of tags/values
+	return value is a dictionary absolute filenames as keys and with dictionaries of tags/values
+	as values
 	
 	the param ``tags`` is the list of DICOM tags (given as tuples of hex numbers) that 
 	will be obtained for each file. If not given,
@@ -102,20 +102,31 @@ def scan_dir(dirname,tags=None):
 			(0x0028, 0x0011),
 		]
 	
-	return_dict = {}
+	filenames = []
 	
 	for root,dirs,files in os.walk(dirname):
 		for filename in files:
 			fullname = os.path.join(root,filename)
 			if is_dicom(fullname):
-				dinfo = info(fullname)
-				return_dict[fullname] = {}
-				for tag in tags:
-					tag_value = dinfo.addr(tag)
-					if tag_value:
-						return_dict[fullname][tag] = tag_value['value']
+				filenames.append(fullname)
 	
+	pool = multiprocessing.Pool(processes=4)
+	dinfos = pool.map(_scan_dir_helper,filenames)
+	
+	return_dict = {}
+	for f in dinfos:
+		filename = f[0]
+		dinfo = f[1]
+		for tag in tags:
+			tag_value = dinfo.addr(tag)
+			if tag_value:
+				return_dict[filename][tag] = tag_value['value']
 	return return_dict
+
+def _scan_dir_helper(filename):
+	'''called by :meth:`scan_dir` to help with multiprocessing'''
+	dinfo = info(filename)
+	return [filename,dinfo]
 
 def cluster_files(file_dict):
 	'''takes output from :meth:`scan_dir` and organizes into lists of files with the same tags'''
