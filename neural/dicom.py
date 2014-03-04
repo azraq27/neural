@@ -117,6 +117,7 @@ def scan_dir(dirname,tags=None):
 	for f in dinfos:
 		filename = f[0]
 		dinfo = f[1]
+		return_dict[filename] = {}
 		for tag in tags:
 			tag_value = dinfo.addr(tag)
 			if tag_value:
