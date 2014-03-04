@@ -1,6 +1,6 @@
 '''methods to analyze DICOM format images'''
 
-import subprocess,re
+import subprocess,re,os
 
 def is_dicom(filename):
 	'''returns Boolean of whether the given file has the DICOM magic number'''
@@ -70,3 +70,47 @@ def info(filename):
 		sex_info[i[0]] = i[1]
 	
 	return DicomInfo(frames,sex_info,slice_timing)
+
+def scan_dir(dirname,tags=None):
+	'''scans a directory tree and returns a dictionary with files and key DICOM tags
+	
+	return value is a dictionary where keys are absolute filenames and values
+	contains a dictionary of tags/values
+	
+	the param ``tags`` is the list of DICOM tags (given as tuples of hex numbers) that 
+	will be obtained for each file. If not given,
+	the default list is:
+	
+	:0008 0022:		Acquisition date
+	:0008 0032:		Acquisition time
+	:0008 0033:		Image time
+	:0008 103E:		Series description
+	:0008 0080:		Institution name
+	:0010 0020:		Patient ID
+	:0028 0010:		Image rows
+	:0028 0011:		Image columns
+	'''
+	if tags==None:
+		tags = [
+			(0x0008, 0x0022),
+			(0x0008, 0x0032),
+			(0x0008, 0x0033),
+			(0x0008, 0x103E),
+			(0x0008, 0x0080),
+			(0x0010, 0x0020),
+			(0x0028, 0x0010),
+			(0x0028, 0x0011),
+		]
+	
+	return_dict = {}
+	
+	for root,dirs,files in os.walk(dirname):
+		for filename in files:
+			fullname = os.path.join(root,filename)
+			if is_dicom(fullname):
+				dinfo = info(fullname)
+				return_dict[fullname] = {}
+				for tag in tags:
+					return_dict[fullname][tag] = dinfo.addr(tag)
+	
+	return return_dict
