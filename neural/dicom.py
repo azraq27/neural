@@ -110,7 +110,7 @@ def scan_dir(dirname,tags=None):
 			if is_dicom(fullname):
 				filenames.append(fullname)
 	
-	pool = multiprocessing.Pool(processes=4)
+	pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
 	dinfos = pool.map(_scan_dir_helper,filenames)
 	
 	return_dict = {}
