@@ -5,6 +5,7 @@ import neural
 from notify import notify
 import os,subprocess
 import datetime
+import hashlib
 
 def flatten(nested_list):
 	'''converts a list-of-lists to a single flat list'''
@@ -78,3 +79,14 @@ def log(fname,msg):
 	''' generic logging function '''
 	with open(fname,'a') as f:
 		f.write(datetime.datetime.now().strftime('%m-%d-%Y %H:%M:\n') + msg + '\n')
+
+def hash(fname):
+	'''returns MD5 hash of given filename'''
+	buffer_size = 10*1024*1024
+	m = hashlib.md5()
+	with open(filename) as f:
+		buff = f.read(buffer_size)
+		while len(buff)>0:
+			m.update(buff)
+			buff = f.read(buffer_size)			
+	return m.digest()

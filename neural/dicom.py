@@ -71,7 +71,7 @@ def info(filename):
 	
 	return DicomInfo(frames,sex_info,slice_timing)
 
-def scan_dir(dirname,tags=None):
+def scan_dir(dirname,tags=None,md5_hash=False):
 	'''scans a directory tree and returns a dictionary with files and key DICOM tags
 	
 	return value is a dictionary absolute filenames as keys and with dictionaries of tags/values
@@ -89,6 +89,9 @@ def scan_dir(dirname,tags=None):
 	:0010 0020:		Patient ID
 	:0028 0010:		Image rows
 	:0028 0011:		Image columns
+	
+	If the param ``md5_hash`` is ``True``, this will also return the MD5 hash of the file. This is useful
+	for detecting duplicate files
 	'''
 	if tags==None:
 		tags = [
@@ -112,17 +115,30 @@ def scan_dir(dirname,tags=None):
 	
 	pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
 	dinfos = pool.map(_scan_dir_helper,filenames)
+	if md5_hash:
+		hashes = pool.map(_hash_helper,filenames)
+	
+	hash_dict = {}
+	for h in hashes:
+		hash_dict[h[0]] = h[1]
 	
 	return_dict = {}
 	for f in dinfos:
 		filename = f[0]
 		dinfo = f[1]
 		return_dict[filename] = {}
+		if md5_hash:
+			return_dict[filename]['md5'] = hash_dict[filename]
 		for tag in tags:
 			tag_value = dinfo.addr(tag)
 			if tag_value:
 				return_dict[filename][tag] = tag_value['value']
 	return return_dict
+
+def _hash_helper(filename):
+	'''called by :meth:`scan_dir` to help with multiprocessing'''
+	md5_hash = nl.hash(filename)
+	return [filename,md5_hash]
 
 def _scan_dir_helper(filename):
 	'''called by :meth:`scan_dir` to help with multiprocessing'''

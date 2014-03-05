@@ -158,11 +158,11 @@ _afni_suffix_regex = r"((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\
 
 def prefix(filename):
 	''' strips common fMRI dataset suffixes from filenames '''
-	return re.sub(_afni_suffix_regex,"",str(filename))
+	return os.path.split(re.sub(_afni_suffix_regex,"",str(filename)))[1]
 
 def suffix(filename,suffix):
 	''' returns a filenames with ``suffix`` inserted before the dataset suffix '''
-	return re.sub(_afni_suffix_regex,"%s\g<1>" % suffix,str(filename))
+	return os.path.split(re.sub(_afni_suffix_regex,"%s\g<1>" % suffix,str(filename)))[1]
 
 def afni_copy(filename):
 	''' creates a ``+orig`` copy of the given dataset and returns the filename as a string '''
