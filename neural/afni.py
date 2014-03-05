@@ -382,16 +382,20 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 	
 	The output affine dataset and 1D, as well as the output of qwarp are named by adding
 	the given suffixes (``affine_suffix`` and ``qwarp_suffix``) to the ``dset_from`` file
+	
+	If ``skull_strip`` is a string instead of ``True``/``False``, it will only skull strip the given
+	dataset instead of both of them
 	'''
 	dset_ss = lambda dset: os.path.split(suffix(dset,'_ns'))[1]
 	dset_u = lambda dset: os.path.split(suffix(dset,'_u'))[1]
-	if skull_strip:
-		dset_source = lambda dset: dset_ss(dset)
-	else:
-		dset_source = lambda dset: dset
+	def dset_source(dset):		
+		if skull_strip==True or skull_strip==dset:
+			return dset_ss(dset)
+		else:
+			return dset
 	
 	for dset in [dset_from,dset_to]:
-		if skull_strip:
+		if skull_strip==True or skull_strip==dset:
 			neural.run([
 				'3dSkullStrip',
 				'-input', dset,
