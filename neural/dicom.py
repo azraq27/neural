@@ -105,45 +105,21 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 			(0x0028, 0x0011),
 		]
 	
-	filenames = []
+	return_dict = {}	
 	
 	for root,dirs,files in os.walk(dirname):
 		for filename in files:
 			fullname = os.path.join(root,filename)
 			if is_dicom(fullname):
-				filenames.append(fullname)
-	
-	pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
-	dinfos = pool.map(_scan_dir_helper,filenames)
-	if md5_hash:
-		hashes = pool.map(_hash_helper,filenames)
-	
-	hash_dict = {}
-	for h in hashes:
-		hash_dict[h[0]] = h[1]
-	
-	return_dict = {}
-	for f in dinfos:
-		filename = f[0]
-		dinfo = f[1]
-		return_dict[filename] = {}
-		if md5_hash:
-			return_dict[filename]['md5'] = hash_dict[filename]
-		for tag in tags:
-			tag_value = dinfo.addr(tag)
-			if tag_value:
-				return_dict[filename][tag] = tag_value['value']
+				dinfo = info(fullname)
+				return_dict[fullname] = {}
+				if md5_hash:
+					return_dict[fullname]['md5'] = nl.hash(fullname)
+				for tag in tags:
+					tag_value = dinfo.addr(tag)
+					if tag_value:
+						return_dict[fullname][tag] = tag_value['value']
 	return return_dict
-
-def _hash_helper(filename):
-	'''called by :meth:`scan_dir` to help with multiprocessing'''
-	md5_hash = nl.hash(filename)
-	return [filename,md5_hash]
-
-def _scan_dir_helper(filename):
-	'''called by :meth:`scan_dir` to help with multiprocessing'''
-	dinfo = info(filename)
-	return [filename,dinfo]
 
 def cluster_files(file_dict):
 	'''takes output from :meth:`scan_dir` and organizes into lists of files with the same tags'''
