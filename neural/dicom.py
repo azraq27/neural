@@ -139,7 +139,7 @@ def cluster_files(file_dict):
 	'''takes output from :meth:`scan_dir` and organizes into lists of files with the same tags'''
 	return_dict = {}
 	for filename in file_dict:
-		key = tuple(file_dict[filename].values())
+		key = tuple([file_dict[x] for x in file_dict[filename] if x!='md5'])
 		if key not in return_dict:
 			return_dict[key] = []
 		return_dict[key].append(filename)
