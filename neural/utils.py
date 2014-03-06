@@ -80,7 +80,7 @@ def log(fname,msg):
 	with open(fname,'a') as f:
 		f.write(datetime.datetime.now().strftime('%m-%d-%Y %H:%M:\n') + msg + '\n')
 
-def hash(fname):
+def hash(filename):
 	'''returns MD5 hash of given filename'''
 	buffer_size = 10*1024*1024
 	m = hashlib.md5()
