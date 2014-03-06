@@ -122,6 +122,18 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 						return_dict[fullname][tag] = tag_value['value']
 	return return_dict
 
+def find_dups(file_dict):
+	'''takes output from :meth:`scan_dir` and returns list of duplicate files'''
+	found_hashes = {}
+	for f in file_dict:
+		if file_dict[f]['md5'] not in found_hashes:
+			found_hashes[file_dict[f]['md5']] = []
+		found_hashes[file_dict[f]['md5']].append(f)
+	for h in found_hashes:
+		if len(found_hashes[h])<2:
+			del(found_hashes[h])
+	return found_hashes
+
 def cluster_files(file_dict):
 	'''takes output from :meth:`scan_dir` and organizes into lists of files with the same tags'''
 	return_dict = {}
