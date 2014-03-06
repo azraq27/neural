@@ -90,3 +90,22 @@ def hash(fname):
 			m.update(buff)
 			buff = f.read(buffer_size)			
 	return m.digest()
+
+class simple_timer:
+	'''a simple way to time a single run of a function
+	
+	Example::
+		with simple_timer():
+			do_stuff()
+	'''
+	def __init__(self):
+		self.start_time = None
+	
+	def __enter__(self):
+		self.start_time = datetime.datetime.now()
+		print 'timer start time: %s' % self.start_time.strftime('%Y-%m-%d %H:%M:%S')
+	
+	def __exit__(self, type, value, traceback):
+		self.end_time = datetime.datetime.now()
+		print 'timer end time: %s' % self.end_time.strftime('%Y-%m-%d %H:%M:%S')
+		print 'time elapsed: %s' % str(self.end_time-self.start_time)
