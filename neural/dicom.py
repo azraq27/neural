@@ -114,7 +114,7 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 				dinfo = info(fullname)
 				return_dict[fullname] = {}
 				if md5_hash:
-					return_dict[fullname]['md5'] = nl.hash(fullname)
+					return_dict[fullname]['md5'] = neural.hash(fullname)
 				for tag in tags:
 					tag_value = dinfo.addr(tag)
 					if tag_value:
