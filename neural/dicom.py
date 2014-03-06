@@ -1,6 +1,7 @@
 '''methods to analyze DICOM format images'''
 
 import subprocess,re,os,multiprocessing
+import neural as nl
 
 def is_dicom(filename):
 	'''returns Boolean of whether the given file has the DICOM magic number'''
@@ -114,7 +115,7 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 				dinfo = info(fullname)
 				return_dict[fullname] = {}
 				if md5_hash:
-					return_dict[fullname]['md5'] = neural.hash(fullname)
+					return_dict[fullname]['md5'] = nl.hash(fullname)
 				for tag in tags:
 					tag_value = dinfo.addr(tag)
 					if tag_value:
