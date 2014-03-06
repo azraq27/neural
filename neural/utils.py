@@ -109,3 +109,7 @@ class simple_timer:
 		self.end_time = datetime.datetime.now()
 		print 'timer end time: %s' % self.end_time.strftime('%Y-%m-%d %H:%M:%S')
 		print 'time elapsed: %s' % str(self.end_time-self.start_time)
+
+def factor(n):
+	'''return set of all prime factors for a number'''
+    return set(reduce(list.__add__, ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))

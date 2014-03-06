@@ -144,3 +144,17 @@ def cluster_files(file_dict):
 			return_dict[key] = []
 		return_dict[key].append(filename)
 	return return_dict
+
+def max_diff(dset_a,dset_b):
+	'''calculates maximal voxel-wise difference in datasets
+	
+	Useful for checking if datasets have the same data. For example, if the maximum difference is
+	< 1.0, they're probably the same dataset'''
+	for dset in [dset_a,dset_b]:
+		if not os.path.exists(dset):
+			raise IOError('Could not find file: %s' % dset)
+	try:
+		with open(os.devnull,'w') as null:
+			return float(subprocess.check_output(['3dBrickStat','-max','3dcalc( -a %s -b %s -expr abs(a-b) )' %(dset_a,dset_b)],stderr=null))
+	except subprocess.CalledProcessError:
+		return float('inf')
