@@ -82,8 +82,8 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 	will be obtained for each file. If not given,
 	the default list is:
 	
-	:0008 0022:		Acquisition date
-	:0008 0032:		Acquisition time
+	:0008 0021:		Series date
+	:0008 0031:		Series time
 	:0008 103E:		Series description
 	:0008 0080:		Institution name
 	:0010 0020:		Patient ID
@@ -95,8 +95,8 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 	'''
 	if tags==None:
 		tags = [
-			(0x0008, 0x0022),
-			(0x0008, 0x0032),
+			(0x0008, 0x0021),
+			(0x0008, 0x0031),
 			(0x0008, 0x103E),
 			(0x0008, 0x0080),
 			(0x0010, 0x0020),
