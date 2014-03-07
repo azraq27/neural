@@ -35,6 +35,7 @@ def notify_log(text):
 	pass
 
 def notify_critical(text):
+	pass
 
 ### Platform-specific methods:
 
