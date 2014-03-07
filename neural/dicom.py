@@ -84,7 +84,6 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 	
 	:0008 0022:		Acquisition date
 	:0008 0032:		Acquisition time
-	:0008 0033:		Image time
 	:0008 103E:		Series description
 	:0008 0080:		Institution name
 	:0010 0020:		Patient ID
@@ -98,7 +97,6 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 		tags = [
 			(0x0008, 0x0022),
 			(0x0008, 0x0032),
-			(0x0008, 0x0033),
 			(0x0008, 0x103E),
 			(0x0008, 0x0080),
 			(0x0010, 0x0020),
@@ -133,7 +131,7 @@ def find_dups(file_dict):
 	for h in found_hashes:
 		if len(found_hashes[h])<2:
 			del(final_hashes[h])
-	return final_hashes
+	return final_hashes.values()
 
 def cluster_files(file_dict):
 	'''takes output from :meth:`scan_dir` and organizes into lists of files with the same tags'''
