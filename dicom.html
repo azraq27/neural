@@ -52,56 +52,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-neural.dicom">
-<span id="neural-dicom-functions-to-interact-with-dicom-images"></span><h1>neural.dicom - Functions to interact with DICOM images<a class="headerlink" href="#module-neural.dicom" title="Permalink to this headline">¶</a></h1>
-<p>methods to analyze DICOM format images</p>
-<dl class="class">
-<dt id="neural.dicom.DicomInfo">
-<em class="property">class </em><tt class="descclassname">neural.dicom.</tt><tt class="descname">DicomInfo</tt><big>(</big><em>frames=</em><span class="optional">[</span><span class="optional">]</span>, <em>sex_info={}</em>, <em>slice_times=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#DicomInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.DicomInfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>container for header information from DICOM file</p>
-<p>Header frames are dictionaries with the following values:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Addr:</th><td class="field-body">tuple of (group,element) tags in hex</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Label:</th><td class="field-body">description</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Offset:</th><td class="field-body">offset of data</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Size:</th><td class="field-body">size of data</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Value:</th><td class="field-body">data value</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="neural.dicom.DicomInfo.addr">
-<tt class="descname">addr</tt><big>(</big><em>address</em><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#DicomInfo.addr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.DicomInfo.addr" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns dictionary with frame information for given address (a tuple of two hex numbers)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="neural.dicom.DicomInfo.label">
-<tt class="descname">label</tt><big>(</big><em>label</em><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#DicomInfo.label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.DicomInfo.label" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns dictionary with frame information for a given text label</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.dicom.info">
-<tt class="descclassname">neural.dicom.</tt><tt class="descname">info</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.info" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a DicomInfo object containing the header information in <tt class="docutils literal"><span class="pre">filename</span></tt></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.dicom.is_dicom">
-<tt class="descclassname">neural.dicom.</tt><tt class="descname">is_dicom</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#neural.dicom.is_dicom" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns Boolean of whether the given file has the DICOM magic number</p>
-</dd></dl>
-
+  <div class="section" id="neural-dicom-functions-to-interact-with-dicom-images">
+<h1>neural.dicom - Functions to interact with DICOM images<a class="headerlink" href="#neural-dicom-functions-to-interact-with-dicom-images" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
