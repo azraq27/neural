@@ -7,6 +7,27 @@ import os,subprocess
 import datetime
 import hashlib
 
+#! A list of archives this library understands
+archive_formats = {
+	'zip': {'suffix':'zip', 'command':lambda output,filename: ['unzip','-o','-d',output,filename]},
+	'tarball': {'suffix':('tar.gz','tgz'), 'command':lambda output,filename: ['tar','zx','-C',output,'-f',filename]},
+	'tarball-bzip': {'suffix':('tar.bz2','tbz'), 'command':lambda output,filename: ['tar','jx','-C',output,'-f',filename]},
+	'7zip': {'suffix':'7z', 'command':lambda output,filename: ['7z','x','-y','-o%s' % output, filename]}
+}
+
+def is_archive(filename):
+	'''returns boolean of whether this filename looks like an archive'''
+	for archive in archive_formats:
+		if f.endswith(archive_formats[archive]['suffix']):
+			return True
+	return False
+
+def unarchive(filename,output_dir='.'):
+	'''unpacks the given archive into ``output_dir``'''
+	if not os.path.exists(output_dir):
+		os.makedirs(output_dir)
+	return subprocess.call(archive_formats[archive]['command'](output_dir,filename))==0
+
 def flatten(nested_list):
 	'''converts a list-of-lists to a single flat list'''
 	return_list = []
