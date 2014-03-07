@@ -51,15 +51,20 @@ if platform.system() == 'Darwin':
 			notify_interactive = notify_mountainlion
 			interactive_enabled = True
 
-if isinstance(sys.stdout,IPython.kernel.zmq.iostream.OutStream):
-	# We're inside iPython Notebook
-	try:
-		import IPython.display
-	except ImportError:
-		pass
-	else:
-		def notify_ipython_html(text):
-			html = IPython.display.HTML( '<b>:: %s</b>' % text)
-			IPython.display.display_html(html)
-		notify_interactive = notify_ipython_html
-		interactive_enabled = True
+try:
+	in_ipython = isinstance(sys.stdout,IPython.kernel.zmq.iostream.OutStream)
+except NameError:
+	pass
+else:
+	if in_ipython:
+		# We're inside iPython Notebook
+		try:
+			import IPython.display
+		except ImportError:
+			pass
+		else:
+			def notify_ipython_html(text):
+				html = IPython.display.HTML( '<b>:: %s</b>' % text)
+				IPython.display.display_html(html)
+			notify_interactive = notify_ipython_html
+			interactive_enabled = True
