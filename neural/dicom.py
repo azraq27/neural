@@ -54,7 +54,10 @@ class DicomInfo:
 
 def info(filename):
 	'''returns a DicomInfo object containing the header information in ``filename``'''
-	out = subprocess.check_output([_dicom_hdr,'-sexinfo',filename])
+	try:
+		out = subprocess.check_output([_dicom_hdr,'-sexinfo',filename])
+	except subprocess.CalledProcessError:
+		return None
 	slice_timing_out = subprocess.check_output([_dicom_hdr,'-slice_times',filename])
 	slice_timing = [float(x) for x in slice_timing_out.strip().split()[5:]]
 	frames = []
@@ -111,13 +114,14 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 			fullname = os.path.join(root,filename)
 			if is_dicom(fullname):
 				dinfo = info(fullname)
-				return_dict[fullname] = {}
-				if md5_hash:
-					return_dict[fullname]['md5'] = nl.hash(fullname)
-				for tag in tags:
-					tag_value = dinfo.addr(tag)
-					if tag_value:
-						return_dict[fullname][tag] = tag_value['value']
+				if(dinfo):
+					return_dict[fullname] = {}
+					if md5_hash:
+						return_dict[fullname]['md5'] = nl.hash(fullname)
+					for tag in tags:
+						tag_value = dinfo.addr(tag)
+						if tag_value:
+							return_dict[fullname][tag] = tag_value['value']
 	return return_dict
 
 def find_dups(file_dict):
