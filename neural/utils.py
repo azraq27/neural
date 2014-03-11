@@ -105,7 +105,7 @@ def log(fname,msg):
 		f.write(datetime.datetime.now().strftime('%m-%d-%Y %H:%M:\n') + msg + '\n')
 
 def hash(filename):
-	'''returns MD5 hash of given filename'''
+	'''returns string of MD5 hash of given filename'''
 	buffer_size = 10*1024*1024
 	m = hashlib.md5()
 	with open(filename) as f:
@@ -113,7 +113,8 @@ def hash(filename):
 		while len(buff)>0:
 			m.update(buff)
 			buff = f.read(buffer_size)			
-	return m.digest()
+	dig = m.digest()
+	return ''.join(['%x' % ord(x) for x in dig])
 
 class simple_timer:
 	'''a simple way to time a single run of a function
