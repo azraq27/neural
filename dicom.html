@@ -8,8 +8,9 @@
     
     <title>neural.dicom - Functions to interact with DICOM images &mdash; NeurAL 0.3 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -23,91 +24,152 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="top" title="NeurAL 0.3 documentation" href="index.html" />
     <link rel="next" title="neural.eprime - E-Prime logfile parsing" href="eprime.html" />
     <link rel="prev" title="neural.afni - Wrapper methods for AFNI functions" href="afni.html" /> 
   </head>
   <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="afni.html" title="neural.afni - Wrapper methods for AFNI functions"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+      <div class="header"><h1 class="heading"><a href="index.html">
+          <span>NeurAL 0.3 documentation</span></a></h1>
+        <h2 class="heading"><span>neural.dicom - Functions to interact with DICOM images</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="afni.html">neural.afni - Wrapper methods for AFNI functions</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="eprime.html">neural.eprime - E-Prime logfile parsing</a>&#160;&#160;»
+        </p>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
-            
-  <div class="section" id="neural-dicom-functions-to-interact-with-dicom-images">
-<h1>neural.dicom - Functions to interact with DICOM images<a class="headerlink" href="#neural-dicom-functions-to-interact-with-dicom-images" title="Permalink to this headline">¶</a></h1>
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="module-neural.dicom">
+<span id="neural-dicom-functions-to-interact-with-dicom-images"></span><h1>neural.dicom - Functions to interact with DICOM images<a class="headerlink" href="#module-neural.dicom" title="Permalink to this headline">¶</a></h1>
+<p>methods to analyze DICOM format images</p>
+<dl class="class">
+<dt id="neural.dicom.DicomInfo">
+<em class="property">class </em><tt class="descclassname">neural.dicom.</tt><tt class="descname">DicomInfo</tt><big>(</big><em>frames=</em><span class="optional">[</span><span class="optional">]</span>, <em>sex_info={}</em>, <em>slice_times=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#DicomInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.DicomInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>container for header information from DICOM file</p>
+<p>Header frames are dictionaries with the following values:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Addr:</th><td class="field-body">tuple of (group,element) tags in hex</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Label:</th><td class="field-body">description</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Offset:</th><td class="field-body">offset of data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Size:</th><td class="field-body">size of data</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Value:</th><td class="field-body">data value</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="neural.dicom.DicomInfo.addr">
+<tt class="descname">addr</tt><big>(</big><em>address</em><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#DicomInfo.addr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.DicomInfo.addr" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns dictionary with frame information for given address (a tuple of two hex numbers)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neural.dicom.DicomInfo.label">
+<tt class="descname">label</tt><big>(</big><em>label</em><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#DicomInfo.label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.DicomInfo.label" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns dictionary with frame information for a given text label</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.dicom.cluster_files">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">cluster_files</tt><big>(</big><em>file_dict</em><big>)</big><a class="headerlink" href="#neural.dicom.cluster_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>takes output from <a class="reference internal" href="#neural.dicom.scan_dir" title="neural.dicom.scan_dir"><tt class="xref py py-meth docutils literal"><span class="pre">scan_dir()</span></tt></a> and organizes into lists of files with the same tags</p>
+<p>returns a dictionary where values are a tuple of the unique tag combination and values contain
+another dictionary with the keys <tt class="docutils literal"><span class="pre">info</span></tt> containing the original tag dict and <tt class="docutils literal"><span class="pre">files</span></tt> containing
+a list of files that match</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.dicom.find_dups">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">find_dups</tt><big>(</big><em>file_dict</em><big>)</big><a class="headerlink" href="#neural.dicom.find_dups" title="Permalink to this definition">¶</a></dt>
+<dd><p>takes output from <a class="reference internal" href="#neural.dicom.scan_dir" title="neural.dicom.scan_dir"><tt class="xref py py-meth docutils literal"><span class="pre">scan_dir()</span></tt></a> and returns list of duplicate files</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.dicom.info">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">info</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/neural/dicom.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.dicom.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a DicomInfo object containing the header information in <tt class="docutils literal"><span class="pre">filename</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.dicom.is_dicom">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">is_dicom</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#neural.dicom.is_dicom" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns Boolean of whether the given file has the DICOM magic number</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.dicom.max_diff">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">max_diff</tt><big>(</big><em>dset_a</em>, <em>dset_b</em><big>)</big><a class="headerlink" href="#neural.dicom.max_diff" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates maximal voxel-wise difference in datasets</p>
+<p>Useful for checking if datasets have the same data. For example, if the maximum difference is
+&lt; 1.0, they&#8217;re probably the same dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.dicom.scan_dir">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">scan_dir</tt><big>(</big><em>dirname</em>, <em>tags=None</em>, <em>md5_hash=False</em><big>)</big><a class="headerlink" href="#neural.dicom.scan_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>scans a directory tree and returns a dictionary with files and key DICOM tags</p>
+<p>return value is a dictionary absolute filenames as keys and with dictionaries of tags/values
+as values</p>
+<p>the param <tt class="docutils literal"><span class="pre">tags</span></tt> is the list of DICOM tags (given as tuples of hex numbers) that 
+will be obtained for each file. If not given,
+the default list is:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">0008 0021:</th><td class="field-body">Series date</td>
+</tr>
+<tr class="field-even field"><th class="field-name">0008 0031:</th><td class="field-body">Series time</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">0008 103E:</th><td class="field-body">Series description</td>
+</tr>
+<tr class="field-even field"><th class="field-name">0008 0080:</th><td class="field-body">Institution name</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">0010 0020:</th><td class="field-body">Patient ID</td>
+</tr>
+<tr class="field-even field"><th class="field-name">0028 0010:</th><td class="field-body">Image rows</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">0028 0011:</th><td class="field-body">Image columns</td>
+</tr>
+</tbody>
+</table>
+<p>If the param <tt class="docutils literal"><span class="pre">md5_hash</span></tt> is <tt class="docutils literal"><span class="pre">True</span></tt>, this will also return the MD5 hash of the file. This is useful
+for detecting duplicate files</p>
+</dd></dl>
+
 </div>
 
 
-          </div>
-        </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="afni.html"
-                        title="previous chapter">neural.afni - Wrapper methods for AFNI functions</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="eprime.html"
-                        title="next chapter">neural.eprime - E-Prime logfile parsing</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/dicom.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="afni.html">neural.afni - Wrapper methods for AFNI functions</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="eprime.html">neural.eprime - E-Prime logfile parsing</a>&#160;&#160;»
+        </p>
+
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="afni.html" title="neural.afni - Wrapper methods for AFNI functions"
-             >previous</a> |</li>
-        <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
+
     <div class="footer">
         &copy; Copyright 2014, Bill Gross.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
