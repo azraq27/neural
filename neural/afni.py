@@ -404,6 +404,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 	
 	
 	'''
+	
 	dset_ss = lambda dset: os.path.split(suffix(dset,'_ns'))[1]
 	dset_u = lambda dset: os.path.split(suffix(dset,'_u'))[1]
 	def dset_source(dset):		
@@ -411,6 +412,14 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 			return dset_ss(dset)
 		else:
 			return dset
+	
+	dset_affine = os.path.split(suffix(dset_from,affine_suffix))[1]
+	dset_affine_1D = prefix(dset_affine) + '.1D'
+	dset_qwarp = os.path.split(suffix(dset_from,qwarp_suffix))[1]
+	
+	if os.path.exists(dset_qwarp):
+		# final product already exists
+		return
 	
 	for dset in [dset_from,dset_to]:
 		if skull_strip==True or skull_strip==dset:
@@ -427,10 +436,6 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 			'-prefix', dset_u(dset_source(dset)),
 			'-input', dset_source(dset)
 		],products=[dset_u(dset_source(dset))])
-	
-	dset_affine = os.path.split(suffix(dset_from,affine_suffix))[1]
-	dset_affine_1D = prefix(dset_affine) + '.1D'
-	dset_qwarp = os.path.split(suffix(dset_from,qwarp_suffix))[1]
 	
 	mask_use = mask
 	if mask:
