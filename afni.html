@@ -48,6 +48,16 @@
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">neural.afni - Wrapper methods for AFNI functions</a><ul>
+<li><a class="reference internal" href="#generic-utilities">Generic Utilities</a></li>
+<li><a class="reference internal" href="#deconvolution-helpers">Deconvolution Helpers</a></li>
+<li><a class="reference internal" href="#alignment-helpers">Alignment Helpers</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to NeurAL&#8217;s documentation!</a></p>
@@ -80,21 +90,21 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="neural-afni-wrapper-methods-for-afni-functions">
-<h1>neural.afni - Wrapper methods for AFNI functions<a class="headerlink" href="#neural-afni-wrapper-methods-for-afni-functions" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-neural.afni"></span><p>wrapper functions for common AFNI tasks</p>
+  <div class="section" id="module-neural.afni">
+<span id="neural-afni-wrapper-methods-for-afni-functions"></span><h1>neural.afni - Wrapper methods for AFNI functions<a class="headerlink" href="#module-neural.afni" title="Permalink to this headline">¶</a></h1>
+<p>wrapper functions for common AFNI tasks</p>
+<div class="section" id="generic-utilities">
+<h2>Generic Utilities<a class="headerlink" href="#generic-utilities" title="Permalink to this headline">¶</a></h2>
 <dl class="staticmethod">
-<dt id="neural.afni.dset_info">
-<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">dset_info</tt><big>(</big><em>dset</em><big>)</big><a class="headerlink" href="#neural.afni.dset_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>runs <tt class="docutils literal"><span class="pre">3dinfo</span></tt> and returns a <a class="reference internal" href="#neural.afni.DsetInfo" title="neural.afni.DsetInfo"><tt class="xref py py-class docutils literal"><span class="pre">DsetInfo</span></tt></a> object containing the results</p>
+<dt id="neural.afni.prefix">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">prefix</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#neural.afni.prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>strips common fMRI dataset suffixes from filenames</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="neural.afni.DsetInfo">
-<em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">DsetInfo</tt><a class="reference internal" href="_modules/neural/afni.html#DsetInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.DsetInfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>contains organized output from <tt class="docutils literal"><span class="pre">3dinfo</span></tt></p>
-<p>All lists are returned in RAI order (i.e., a list of 3 numbers refers to the R-L axis,
-A-P axis, then I-S axis)</p>
+<dl class="staticmethod">
+<dt id="neural.afni.suffix">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">suffix</tt><big>(</big><em>filename</em>, <em>suffix</em><big>)</big><a class="headerlink" href="#neural.afni.suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a filenames with <tt class="docutils literal"><span class="pre">suffix</span></tt> inserted before the dataset suffix</p>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -150,15 +160,17 @@ given dataset at the specified <em>p</em>-value</p>
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="neural.afni.prefix">
-<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">prefix</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#neural.afni.prefix" title="Permalink to this definition">¶</a></dt>
-<dd><p>strips common fMRI dataset suffixes from filenames</p>
+<dt id="neural.afni.dset_info">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">dset_info</tt><big>(</big><em>dset</em><big>)</big><a class="headerlink" href="#neural.afni.dset_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs <tt class="docutils literal"><span class="pre">3dinfo</span></tt> and returns a <a class="reference internal" href="#neural.afni.DsetInfo" title="neural.afni.DsetInfo"><tt class="xref py py-class docutils literal"><span class="pre">DsetInfo</span></tt></a> object containing the results</p>
 </dd></dl>
 
-<dl class="staticmethod">
-<dt id="neural.afni.suffix">
-<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">suffix</tt><big>(</big><em>filename</em>, <em>suffix</em><big>)</big><a class="headerlink" href="#neural.afni.suffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a filenames with <tt class="docutils literal"><span class="pre">suffix</span></tt> inserted before the dataset suffix</p>
+<dl class="class">
+<dt id="neural.afni.DsetInfo">
+<em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">DsetInfo</tt><a class="reference internal" href="_modules/neural/afni.html#DsetInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.DsetInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains organized output from <tt class="docutils literal"><span class="pre">3dinfo</span></tt></p>
+<p>All lists are returned in RAI order (i.e., a list of 3 numbers refers to the R-L axis,
+A-P axis, then I-S axis)</p>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -195,6 +207,9 @@ with the <tt class="docutils literal"><span class="pre">+view</span></tt>.</p>
 </dl>
 </dd></dl>
 
+</div>
+<div class="section" id="deconvolution-helpers">
+<h2>Deconvolution Helpers<a class="headerlink" href="#deconvolution-helpers" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="neural.afni.Decon">
 <em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">Decon</tt><a class="reference internal" href="_modules/neural/afni.html#Decon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.Decon" title="Permalink to this definition">¶</a></dt>
@@ -288,6 +303,9 @@ is a symbolic statement</td>
 
 </dd></dl>
 
+</div>
+<div class="section" id="alignment-helpers">
+<h2>Alignment Helpers<a class="headerlink" href="#alignment-helpers" title="Permalink to this headline">¶</a></h2>
 <dl class="staticmethod">
 <dt id="neural.afni.qwarp_align">
 <em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">qwarp_align</tt><big>(</big><em>dset_from</em>, <em>dset_to</em>, <em>skull_strip=True</em>, <em>mask=None</em>, <em>affine_suffix='_aff'</em>, <em>qwarp_suffix='_qwarp'</em><big>)</big><a class="headerlink" href="#neural.afni.qwarp_align" title="Permalink to this definition">¶</a></dt>
@@ -346,6 +364,7 @@ with the qwarp.</p>
 outputs the inverted warp + affine to <tt class="docutils literal"><span class="pre">output_dset</span></tt></p>
 </dd></dl>
 
+</div>
 </div>
 
 
