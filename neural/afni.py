@@ -370,7 +370,7 @@ class Decon:
 	
 	def run(self,working_directory='.'):
 		'''runs 3dDeconvolve through the neural.utils.run shortcut'''
-		return neural.run(self.command_list(),working_directory=working_directory)
+		return neural.run(self.command_list(),working_directory=working_directory,products=self.prefix)
 
 def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',qwarp_suffix='_qwarp'):
 	'''aligns ``dset_from`` to ``dset_to`` using 3dQwarp
