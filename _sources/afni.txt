@@ -2,6 +2,7 @@ neural.afni - Wrapper methods for AFNI functions
 ===============================================
 
 .. automodule:: neural.afni
+	
 	.. currentmodule:: neural.afni
 	
 	.. automethod:: dset_info
