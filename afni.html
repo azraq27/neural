@@ -83,6 +83,146 @@
   <div class="section" id="neural-afni-wrapper-methods-for-afni-functions">
 <h1>neural.afni - Wrapper methods for AFNI functions<a class="headerlink" href="#neural-afni-wrapper-methods-for-afni-functions" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-neural.afni"></span><p>wrapper functions for common AFNI tasks</p>
+<dl class="staticmethod">
+<dt id="neural.afni.dset_info">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">dset_info</tt><big>(</big><em>dset</em><big>)</big><a class="headerlink" href="#neural.afni.dset_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs <tt class="docutils literal"><span class="pre">3dinfo</span></tt> and returns a <tt class="xref py py-class docutils literal"><span class="pre">DsetInfo</span></tt> object containing the results</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.subbrick">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">subbrick</tt><big>(</big><em>dset</em>, <em>label</em>, <em>coef=False</em>, <em>tstat=False</em>, <em>fstat=False</em>, <em>rstat=False</em><big>)</big><a class="headerlink" href="#neural.afni.subbrick" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a string referencing the given subbrick within a dset</p>
+<p>This method reads the header of the dataset <tt class="docutils literal"><span class="pre">dset</span></tt>, finds the subbrick whose
+label matches <tt class="docutils literal"><span class="pre">label</span></tt> and returns a string of type <tt class="docutils literal"><span class="pre">dataset[X]</span></tt>, which can
+be used by most AFNI programs to refer to a subbrick within a file</p>
+<p>The options coef, tstat, fstat, and rstat will add the suffix that is
+appended to the label by 3dDeconvolve</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Coef:</th><td class="field-body">&#8220;#0_Coef&#8221;</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Tstat:</th><td class="field-body">&#8220;#0_Tstat&#8221;</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Fstat:</th><td class="field-body">&#8220;_Fstat&#8221;</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Rstat:</th><td class="field-body">&#8220;_R^2&#8221;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.calc">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">calc</tt><big>(</big><em>dsets</em>, <em>expr</em><big>)</big><a class="headerlink" href="#neural.afni.calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a string of an inline 3dcalc expression</p>
+<p><tt class="docutils literal"><span class="pre">dsets</span></tt> can be a single string, or list of strings. Each string in <tt class="docutils literal"><span class="pre">dsets</span></tt> will
+be labeled &#8216;a&#8217;,&#8217;b&#8217;,&#8217;c&#8217;, sequentially. The expression <tt class="docutils literal"><span class="pre">expr</span></tt> is used directly</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.cdf">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">cdf</tt><big>(</big><em>dset</em>, <em>p</em>, <em>subbrick=0</em><big>)</big><a class="headerlink" href="#neural.afni.cdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>converts <em>p</em>-values to the appropriate statistic for the specified subbrick</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.thresh_at">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">thresh_at</tt><big>(</big><em>dset</em>, <em>p</em>, <em>subbrick=0</em>, <em>positive_only=False</em><big>)</big><a class="headerlink" href="#neural.afni.thresh_at" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a string containing an inline <tt class="docutils literal"><span class="pre">3dcalc</span></tt> command that thresholds the 
+given dataset at the specified <em>p</em>-value</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.voxel_count">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">voxel_count</tt><big>(</big><em>dset</em>, <em>subbrick=0</em>, <em>p=None</em>, <em>positive_only=False</em><big>)</big><a class="headerlink" href="#neural.afni.voxel_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the number of non-zero voxels, or number of voxels exceeding the given <em>p</em>-value threshold</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.prefix">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">prefix</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#neural.afni.prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>strips common fMRI dataset suffixes from filenames</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.suffix">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">suffix</tt><big>(</big><em>filename</em>, <em>suffix</em><big>)</big><a class="headerlink" href="#neural.afni.suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a filenames with <tt class="docutils literal"><span class="pre">suffix</span></tt> inserted before the dataset suffix</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.afni_copy">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">afni_copy</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#neural.afni.afni_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a <tt class="docutils literal"><span class="pre">+orig</span></tt> copy of the given dataset and returns the filename as a string</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.nifti_copy">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">nifti_copy</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#neural.afni.nifti_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a <tt class="docutils literal"><span class="pre">.nii.gz</span></tt> copy of the given dataset and returns the filename as a string</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.qwarp_align">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">qwarp_align</tt><big>(</big><em>dset_from</em>, <em>dset_to</em>, <em>skull_strip=True</em>, <em>mask=None</em>, <em>affine_suffix='_aff'</em>, <em>qwarp_suffix='_qwarp'</em><big>)</big><a class="headerlink" href="#neural.afni.qwarp_align" title="Permalink to this definition">¶</a></dt>
+<dd><p>aligns <tt class="docutils literal"><span class="pre">dset_from</span></tt> to <tt class="docutils literal"><span class="pre">dset_to</span></tt> using 3dQwarp</p>
+<p>Will run <tt class="docutils literal"><span class="pre">3dSkullStrip</span></tt> (unless <tt class="docutils literal"><span class="pre">skull_strip</span></tt> is <tt class="docutils literal"><span class="pre">False</span></tt>), <tt class="docutils literal"><span class="pre">3dUnifize</span></tt>,
+<tt class="docutils literal"><span class="pre">3dAllineate</span></tt>, and then <tt class="docutils literal"><span class="pre">3dQwarp</span></tt>. This method will add suffixes to the input
+dataset for the intermediate files (e.g., <tt class="docutils literal"><span class="pre">_ss</span></tt>, <tt class="docutils literal"><span class="pre">_u</span></tt>). If those files already
+exist, it will assume they were intelligently named, and use them as is</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Skull_strip:</th><td class="field-body">If True/False, turns skull-stripping of both datasets on/off.
+If a string matching <tt class="docutils literal"><span class="pre">dset_from</span></tt> or <tt class="docutils literal"><span class="pre">dset_to</span></tt>, will only
+skull-strip the given dataset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Mask:</th><td class="field-body">Applies the given mask to the alignment. Because of the nature
+of the alignment algorithms, the mask is <strong>always</strong> applied to
+the <tt class="docutils literal"><span class="pre">dset_to</span></tt>. If this isn&#8217;t what you want, you need to reverse
+the transform and re-apply it (e.g., using <a class="reference internal" href="#neural.afni.qwarp_invert" title="neural.afni.qwarp_invert"><tt class="xref py py-meth docutils literal"><span class="pre">qwarp_invert()</span></tt></a> 
+and <a class="reference internal" href="#neural.afni.qwarp_apply" title="neural.afni.qwarp_apply"><tt class="xref py py-meth docutils literal"><span class="pre">qwarp_apply()</span></tt></a>). If the <tt class="docutils literal"><span class="pre">dset_to</span></tt> dataset is skull-stripped,
+the mask will also be resampled to match the <tt class="docutils literal"><span class="pre">dset_to</span></tt> grid.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Affine_suffix:</th><td class="field-body">Suffix applied to <tt class="docutils literal"><span class="pre">dset_from</span></tt> to name the new dataset, as well as
+the <tt class="docutils literal"><span class="pre">.1D</span></tt> file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Qwarp_suffix:</th><td class="field-body">Suffix applied to the final <tt class="docutils literal"><span class="pre">dset_from</span></tt> dataset. An additional file
+with the additional suffix <tt class="docutils literal"><span class="pre">_WARP</span></tt> will be created containing the parameters
+(e.g., with the default <tt class="docutils literal"><span class="pre">_qwarp</span></tt> suffix, the parameters will be in a file with
+the suffix <tt class="docutils literal"><span class="pre">_qwarp_WARP</span></tt>)</td>
+</tr>
+</tbody>
+</table>
+<p>The output affine dataset and 1D, as well as the output of qwarp are named by adding
+the given suffixes (<tt class="docutils literal"><span class="pre">affine_suffix</span></tt> and <tt class="docutils literal"><span class="pre">qwarp_suffix</span></tt>) to the <tt class="docutils literal"><span class="pre">dset_from</span></tt> file</p>
+<p>If <tt class="docutils literal"><span class="pre">skull_strip</span></tt> is a string instead of <tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>, it will only skull strip the given
+dataset instead of both of them</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.qwarp_apply">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">qwarp_apply</tt><big>(</big><em>dset_from</em>, <em>dset_warp</em>, <em>affine=None</em>, <em>warp_suffix='_warp'</em>, <em>master='WARP'</em><big>)</big><a class="headerlink" href="#neural.afni.qwarp_apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>applies the transform from a previous qwarp</p>
+<p>Uses the warp parameters from the dataset listed in 
+<tt class="docutils literal"><span class="pre">dset_warp</span></tt> (usually the dataset name ends in <tt class="docutils literal"><span class="pre">_WARP</span></tt>) 
+to the dataset <tt class="docutils literal"><span class="pre">dset_from</span></tt>. If a <tt class="docutils literal"><span class="pre">.1D</span></tt> file is given
+in the <tt class="docutils literal"><span class="pre">affine</span></tt> parameter, it will be applied simultaneously
+with the qwarp.</p>
+<p>Output dataset with have the <tt class="docutils literal"><span class="pre">warp_suffix</span></tt> suffix added to its name</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="neural.afni.qwarp_invert">
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">qwarp_invert</tt><big>(</big><em>warp_param_dset</em>, <em>output_dset</em>, <em>affine_1Dfile=None</em><big>)</big><a class="headerlink" href="#neural.afni.qwarp_invert" title="Permalink to this definition">¶</a></dt>
+<dd><p>inverts a qwarp (defined in <tt class="docutils literal"><span class="pre">warp_param_dset</span></tt>) (and concatenates affine matrix <tt class="docutils literal"><span class="pre">affine_1Dfile</span></tt> if given)
+outputs the inverted warp + affine to <tt class="docutils literal"><span class="pre">output_dset</span></tt></p>
+</dd></dl>
+
 </div>
 
 
