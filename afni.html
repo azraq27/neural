@@ -84,6 +84,36 @@
 <h1>neural.afni - Wrapper methods for AFNI functions<a class="headerlink" href="#neural-afni-wrapper-methods-for-afni-functions" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-neural.afni"></span><p>wrapper functions for common AFNI tasks</p>
 <dl class="class">
+<dt id="neural.afni.DsetInfo">
+<em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">DsetInfo</tt><a class="reference internal" href="_modules/neural/afni.html#DsetInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.DsetInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains organized output from <tt class="docutils literal"><span class="pre">3dinfo</span></tt></p>
+<p>All lists are returned in RAI order (i.e., a list of 3 numbers refers to the R-L axis,
+A-P axis, then I-S axis)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="neural.afni.temp_afni_copy">
+<em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">temp_afni_copy</tt><big>(</big><em>in_dset</em>, <em>out_dsets=None</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#temp_afni_copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.temp_afni_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>used within a <tt class="docutils literal"><span class="pre">with</span></tt> block, will create a temporary <tt class="docutils literal"><span class="pre">+orig</span></tt> copy of dataset</p>
+<p>When invoked in a <tt class="docutils literal"><span class="pre">with</span></tt> block, will make a <tt class="docutils literal"><span class="pre">+orig</span></tt> copy of the given dataset
+and return the filename as a string.</p>
+<p>On exiting the block, it will delete the <tt class="docutils literal"><span class="pre">+orig</span></tt> copy. If out_dsets is a string
+or list of strings, it will try to make nifti copies of all datasets listed 
+and then delete the original version if successful. AFNI datasets should be specified
+with the <tt class="docutils literal"><span class="pre">+view</span></tt>.</p>
+<dl class="docutils">
+<dt>Example usage::</dt>
+<dd><dl class="first last docutils">
+<dt>with temp_afni_copy(&#8216;dataset.nii.gz&#8217;) as dset_afni:</dt>
+<dd>do_something_with_a_dset(dset_afni)</dd>
+<dt>with temp_afni_copy(&#8216;dataset.nii.gz&#8217;,&#8217;output_dataset+orig&#8217;) as dset_afni:</dt>
+<dd>do_something_with_a_dset(dset_afni,output=&#8217;output_dataset&#8217;)</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
 <dt id="neural.afni.Decon">
 <em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">Decon</tt><a class="reference internal" href="_modules/neural/afni.html#Decon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.Decon" title="Permalink to this definition">¶</a></dt>
 <dd><p>wrapper for AFNI 3dDeconvolve command</p>
@@ -174,158 +204,6 @@ is a symbolic statement</td>
 <dd><p>runs 3dDeconvolve through the neural.utils.run shortcut</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="class">
-<dt id="neural.afni.DsetInfo">
-<em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">DsetInfo</tt><a class="reference internal" href="_modules/neural/afni.html#DsetInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.DsetInfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>contains organized output from <tt class="docutils literal"><span class="pre">3dinfo</span></tt></p>
-<p>All lists are returned in RAI order (i.e., a list of 3 numbers refers to the R-L axis,
-A-P axis, then I-S axis)</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.afni_copy">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">afni_copy</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#afni_copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.afni_copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>creates a <tt class="docutils literal"><span class="pre">+orig</span></tt> copy of the given dataset and returns the filename as a string</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.calc">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">calc</tt><big>(</big><em>dsets</em>, <em>expr</em><big>)</big><a class="headerlink" href="#neural.afni.calc" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a string of an inline 3dcalc expression</p>
-<p><tt class="docutils literal"><span class="pre">dsets</span></tt> can be a single string, or list of strings. Each string in <tt class="docutils literal"><span class="pre">dsets</span></tt> will
-be labeled &#8216;a&#8217;,&#8217;b&#8217;,&#8217;c&#8217;, sequentially. The expression <tt class="docutils literal"><span class="pre">expr</span></tt> is used directly</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.cdf">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">cdf</tt><big>(</big><em>dset</em>, <em>p</em>, <em>subbrick=0</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>converts <em>p</em>-values to the appropriate statistic for the specified subbrick</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.dset_info">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">dset_info</tt><big>(</big><em>dset</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#dset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.dset_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>runs <tt class="docutils literal"><span class="pre">3dinfo</span></tt> and returns a <a class="reference internal" href="#neural.afni.DsetInfo" title="neural.afni.DsetInfo"><tt class="xref py py-class docutils literal"><span class="pre">DsetInfo</span></tt></a> object containing the results</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.nifti_copy">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">nifti_copy</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#nifti_copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.nifti_copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>creates a <tt class="docutils literal"><span class="pre">.nii.gz</span></tt> copy of the given dataset and returns the filename as a string</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.open">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">open</tt><big>(</big><em>dsets=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#neural.afni.open" title="Permalink to this definition">¶</a></dt>
-<dd><p>hack-y style method to try to open an AFNI window with the directory or datasets given</p>
-<p>if this function is useful, it should be made more stable/portable</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.prefix">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">prefix</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#prefix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.prefix" title="Permalink to this definition">¶</a></dt>
-<dd><p>strips common fMRI dataset suffixes from filenames</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.qwarp_align">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">qwarp_align</tt><big>(</big><em>dset_from</em>, <em>dset_to</em>, <em>skull_strip=True</em>, <em>mask=None</em>, <em>affine_suffix='_aff'</em>, <em>qwarp_suffix='_qwarp'</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#qwarp_align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.qwarp_align" title="Permalink to this definition">¶</a></dt>
-<dd><p>aligns <tt class="docutils literal"><span class="pre">dset_from</span></tt> to <tt class="docutils literal"><span class="pre">dset_to</span></tt> using 3dQwarp</p>
-<p>Will run <tt class="docutils literal"><span class="pre">3dSkullStrip</span></tt> (unless <tt class="docutils literal"><span class="pre">skull_strip</span></tt> is <tt class="docutils literal"><span class="pre">False</span></tt>), <tt class="docutils literal"><span class="pre">3dUnifize</span></tt>,
-<tt class="docutils literal"><span class="pre">3dAllineate</span></tt>, and then <tt class="docutils literal"><span class="pre">3dQwarp</span></tt>. This method will add suffixes to the input
-dataset for the intermediate files (e.g., <tt class="docutils literal"><span class="pre">_ss</span></tt>, <tt class="docutils literal"><span class="pre">_u</span></tt>). If those files already
-exist, it will assume they were intelligently named, and use them as is</p>
-<p>The output affine dataset and 1D, as well as the output of qwarp are named by adding
-the given suffixes (<tt class="docutils literal"><span class="pre">affine_suffix</span></tt> and <tt class="docutils literal"><span class="pre">qwarp_suffix</span></tt>) to the <tt class="docutils literal"><span class="pre">dset_from</span></tt> file</p>
-<p>If <tt class="docutils literal"><span class="pre">skull_strip</span></tt> is a string instead of <tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>, it will only skull strip the given
-dataset instead of both of them</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.qwarp_apply">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">qwarp_apply</tt><big>(</big><em>dset_from</em>, <em>dset_warp</em>, <em>affine=None</em>, <em>warp_suffix='_warp'</em>, <em>master='WARP'</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#qwarp_apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.qwarp_apply" title="Permalink to this definition">¶</a></dt>
-<dd><p>applies the transform from a previous qwarp</p>
-<p>Uses the warp parameters from the dataset listed in 
-<tt class="docutils literal"><span class="pre">dset_warp</span></tt> (usually the dataset name ends in <tt class="docutils literal"><span class="pre">_WARP</span></tt>) 
-to the dataset <tt class="docutils literal"><span class="pre">dset_from</span></tt>. If a <tt class="docutils literal"><span class="pre">.1D</span></tt> file is given
-in the <tt class="docutils literal"><span class="pre">affine</span></tt> parameter, it will be applied simultaneously
-with the qwarp.</p>
-<p>Output dataset with have the <tt class="docutils literal"><span class="pre">warp_suffix</span></tt> suffix added to its name</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.qwarp_invert">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">qwarp_invert</tt><big>(</big><em>warp_param_dset</em>, <em>output_dset</em>, <em>affine_1Dfile=None</em><big>)</big><a class="headerlink" href="#neural.afni.qwarp_invert" title="Permalink to this definition">¶</a></dt>
-<dd><p>inverts a qwarp (defined in <tt class="docutils literal"><span class="pre">warp_param_dset</span></tt>) (and concatenates affine matrix <tt class="docutils literal"><span class="pre">affine_1Dfile</span></tt> if given)
-outputs the inverted warp + affine to <tt class="docutils literal"><span class="pre">output_dset</span></tt></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.subbrick">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">subbrick</tt><big>(</big><em>dset</em>, <em>label</em>, <em>coef=False</em>, <em>tstat=False</em>, <em>fstat=False</em>, <em>rstat=False</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#subbrick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.subbrick" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a string referencing the given subbrick within a dset</p>
-<p>This method reads the header of the dataset <tt class="docutils literal"><span class="pre">dset</span></tt>, finds the subbrick whose
-label matches <tt class="docutils literal"><span class="pre">label</span></tt> and returns a string of type <tt class="docutils literal"><span class="pre">dataset[X]</span></tt>, which can
-be used by most AFNI programs to refer to a subbrick within a file</p>
-<p>The options coef, tstat, fstat, and rstat will add the suffix that is
-appended to the label by 3dDeconvolve</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Coef:</th><td class="field-body">&#8220;#0_Coef&#8221;</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Tstat:</th><td class="field-body">&#8220;#0_Tstat&#8221;</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Fstat:</th><td class="field-body">&#8220;_Fstat&#8221;</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Rstat:</th><td class="field-body">&#8220;_R^2&#8221;</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.suffix">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">suffix</tt><big>(</big><em>filename</em>, <em>suffix</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#suffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.suffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a filenames with <tt class="docutils literal"><span class="pre">suffix</span></tt> inserted before the dataset suffix</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="neural.afni.temp_afni_copy">
-<em class="property">class </em><tt class="descclassname">neural.afni.</tt><tt class="descname">temp_afni_copy</tt><big>(</big><em>in_dset</em>, <em>out_dsets=None</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#temp_afni_copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.temp_afni_copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>used within a <tt class="docutils literal"><span class="pre">with</span></tt> block, will create a temporary <tt class="docutils literal"><span class="pre">+orig</span></tt> copy of dataset</p>
-<p>When invoked in a <tt class="docutils literal"><span class="pre">with</span></tt> block, will make a <tt class="docutils literal"><span class="pre">+orig</span></tt> copy of the given dataset
-and return the filename as a string.</p>
-<p>On exiting the block, it will delete the <tt class="docutils literal"><span class="pre">+orig</span></tt> copy. If out_dsets is a string
-or list of strings, it will try to make nifti copies of all datasets listed 
-and then delete the original version if successful. AFNI datasets should be specified
-with the <tt class="docutils literal"><span class="pre">+view</span></tt>.</p>
-<dl class="docutils">
-<dt>Example usage::</dt>
-<dd><dl class="first last docutils">
-<dt>with temp_afni_copy(&#8216;dataset.nii.gz&#8217;) as dset_afni:</dt>
-<dd>do_something_with_a_dset(dset_afni)</dd>
-<dt>with temp_afni_copy(&#8216;dataset.nii.gz&#8217;,&#8217;output_dataset+orig&#8217;) as dset_afni:</dt>
-<dd>do_something_with_a_dset(dset_afni,output=&#8217;output_dataset&#8217;)</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.thresh_at">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">thresh_at</tt><big>(</big><em>dset</em>, <em>p</em>, <em>subbrick=0</em>, <em>positive_only=False</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#thresh_at"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.thresh_at" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a string containing an inline <tt class="docutils literal"><span class="pre">3dcalc</span></tt> command that thresholds the 
-given dataset at the specified <em>p</em>-value</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neural.afni.voxel_count">
-<tt class="descclassname">neural.afni.</tt><tt class="descname">voxel_count</tt><big>(</big><em>dset</em>, <em>subbrick=0</em>, <em>p=None</em>, <em>positive_only=False</em><big>)</big><a class="reference internal" href="_modules/neural/afni.html#voxel_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neural.afni.voxel_count" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the number of non-zero voxels, or number of voxels exceeding the given <em>p</em>-value threshold</p>
 </dd></dl>
 
 </div>
