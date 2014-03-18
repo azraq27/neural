@@ -32,9 +32,7 @@ neural.afni - Wrapper methods for AFNI functions
 	.. autoclass:: neural.afni.Decon
 		:members:
 		
-	.. automethod:: neural.afni.qwarp_align
-	
-	.. automethod:: neural.afni.dset_source		
+	.. automethod:: neural.afni.qwarp_align	
 	
 	.. automethod:: neural.afni.qwarp_apply
 	
