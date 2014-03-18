@@ -380,11 +380,29 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 	dataset for the intermediate files (e.g., ``_ss``, ``_u``). If those files already
 	exist, it will assume they were intelligently named, and use them as is
 	
+	:skull_strip:		If True/False, turns skull-stripping of both datasets on/off.
+						If a string matching ``dset_from`` or ``dset_to``, will only
+						skull-strip the given dataset
+	:mask:				Applies the given mask to the alignment. Because of the nature
+						of the alignment algorithms, the mask is **always** applied to
+						the ``dset_to``. If this isn't what you want, you need to reverse
+						the transform and re-apply it (e.g., using :meth:`qwarp_invert` 
+						and :meth:`qwarp_apply`). If the ``dset_to`` dataset is skull-stripped,
+						the mask will also be resampled to match the ``dset_to`` grid.
+	:affine_suffix:		Suffix applied to ``dset_from`` to name the new dataset, as well as
+						the ``.1D`` file.
+	:qwarp_suffix:		Suffix applied to the final ``dset_from`` dataset. An additional file
+						with the additional suffix ``_WARP`` will be created containing the parameters
+						(e.g., with the default ``_qwarp`` suffix, the parameters will be in a file with
+						the suffix ``_qwarp_WARP``)
+	
 	The output affine dataset and 1D, as well as the output of qwarp are named by adding
 	the given suffixes (``affine_suffix`` and ``qwarp_suffix``) to the ``dset_from`` file
 	
 	If ``skull_strip`` is a string instead of ``True``/``False``, it will only skull strip the given
 	dataset instead of both of them
+	
+	
 	'''
 	dset_ss = lambda dset: os.path.split(suffix(dset,'_ns'))[1]
 	dset_u = lambda dset: os.path.split(suffix(dset,'_u'))[1]
@@ -413,6 +431,15 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 	dset_affine = os.path.split(suffix(dset_from,affine_suffix))[1]
 	dset_affine_1D = prefix(dset_affine) + '.1D'
 	dset_qwarp = os.path.split(suffix(dset_from,qwarp_suffix))[1]
+	
+	mask_use = mask
+	if mask:
+		# the mask was probably made in the space of the original dset_to anatomy,
+		# which has now been cropped from the skull stripping. So the lesion mask
+		# needs to be resampled to match the corresponding mask
+		if skull_strip==True or skull_strip==dset_to:
+			nl.run(['3dresample','-master',dset_u(dset_ss(dset)),'-inset',mask,'-prefix',nl.afni.suffix(mask,'_resam')])
+			mask_use = nl.afni.suffix(mask,'_resam')
 	
 	all_cmd = [
 		'3dAllineate',
