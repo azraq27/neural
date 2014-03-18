@@ -5,40 +5,40 @@ neural.afni - Wrapper methods for AFNI functions
 	
 	.. currentmodule:: neural.afni
 	
-	.. automethod:: dset_info
+		.. automethod:: dset_info
 	
-	.. autoclass:: DsetInfo
-		:members:
+		.. autoclass:: DsetInfo
+			:members:
 
-	.. automethod:: subbrick
+		.. automethod:: subbrick
 	
-	.. automethod:: calc
+		.. automethod:: calc
 	
-	.. automethod:: cdf
+		.. automethod:: cdf
 	
-	.. automethod:: thresh_at
+		.. automethod:: thresh_at
 	
-	.. automethod:: voxel_count
+		.. automethod:: voxel_count
 	
-	.. automethod:: prefix
+		.. automethod:: prefix
 	
-	.. automethod:: suffix
+		.. automethod:: suffix
 	
-	.. automethod:: afni_copy
+		.. automethod:: afni_copy
 	
-	.. automethod:: nifti_copy
+		.. automethod:: nifti_copy
 	
-	.. autoclass:: temp_afni_copy
-		:members:
+		.. autoclass:: temp_afni_copy
+			:members:
 		
-	.. autoclass:: Decon
-		:members:
+		.. autoclass:: Decon
+			:members:
 		
-	.. automethod:: qwarp_align
+		.. automethod:: qwarp_align
 	
-	.. automethod:: dset_source		
+		.. automethod:: dset_source		
 	
-	.. automethod:: qwarp_apply
+		.. automethod:: qwarp_apply
 	
-	.. automethod:: qwarp_invert
+		.. automethod:: qwarp_invert
 	
