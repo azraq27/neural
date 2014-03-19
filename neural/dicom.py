@@ -155,6 +155,6 @@ def max_diff(dset_a,dset_b):
 			raise IOError('Could not find file: %s' % dset)
 	try:
 		with open(os.devnull,'w') as null:
-			return float(subprocess.check_output(['3dBrickStat','-max','3dcalc( -a %s -b %s -expr abs(a-b) )' %(dset_a,dset_b)],stderr=null))
+			return float(subprocess.check_output(['3dBrickStat','-max','3dcalc( -a %s -b %s -expr abs(a-b) )' %(dset_a,dset_b)],stderr=null).split()[0])
 	except subprocess.CalledProcessError:
 		return float('inf')
