@@ -443,8 +443,8 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 		# which has now been cropped from the skull stripping. So the lesion mask
 		# needs to be resampled to match the corresponding mask
 		if skull_strip==True or skull_strip==dset_to:
-			nl.run(['3dresample','-master',dset_u(dset_ss(dset)),'-inset',mask,'-prefix',nl.afni.suffix(mask,'_resam')])
-			mask_use = nl.afni.suffix(mask,'_resam')
+			neural.run(['3dresample','-master',dset_u(dset_ss(dset)),'-inset',mask,'-prefix',neural.afni.suffix(mask,'_resam')])
+			mask_use = neural.afni.suffix(mask,'_resam')
 	
 	all_cmd = [
 		'3dAllineate',
