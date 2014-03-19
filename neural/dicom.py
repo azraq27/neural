@@ -54,7 +54,10 @@ class DicomInfo:
 
 def info(filename):
 	'''returns a DicomInfo object containing the header information in ``filename``'''
-	out = subprocess.check_output([_dicom_hdr,'-sexinfo',filename])
+	try:
+		out = subprocess.check_output([_dicom_hdr,'-sexinfo',filename])
+	except subprocess.CalledProcessError:
+		return None
 	slice_timing_out = subprocess.check_output([_dicom_hdr,'-slice_times',filename])
 	slice_timing = [float(x) for x in slice_timing_out.strip().split()[5:]]
 	frames = []
@@ -82,9 +85,8 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 	will be obtained for each file. If not given,
 	the default list is:
 	
-	:0008 0022:		Acquisition date
-	:0008 0032:		Acquisition time
-	:0008 0033:		Image time
+	:0008 0021:		Series date
+	:0008 0031:		Series time
 	:0008 103E:		Series description
 	:0008 0080:		Institution name
 	:0010 0020:		Patient ID
@@ -96,9 +98,8 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 	'''
 	if tags==None:
 		tags = [
-			(0x0008, 0x0022),
-			(0x0008, 0x0032),
-			(0x0008, 0x0033),
+			(0x0008, 0x0021),
+			(0x0008, 0x0031),
 			(0x0008, 0x103E),
 			(0x0008, 0x0080),
 			(0x0010, 0x0020),
@@ -113,13 +114,14 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 			fullname = os.path.join(root,filename)
 			if is_dicom(fullname):
 				dinfo = info(fullname)
-				return_dict[fullname] = {}
-				if md5_hash:
-					return_dict[fullname]['md5'] = nl.hash(fullname)
-				for tag in tags:
-					tag_value = dinfo.addr(tag)
-					if tag_value:
-						return_dict[fullname][tag] = tag_value['value']
+				if(dinfo):
+					return_dict[fullname] = {}
+					if md5_hash:
+						return_dict[fullname]['md5'] = nl.hash(fullname)
+					for tag in tags:
+						tag_value = dinfo.addr(tag)
+						if tag_value:
+							return_dict[fullname][tag] = tag_value['value']
 	return return_dict
 
 def find_dups(file_dict):
@@ -133,16 +135,23 @@ def find_dups(file_dict):
 	for h in found_hashes:
 		if len(found_hashes[h])<2:
 			del(final_hashes[h])
-	return final_hashes
+	return final_hashes.values()
 
 def cluster_files(file_dict):
-	'''takes output from :meth:`scan_dir` and organizes into lists of files with the same tags'''
+	'''takes output from :meth:`scan_dir` and organizes into lists of files with the same tags
+	
+	returns a dictionary where values are a tuple of the unique tag combination and values contain
+	another dictionary with the keys ``info`` containing the original tag dict and ``files`` containing
+	a list of files that match'''
 	return_dict = {}
 	for filename in file_dict:
-		key = tuple([file_dict[filename][x] for x in file_dict[filename] if x!='md5'])
-		if key not in return_dict:
-			return_dict[key] = []
-		return_dict[key].append(filename)
+		info_dict = dict(file_dict[filename])
+		if 'md5' in info_dict:
+			del(info_dict['md5'])
+		dict_key = tuple(sorted([file_dict[filename][x] for x in info_dict]))
+		if dict_key not in return_dict:
+			return_dict[dict_key] = {'info':info_dict,'files':[]}
+		return_dict[dict_key]['files'].append(filename)
 	return return_dict
 
 def max_diff(dset_a,dset_b):
