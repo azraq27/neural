@@ -460,7 +460,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 	]
 	
 	if mask:
-		all_cmd += ['-emask', mask]
+		all_cmd += ['-emask', mask_use]
 	
 	neural.run(all_cmd,products=dset_affine)
 	
@@ -473,7 +473,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
 	]
 	
 	if mask:
-		warp_cmd += ['-emask', mask]
+		warp_cmd += ['-emask', mask_use]
 	
 	neural.run(warp_cmd,products=dset_qwarp)
 
