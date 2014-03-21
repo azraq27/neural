@@ -175,7 +175,7 @@ class Scheduler:
 		now = datetime.now()
 		for server in self.servers:
 			valid = True
-			if server['valid_times']:
+			if 'valid_times' in server and server['valid_times']:
 				times = server['valid_times']
 				if self._is_list_of_tuples(times,is_list=True):
 					wday = (now.weekday() + 1) % 7	# Make Sunday==0
@@ -185,7 +185,7 @@ class Scheduler:
 					if self._time_is_inbetween(now,t):
 						valid = True
 						break
-			if server['invalid_times']:
+			if 'invalid_times' in server and server['invalid_times']:
 				times = server['invalid_times']
 				if self._is_list_of_tuples(times,is_list=True):
 					wday = (now.weekday() + 1) % 7	# Make Sunday==0
@@ -196,7 +196,7 @@ class Scheduler:
 						break
 			if valid:
 				valid_servers.append(server)
-		sorted_servers = sorted(valid_servers,key=lambda x: x['speed'] if x['speed'] else 0)
+		sorted_servers = sorted(valid_servers,key=lambda x: x['speed'] if 'speed' in x and x['speed'] else 0)
 		return sorted_servers[-1]
 
 scheduler = Scheduler()
@@ -204,12 +204,12 @@ scheduler = Scheduler()
 def _new_run(command,products=None,working_directory='.',force_local=False):
 	server = scheduler.choose_server()
 	if force_local or server['address']=='local':
-		nl.utils.run(command,products,working_directory,force_local)
+		return nl.utils.run(command,products,working_directory,force_local)
 	else:
 		job = Job(command,products,working_directory)
 		if 'password' in server:
-			send_job(job,server['address'],server['port'],server['password'])
+			return send_job(job,server['address'],server['port'],server['password'])
 		else:
-			send_job(job,server['address'],server['port'])
+			return send_job(job,server['address'],server['port'])
 
 nl.run = _new_run
