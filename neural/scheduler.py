@@ -214,6 +214,6 @@ def _new_run(command,products=None,working_directory='.',force_local=False):
 			job_return = send_job(job,server['address'],server['port'],server['password'])
 		else:
 			job_return = send_job(job,server['address'],server['port'])
-		return job_return.output:
+		return job_return.output
 
 nl.run = _new_run
