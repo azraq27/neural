@@ -59,7 +59,7 @@ class run_in:
 	def __exit__(self, type, value, traceback):
 		os.chdir(self.old_cwd)
 
-def run(command,products=None,working_directory='.'):
+def run(command,products=None,working_directory='.',force_local=False):
 	'''wrapper to run external programs
 	
 	:command:			list containing command and parameters 
@@ -67,6 +67,8 @@ def run(command,products=None,working_directory='.'):
 	:products:			string or list of files that are the products of this command
 						if all products exist, the command will not be run, and False returned
 	:working_directory:	will chdir to this directory
+	:force_local:		when used with :module:`neural.scheduler`, setting to ``True`` will disable
+						all job distribution functions
 	
 	Returns stdout of command
 	'''
@@ -113,6 +115,13 @@ def hash(filename):
 		while len(buff)>0:
 			m.update(buff)
 			buff = f.read(buffer_size)			
+	dig = m.digest()
+	return ''.join(['%x' % ord(x) for x in dig])
+
+def hash_str(string):
+	'''returns string of MD5 hash of given string'''
+	m = hashlib.md5()
+	m.update(string)
 	dig = m.digest()
 	return ''.join(['%x' % ord(x) for x in dig])
 
