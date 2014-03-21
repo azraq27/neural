@@ -1,6 +1,6 @@
 '''methods to analyze DICOM format images'''
 
-import subprocess,re,os,multiprocessing
+import subprocess,re,os,multiprocessing,glob
 import neural as nl
 
 def is_dicom(filename):
@@ -167,3 +167,31 @@ def max_diff(dset_a,dset_b):
 			return float(subprocess.check_output(['3dBrickStat','-max','3dcalc( -a %s -b %s -expr abs(a-b) )' %(dset_a,dset_b)],stderr=null).split()[0])
 	except subprocess.CalledProcessError:
 		return float('inf')
+
+def _create_dset_dicom(directory):
+	d = str(directory)
+	while d.endswith('/'):
+		d = d[:1]
+	
+	nl.run([
+		'Dimon',
+		'-infile_prefix','%s/' % directory,
+		'-dicom_org', '-GERT_Reco', 
+		'-gert_to3d_prefix', d,
+		'-gert_create_dataset', '-gert_write_as_nifti',
+		'-quit'])
+	
+	if os.path.exists('%s.nii' % d):
+		nl.run(['gzip','%s.nii' % d])
+	
+	for junk in ['dimon.files.run.*','GERT_Reco_dicom_*']:
+		for fname in glob.glob(junk):
+			try:
+				os.remove(fname)
+			except IOError:
+				pass
+
+def create_dset(directory):
+	'''tries to autocreate a dataset from images in the given directory'''
+	_create_dset_dicom(directory)
+	# Add more options for GE I-files, and other non-DICOM data formats
