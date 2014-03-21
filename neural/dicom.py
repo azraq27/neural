@@ -181,8 +181,9 @@ def _create_dset_dicom(directory):
 		'-gert_create_dataset', '-gert_write_as_nifti',
 		'-quit'])
 	
-	if os.path.exists('%s.nii' % d):
-		nl.run(['gzip','%s.nii' % d])
+	out_file = '%s.nii' % nl.afni.prefix(d)
+	if os.path.exists(out_file):
+		nl.run(['gzip',out_file])
 	
 	for junk in ['dimon.files.run.*','GERT_Reco_dicom_*']:
 		for fname in glob.glob(junk):
