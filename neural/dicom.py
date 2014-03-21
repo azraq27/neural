@@ -177,7 +177,7 @@ def _create_dset_dicom(directory):
 		'Dimon',
 		'-infile_prefix','%s/' % directory,
 		'-dicom_org', '-GERT_Reco', 
-		'-gert_to3d_prefix', d,
+		'-gert_to3d_prefix', nl.afni.prefix(d),
 		'-gert_create_dataset', '-gert_write_as_nifti',
 		'-quit'])
 	
