@@ -23,40 +23,43 @@ class Server:
 		c = zmq.Context()
 		sock = c.socket(zmq.REP)
 		sock.bind('tcp://*:%s' % self.port)
-	
-		while True:
-			msg = sock.recv()
-			try:
-				obj = json.loads(msg)
-				if 'key' not in obj or obj['key']!=_key:
-					raise ValueError
-				if self.password:
-					if 'password' not in obj or 'time' not in obj:
+		
+		try:
+			while True:
+				msg = sock.recv()
+				try:
+					obj = json.loads(msg)
+					if 'key' not in obj or obj['key']!=_key:
 						raise ValueError
-					if nl.hash_str(self.password + str(obj['time']))!= obj['password']:
-						raise ValueError
-			except ValueError:
-				# not a valid packet
-				sock.send('ERR')
-				continue
-			else:
-				if 'task' in obj:
-					if obj['task']=='info':
-						sock.send(json.dumps({'name':self.name,'address':self.address,'port':self.port}))
-						continue
+					if self.password:
+						if 'password' not in obj or 'time' not in obj:
+							raise ValueError
+						if nl.hash_str(self.password + str(obj['time']))!= obj['password']:
+							raise ValueError
+				except ValueError:
+					# not a valid packet
+					sock.send('ERR')
+					continue
+				else:
+					if 'task' in obj:
+						if obj['task']=='info':
+							sock.send(json.dumps({'name':self.name,'address':self.address,'port':self.port}))
+							continue
 					
-					if obj['task']=='job':
-						print 'Being asked to run command: ' + str(obj['command'])
-						cmd = [obj['command'],None,'.']
-						if 'products' in obj:
-							cmd[1] = obj['products']
-						if 'working_directory' in obj:
-							cmd[2] = obj['working_directory']
-						output = nl.run(*cmd)
-						sock.send(json.dumps({'output':output}))
-						continue
+						if obj['task']=='job':
+							print 'Being asked to run command: ' + str(obj['command'])
+							cmd = [obj['command'],None,'.']
+							if 'products' in obj:
+								cmd[1] = obj['products']
+							if 'working_directory' in obj:
+								cmd[2] = obj['working_directory']
+							output = nl.run(*cmd)
+							sock.send(json.dumps({'output':output}))
+							continue
 				
-				sock.send('OK')
+					sock.send('OK')
+		except KeyboardInterrupt:
+			c.destroy()
 
 def _send_raw(msg,address='localhost',port=default_port):
 	c = zmq.Context()
