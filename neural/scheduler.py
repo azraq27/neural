@@ -208,8 +208,10 @@ def _new_run(command,products=None,working_directory='.',force_local=False):
 	else:
 		job = Job(command,products,working_directory)
 		if 'password' in server:
-			return send_job(job,server['address'],server['port'],server['password'])
+			job_return = send_job(job,server['address'],server['port'],server['password'])
 		else:
-			return send_job(job,server['address'],server['port'])
+			job_return = send_job(job,server['address'],server['port'])
+		if job_return and 'output' in job_return:
+			return job_return['output']
 
 nl.run = _new_run
