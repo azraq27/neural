@@ -139,7 +139,10 @@ def thresh_at(dset,p,subbrick=0,positive_only=False):
 	expr = 'astep(a,%f)' % t
 	if positive_only:
 		expr = 'step(a-%f)' % t
-	return '3dcalc( -a%d %s -expr %s )' % (subbrick,dset,expr)
+	subref = '-a%d' % subbrick
+	if subbrick==0 and dset[-1]==']':
+		subref = '-a'
+	return '3dcalc( %s %s -expr %s )' % (subref,dset,expr)
 
 def voxel_count(dset,subbrick=0,p=None,positive_only=False):
 	''' returns the number of non-zero voxels, or number of voxels exceeding the given *p*-value threshold '''
