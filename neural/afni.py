@@ -145,7 +145,7 @@ def thresh_at(dset,p,subbrick=0,positive_only=False,suffix=None):
 		subref = '-a'
 	if suffix==None:
 		return '3dcalc( %s %s -expr %s )' % (subref,dset,expr)
-	nl.run(['3dcalc',subref,dset,'-expr',expr,'-prefix',suffix(dset,suffix)])
+	neural.run(['3dcalc',subref,dset,'-expr',expr,'-prefix',suffix(dset,suffix)])
 
 def voxel_count(dset,subbrick=0,p=None,positive_only=False):
 	''' returns the number of non-zero voxels, or number of voxels exceeding the given *p*-value threshold '''
