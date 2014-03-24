@@ -132,7 +132,7 @@ def cdf(dset,p,subbrick=0):
 	command = ['cdf','-p2t',info.subbricks[subbrick]['stat'],str(p)] + info.subbricks[subbrick]['params']
 	return float(subprocess.check_output(command).split()[2])
 
-def thresh_at(dset,p,subbrick=0,positive_only=False,suffix=None):
+def thresh_at(dset,p,subbrick=0,positive_only=False,output_suffix=None):
 	''' returns a string containing an inline ``3dcalc`` command that thresholds the 
 		given dataset at the specified *p*-value, or will create a new dataset if a 
 		suffix is given '''
@@ -143,9 +143,9 @@ def thresh_at(dset,p,subbrick=0,positive_only=False,suffix=None):
 	subref = '-a%d' % subbrick
 	if subbrick==0 and dset[-1]==']':
 		subref = '-a'
-	if suffix==None:
+	if output_suffix==None:
 		return '3dcalc( %s %s -expr %s )' % (subref,dset,expr)
-	neural.run(['3dcalc',subref,dset,'-expr',expr,'-prefix',suffix(dset,suffix)])
+	neural.run(['3dcalc',subref,dset,'-expr',expr,'-prefix',suffix(dset,output_suffix)])
 
 def voxel_count(dset,subbrick=0,p=None,positive_only=False):
 	''' returns the number of non-zero voxels, or number of voxels exceeding the given *p*-value threshold '''
