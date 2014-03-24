@@ -182,7 +182,7 @@ def _create_dset_dicom(directory):
 		'-infile_prefix','%s/' % directory,
 		'-dicom_org', '-GERT_Reco', 
 		'-gert_to3d_prefix', nl.afni.prefix(d),
-		'-gert_create_dataset', '-gert_write_as_nifti',
+		'-gert_create_dataset', '-gert_write_as_nifti', '-gert_quit_on_err',
 		'-quit'])
 	
 	out_file = '%s.nii' % nl.afni.prefix(d)
