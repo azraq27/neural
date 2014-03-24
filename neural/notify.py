@@ -9,7 +9,8 @@ import platform
 level_interactive = 0	#! Only notify to an interactive system
 level_normal = 1		#! Print things out to the active user
 level_log = 2			#! Don't print now, but add to the log, notify per schedule
-level_critical = 3		#! Try to alert user by all means necessary
+level_important = 3		#! Print, and try to add it to the list of significant events for this run
+level_critical = 4		#! Try to alert user by all means necessary
 
 interactive_enabled = False
 

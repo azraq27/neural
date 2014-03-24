@@ -173,6 +173,10 @@ def _create_dset_dicom(directory):
 	while d.endswith('/'):
 		d = d[:1]
 	
+	if not os.path.exists(directory):
+		nl.notify('Error: could not find %s')
+		return
+	
 	nl.run([
 		'Dimon',
 		'-infile_prefix','%s/' % directory,

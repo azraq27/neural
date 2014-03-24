@@ -6,6 +6,7 @@ from notify import notify
 import os,subprocess
 import datetime
 import hashlib
+import zlib, base64
 
 #! A list of archives this library understands
 archive_formats = {
@@ -147,3 +148,11 @@ class simple_timer:
 def factor(n):
 	'''return set of all prime factors for a number'''
 	return set(reduce(list.__add__, ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+
+def compress(data, level=9):
+	''' return compressed, ASCII-encoded string '''
+	return base64.encodestring(zlib.compress(data,9))
+
+def decompress(data):
+	''' return uncompressed string '''
+	return zlib.decompress(base64.decodestring(data))
