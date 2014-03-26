@@ -304,6 +304,9 @@ class Decon:
 		self.tout = True
 		self.vout = True
 		self.rout = True
+		self.reps = None
+		self.TR = None
+		self.stim_sds = None
 	
 	def command_list(self):
 		'''returns the 3dDeconvolve command as a list
@@ -319,7 +322,12 @@ class Decon:
 			cmd += ['-input'] + self.input_dsets
 		else:
 			cmd += ['-nodata']
-		cmd += ['-censor', self.censor_file]
+			if self.reps:
+				cmd += [str(self.reps)]
+				if self.TR:
+					cmd += [str(self.TR)]
+		if self.censor_file:
+			cmd += ['-censor', self.censor_file]
 		cmd += ['-nfirst',str(self.nfirst)]
 		if self.mask:
 			if self.mask=='auto':
@@ -365,7 +373,7 @@ class Decon:
 		if self.prefix:
 			cmd += ['-bucket', self.prefix]
 		
-		return cmd
+		return [str(x) for x in cmd]
 	
 	def command_string(self):
 		'''returns the 3dDeconvolve command as as string
@@ -373,10 +381,15 @@ class Decon:
 		This command can then be run in something like a shell script
 		'''
 		return ' '.join(self.command_list())
+		
 	
 	def run(self,working_directory='.'):
 		'''runs 3dDeconvolve through the neural.utils.run shortcut'''
-		return neural.run(self.command_list(),working_directory=working_directory,products=self.prefix)
+		out = neural.run(self.command_list(),working_directory=working_directory,products=self.prefix)
+		stim_sds_list = [x.split() for x in out.strip().split('\n\n')]
+		self.stim_sds = {}
+		for stim in stim_sds_list:
+			self.stim_sds[stim[1]] = float(stim[-1])
 
 def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',qwarp_suffix='_qwarp'):
 	'''aligns ``dset_from`` to ``dset_to`` using 3dQwarp
@@ -515,3 +528,4 @@ def qwarp_invert(warp_param_dset,output_dset,affine_1Dfile=None):
 	if affine_1Dfile:
 		cmd += ['-warp2','INV(%s)' % affine_1Dfile]
 	neural.run(cmd,products=output_dset)
+
