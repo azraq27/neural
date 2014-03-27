@@ -181,12 +181,12 @@ def _create_dset_dicom(directory):
 		'Dimon',
 		'-infile_prefix','%s/' % directory,
 		'-dicom_org', '-GERT_Reco', 
-		'-gert_to3d_prefix', .prefix(d),
+		'-gert_to3d_prefix', nl.afni.prefix(d),
 		'-gert_create_dataset', '-gert_write_as_nifti', '-gert_quit_on_err',
 		'-max_images','100000',
 		'-quit'])
 	
-	out_file = '%s.nii' % .prefix(d)
+	out_file = '%s.nii' % nl.afni.prefix(d)
 	if os.path.exists(out_file):
 		nl.run(['gzip',out_file])
 	
@@ -213,8 +213,8 @@ def organize_dir(orig_dir):
 		(0x8,0x31),		# Time
 		(0x8,0x103e)	# Descr
 	]
-	files = nl.dicom.scan_dir(orig_dir,tags=tags,md5_hash=True)
-	dups = nl.dicom.find_dups(files)
+	files = scan_dir(orig_dir,tags=tags,md5_hash=True)
+	dups = find_dups(files)
 	for dup in dups:
 		nl.notify('Found duplicates of %s...' % dup[0])
 		for each_dup in dup[1:]:
@@ -225,7 +225,7 @@ def organize_dir(orig_dir):
 				nl.notify('\t[failed]')
 			del(files[each_dup])
 	
-	clustered = nl.dicom.cluster_files(files)
+	clustered = cluster_files(files)
 	output_dir = '%s-sorted' % orig_dir
 	for key in clustered:
 		if (0x8,0x31) in clustered[key]['info']:
