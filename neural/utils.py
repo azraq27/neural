@@ -60,6 +60,20 @@ class run_in:
 	def __exit__(self, type, value, traceback):
 		os.chdir(self.old_cwd)
 
+class RunResult:
+    '''result of calling :meth:`run`
+    
+    when used as a string, will try to reasonably return the filename of the primary output
+    of the command (if known)'''
+    
+    def __init__(self,output=None,return_code=None,output_filename=None):
+        self.output_filename = output_filename
+        self.output = output
+        self.return_code = return_code
+    
+    def __str__(self):
+        return self.output_filename
+
 def run(command,products=None,working_directory='.',force_local=False):
 	'''wrapper to run external programs
 	
@@ -71,7 +85,7 @@ def run(command,products=None,working_directory='.',force_local=False):
 	:force_local:		when used with :module:`neural.scheduler`, setting to ``True`` will disable
 						all job distribution functions
 	
-	Returns stdout of command
+	Returns result in form of :class:`RunResult`
 	'''
 	with run_in(working_directory):
 		if products:
@@ -85,6 +99,7 @@ def run(command,products=None,working_directory='.',force_local=False):
 		if(neural.verbose):
 			notify('Running %s...' % command[0])
 		out = None
+        returncode = 0
 		try:
 			out = subprocess.check_output(command)
 		except subprocess.CalledProcessError, e:
@@ -100,7 +115,12 @@ def run(command,products=None,working_directory='.',force_local=False):
 -----------------------
 Return code: %d
 ''' % (command[0],' '.join(command),e.output,e.returncode))
-		return out
+            returncode = e.returncode
+        
+        result = RunResult(out,returncode)
+        if products and returncode==0:
+            result.output_filename = products[0]
+		return result
 
 def log(fname,msg):
 	''' generic logging function '''
