@@ -64,8 +64,7 @@ class RunResult:
     '''result of calling :meth:`run`
     
     when used as a string, will try to reasonably return the filename of the primary output
-    of the command (if known)'''
-    
+    of the command (if known)'''    
     def __init__(self,output=None,return_code=None,output_filename=None):
         self.output_filename = output_filename
         self.output = output
@@ -116,7 +115,6 @@ def run(command,products=None,working_directory='.',force_local=False):
 Return code: %d
 ''' % (command[0],' '.join(command),e.output,e.returncode))
             returncode = e.returncode
-        
         result = RunResult(out,returncode)
         if products and returncode==0:
             result.output_filename = products[0]
