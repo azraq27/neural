@@ -54,7 +54,7 @@ class Server:
 							if 'working_directory' in obj:
 								cmd[2] = obj['working_directory']
 							output = nl.run(*cmd)
-							sock.send(json.dumps({'output':output}))
+							sock.send(json.dumps({'output':output.__dict__()}))
 							continue
 				
 					sock.send('OK')
@@ -86,7 +86,6 @@ class Job:
 		self.working_directory = working_directory
 		self.products = products
 		self.result = None
-		self.output = None
 
 def send_job(job,address='localhost',port=default_port,password=None):
 	job_req_dict = dict({'key':_key,'task':'job','time':time.time()}.items() + job.__dict__.items())
@@ -97,7 +96,13 @@ def send_job(job,address='localhost',port=default_port,password=None):
 	try:
 		rep_dict = json.loads(rep)
 		for key in rep_dict:
-			setattr(job,key,rep_dict[key])
+            if key=='output':
+                output = nl.utils.RunResult()
+                for okey in output:
+                    setattr(output,okey,output[okey])
+                job.output = output
+            else:
+                setattr(job,key,rep_dict[key])
 	except (ValueError,KeyError):
 		return None
 	return job
