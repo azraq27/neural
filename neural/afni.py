@@ -381,7 +381,6 @@ class Decon:
 		This command can then be run in something like a shell script
 		'''
 		return ' '.join(self.command_list())
-		
 	
 	def run(self,working_directory='.'):
 		'''runs 3dDeconvolve through the neural.utils.run shortcut'''

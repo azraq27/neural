@@ -100,10 +100,10 @@ def run(command,products=None,working_directory='.',force_local=False):
 			notify('Running %s...' % command[0])
 		out = None
         returncode = 0
-		try:
+        try:
 			out = subprocess.check_output(command)
-		except subprocess.CalledProcessError, e:
-			notify('''ERROR: %s returned a non-zero status
+        except subprocess.CalledProcessError, e:
+            notify('''ERROR: %s returned a non-zero status
 
 ----COMMAND------------
 %s
@@ -120,7 +120,7 @@ Return code: %d
         result = RunResult(out,returncode)
         if products and returncode==0:
             result.output_filename = products[0]
-		return result
+        return result
 
 def log(fname,msg):
 	''' generic logging function '''
