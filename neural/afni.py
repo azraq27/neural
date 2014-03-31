@@ -385,10 +385,11 @@ class Decon:
     def run(self,working_directory='.'):
         '''runs 3dDeconvolve through the neural.utils.run shortcut'''
         out = neural.run(self.command_list(),working_directory=working_directory,products=self.prefix)
-        stim_sds_list = [x.split() for x in out.strip().split('\n\n')]
-        self.stim_sds = {}
-        for stim in stim_sds_list:
-            self.stim_sds[stim[1]] = float(stim[-1])
+        if out and out.output:
+            stim_sds_list = [x.split() for x in out.output.strip().split('\n\n')]
+            self.stim_sds = {}
+            for stim in stim_sds_list:
+                self.stim_sds[stim[1]] = float(stim[-1])
 
 def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',qwarp_suffix='_qwarp'):
     '''aligns ``dset_from`` to ``dset_to`` using 3dQwarp
