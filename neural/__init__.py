@@ -11,6 +11,7 @@ verbose = True
 from utils import *
 
 import afni
+import fsl
 import eprime
 import dicom
 
