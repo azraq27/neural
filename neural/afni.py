@@ -442,7 +442,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
     
     for dset in [dset_from,dset_to]:
         if skull_strip==True or skull_strip==dset:
-            neural.fsl.skullstrip(dset,'_ns')
+            neural.fsl.skull_strip(dset,'_ns')
         
         neural.run([
             '3dUnifize',
