@@ -421,7 +421,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
     If ``skull_strip`` is a string instead of ``True``/``False``, it will only skull strip the given
     dataset instead of both of them
     
-    
+    # TODO: currently does not work with +tlrc datasets because the filenames get mangled
     '''
     
     dset_ss = lambda dset: os.path.split(suffix(dset,'_ns'))[1]
