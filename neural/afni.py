@@ -442,13 +442,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
     
     for dset in [dset_from,dset_to]:
         if skull_strip==True or skull_strip==dset:
-            neural.run([
-                '3dSkullStrip',
-                '-input', dset,
-                '-prefix', dset_ss(dset),
-                '-niter', '400',
-                '-ld', '40'
-            ],products=dset_ss(dset))
+            neural.fsl.skullstrip(dset,'_ns')
         
         neural.run([
             '3dUnifize',
@@ -529,3 +523,12 @@ def qwarp_invert(warp_param_dset,output_dset,affine_1Dfile=None):
         cmd += ['-warp2','INV(%s)' % affine_1Dfile]
     neural.run(cmd,products=output_dset)
 
+def skull_strip(dset,out_suffix='_ns'):
+    ''' runs 3dSkullStrip '''
+    neural.run([
+        '3dSkullStrip',
+        '-input', dset,
+        '-prefix', suffix(dset,out_suffix),
+        '-niter', '400',
+        '-ld', '40'
+    ],products=suffix(dset,out_suffix))
