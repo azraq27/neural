@@ -1,5 +1,5 @@
 ''' wrapper functions for common AFNI tasks '''
-import re,subprocess,os
+import re,subprocess,os,glob
 import multiprocessing
 import neural
 import platform
@@ -79,8 +79,14 @@ def dset_info(dset):
     
     # Other info..
     details_regex = {
-        r'Identifier Code:\s+([^ ]+)': 'identifier',
+        'identifier': r'Identifier Code:\s+([^ ]+)',
+        'filetype': r'Storage Mode:\s+([^ ]+)'
     }
+    
+    for d in details_regex:
+        m = re.search(details_regex[d],raw_info)
+        if m:
+            setattr(info,d,m.group(1))
     
     return info
 
@@ -183,6 +189,19 @@ def nifti_copy(filename):
     if not os.path.exists(nifti_filename):
         subprocess.call(['3dcalc','-a',filename,'-expr','a','-prefix',nifti_filename])
     return nifti_filename
+
+def is_nifti(filename):
+    info = dset_info(filename)
+    if 'filetype' in dir(info):
+        if info.filetype=='NIFTI':
+            return True
+        else:
+            return False
+    else
+        if filename.find('.nii')>0:
+            return True
+        else
+            return False
 
 class temp_afni_copy:
     ''' used within a ``with`` block, will create a temporary ``+orig`` copy of dataset
@@ -532,3 +551,42 @@ def skull_strip(dset,out_suffix='_ns'):
         '-niter', '400',
         '-ld', '40'
     ],products=suffix(dset,out_suffix))
+
+def align_epi_anat(anatomy,epi_dsets):
+    ''' aligns epis to anatomy using ``align_epi_anat.py`` script
+    
+    :epi_dsets:       can be either a string or list of strings of the epi child datasets
+    
+    The default output suffix is "_al"
+    '''
+    
+    if isinstance(epi_dsets,basestring):
+        epi_dsets = [epi_dsets]
+    
+    if os.path.exists(nl.afni.suffix(epi_dsets[0],'_al')):
+        return
+    
+    anatomy_use = anatomy
+    if is_nifti(anatomy):
+        anatomy_use = afni_copy(anatomy)
+    epi_dsets_use = []
+    for dset in epi_dsets:
+        if is_nifti(dset):
+            epi_dsets_use.append(afni_copy(dset))
+        else:
+            epi_dsets_use.append(dset)
+    
+    cmd = ["align_epi_anat.py", "-epi2anat", "-anat", anatomy_use, "-epi_base", "5", "-epi", epi_dsets_use[0]]
+    if len(epi_dsets_use)>1:
+        cmd += ['-child_epi'] + epi_dsets_use[1:]
+    nl.run(cmd)
+    
+    for dset in ([anatomy] + epi_dsets):
+        if is_nifti(dset):
+            if dset!=anatomy:
+                nifti_copy(nl.afni.prefix(dset)+'_al+orig')            
+            if dset==anatomy or os.path.exists(nl.afni.suffix(dset,'_al')):
+                for suffix in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
+                    for d in glob.glob(nl.afni.prefix(dset) + suffix):
+                        if os.path.exists(d):
+                            os.remove(d)
