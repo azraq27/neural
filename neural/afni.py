@@ -197,10 +197,10 @@ def is_nifti(filename):
             return True
         else:
             return False
-    else
+    else:
         if filename.find('.nii')>0:
             return True
-        else
+        else:
             return False
 
 class temp_afni_copy:
