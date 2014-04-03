@@ -30,7 +30,7 @@ def open(dsets=[]):
 
 def _dset_raw_info(dset):
     ''' returns raw output from running ``3dinfo`` '''
-    return subprocess.check_output(['3dinfo','-verb',dset])
+    return subprocess.check_output(['3dinfo','-verb',dset],stderr=subprocess.STDOUT)
 
 class DsetInfo:
     ''' contains organized output from ``3dinfo`` 
@@ -589,7 +589,7 @@ def align_epi_anat(anatomy,epi_dsets):
             if dset!=anatomy:
                 nifti_copy(prefix(dset)+'_al+orig')            
             if dset==anatomy or os.path.exists(suffix(dset,'_al')):
-                for suffix in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
-                    for d in glob.glob(prefix(dset) + suffix):
+                for s in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
+                    for d in glob.glob(prefix(dset) + s):
                         if os.path.exists(d):
                             os.remove(d)
