@@ -80,7 +80,7 @@ def dset_info(dset):
     # Other info..
     details_regex = {
         'identifier': r'Identifier Code:\s+([^ ]+)',
-        'filetype': r'Storage Mode:\s+([^ ]+)'
+        'filetype': r'Storage Mode:\s+([^ ]+)$'
     }
     
     for d in details_regex:
@@ -585,12 +585,12 @@ def align_epi_anat(anatomy,epi_dsets):
     out = neural.run(cmd)
     print out.output
     
-#    for dset in ([anatomy] + epi_dsets):
-#        if is_nifti(dset):
-#            if dset!=anatomy:
-#                nifti_copy(prefix(dset)+'_al+orig')            
-#            if dset==anatomy or os.path.exists(suffix(dset,'_al')):
-#                for s in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
-#                    for d in glob.glob(prefix(dset) + s):
-#                        if os.path.exists(d):
-#                            os.remove(d)
+    for dset in ([anatomy] + epi_dsets):
+        if is_nifti(dset):
+            if dset!=anatomy:
+                nifti_copy(prefix(dset)+'_al+orig')            
+            if dset==anatomy or os.path.exists(suffix(dset,'_al')):
+                for s in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
+                    for d in glob.glob(prefix(dset) + s):
+                        if os.path.exists(d):
+                            os.remove(d)
