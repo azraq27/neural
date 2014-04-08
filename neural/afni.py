@@ -582,7 +582,8 @@ def align_epi_anat(anatomy,epi_dsets):
     cmd = ["align_epi_anat.py", "-epi2anat", "-anat", anatomy_use, "-epi_base", "5", "-epi", epi_dsets_use[0]]
     if len(epi_dsets_use)>1:
         cmd += ['-child_epi'] + epi_dsets_use[1:]
-    neural.run(cmd)
+    out = neural.run(cmd)
+    print out.output
     
 #    for dset in ([anatomy] + epi_dsets):
 #        if is_nifti(dset):
