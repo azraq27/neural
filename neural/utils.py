@@ -10,55 +10,65 @@ import zlib, base64
 
 #! A list of archives this library understands
 archive_formats = {
-	'zip': {'suffix':'zip', 'command':lambda output,filename: ['unzip','-o','-d',output,filename]},
-	'tarball': {'suffix':('tar.gz','tgz'), 'command':lambda output,filename: ['tar','zx','-C',output,'-f',filename]},
-	'tarball-bzip': {'suffix':('tar.bz2','tbz'), 'command':lambda output,filename: ['tar','jx','-C',output,'-f',filename]},
-	'7zip': {'suffix':'7z', 'command':lambda output,filename: ['7z','x','-y','-o%s' % output, filename]}
+    'zip': {'suffix':'zip', 'command':lambda output,filename: ['unzip','-o','-d',output,filename]},
+    'tarball': {'suffix':('tar.gz','tgz'), 'command':lambda output,filename: ['tar','zx','-C',output,'-f',filename]},
+    'tarball-bzip': {'suffix':('tar.bz2','tbz'), 'command':lambda output,filename: ['tar','jx','-C',output,'-f',filename]},
+    '7zip': {'suffix':'7z', 'command':lambda output,filename: ['7z','x','-y','-o%s' % output, filename]}
 }
 
 def is_archive(filename):
-	'''returns boolean of whether this filename looks like an archive'''
-	for archive in archive_formats:
-		if filename.endswith(archive_formats[archive]['suffix']):
-			return True
-	return False
+    '''returns boolean of whether this filename looks like an archive'''
+    for archive in archive_formats:
+        if filename.endswith(archive_formats[archive]['suffix']):
+            return True
+    return False
 
 def unarchive(filename,output_dir='.'):
-	'''unpacks the given archive into ``output_dir``'''
-	if not os.path.exists(output_dir):
-		os.makedirs(output_dir)
-	for archive in archive_formats:
-		if filename.endswith(archive_formats[archive]['suffix']):
-			return subprocess.call(archive_formats[archive]['command'](output_dir,filename))==0
-	return False
+    '''unpacks the given archive into ``output_dir``'''
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    for archive in archive_formats:
+        if filename.endswith(archive_formats[archive]['suffix']):
+            return subprocess.call(archive_formats[archive]['command'](output_dir,filename))==0
+    return False
 
 def flatten(nested_list):
-	'''converts a list-of-lists to a single flat list'''
-	return_list = []
-	for i in nested_list:
-		if isinstance(i,list):
-			return_list += flatten(i)
-		else:
-			return_list.append(i)
-	return return_list
+    '''converts a list-of-lists to a single flat list'''
+    return_list = []
+    for i in nested_list:
+        if isinstance(i,list):
+            return_list += flatten(i)
+        else:
+            return_list.append(i)
+    return return_list
 
 class run_in:
-	'''temporarily changes into another directory
-	
-	Example::	
-		with run_in('another_directory'):
-			do_some_stuff_there()
-	'''
-	def __init__(self,working_directory):
-		self.working_directory = working_directory
+    '''temporarily changes into another directory
+    
+    If the directory name you pass doesn't exist, but matches the current directory
+    you are in, it will silently ignore your silliness. Otherwise, it will raise an
+    ``OSError``
+    
+    Example::   
+        with run_in('another_directory'):
+            do_some_stuff_there()
+    '''
+    def __init__(self,working_directory):
+        self.working_directory = working_directory
 
-	def __enter__(self):
-		self.old_cwd = os.getcwd()
-		if self.working_directory:
-			os.chdir(self.working_directory)
-
-	def __exit__(self, type, value, traceback):
-		os.chdir(self.old_cwd)
+    def __enter__(self):
+        self.old_cwd = os.getcwd()
+        if self.working_directory:
+            if os.path.exists(self.working_directory):
+                os.chdir(self.working_directory)
+            elif self.old_cwd.endswith(self.working_directory.rstrip('/')):
+                # Silly, we're already in that directory
+                pass
+            else:
+                raise IOError('Attempting to run_in the non-existent directory "%s"' % self.working_directory)
+    
+    def __exit__(self, type, value, traceback):
+        os.chdir(self.old_cwd)
 
 class RunResult:
     '''result of calling :meth:`run`
@@ -74,33 +84,33 @@ class RunResult:
         return self.output_filename
 
 def run(command,products=None,working_directory='.',force_local=False):
-	'''wrapper to run external programs
-	
-	:command:			list containing command and parameters 
-						(formatted the same as subprocess; must contain only strings)
-	:products:			string or list of files that are the products of this command
-						if all products exist, the command will not be run, and False returned
-	:working_directory:	will chdir to this directory
-	:force_local:		when used with :module:`neural.scheduler`, setting to ``True`` will disable
-						all job distribution functions
-	
-	Returns result in form of :class:`RunResult`
-	'''
-	with run_in(working_directory):
-		if products:
-			if isinstance(products,basestring):
-				products = [products]
-			if all([os.path.exists(x) for x in products]):
-				return False
-		
-		command = flatten(command)
-		command = [str(x) for x in command]
-		if(neural.verbose):
-			notify('Running %s...' % command[0])
-		out = None
+    '''wrapper to run external programs
+    
+    :command:           list containing command and parameters 
+                        (formatted the same as subprocess; must contain only strings)
+    :products:          string or list of files that are the products of this command
+                        if all products exist, the command will not be run, and False returned
+    :working_directory: will chdir to this directory
+    :force_local:       when used with :module:`neural.scheduler`, setting to ``True`` will disable
+                        all job distribution functions
+    
+    Returns result in form of :class:`RunResult`
+    '''
+    with run_in(working_directory):
+        if products:
+            if isinstance(products,basestring):
+                products = [products]
+            if all([os.path.exists(x) for x in products]):
+                return False
+        
+        command = flatten(command)
+        command = [str(x) for x in command]
+        if(neural.verbose):
+            notify('Running %s...' % command[0])
+        out = None
         returncode = 0
         try:
-			out = subprocess.check_output(command)
+            out = subprocess.check_output(command)
         except subprocess.CalledProcessError, e:
             notify('''ERROR: %s returned a non-zero status
 
@@ -108,7 +118,7 @@ def run(command,products=None,working_directory='.',force_local=False):
 %s
 -----------------------
 
-					
+                    
 ----OUTPUT-------------
 %s
 -----------------------
@@ -121,56 +131,56 @@ Return code: %d
         return result
 
 def log(fname,msg):
-	''' generic logging function '''
-	with open(fname,'a') as f:
-		f.write(datetime.datetime.now().strftime('%m-%d-%Y %H:%M:\n') + msg + '\n')
+    ''' generic logging function '''
+    with open(fname,'a') as f:
+        f.write(datetime.datetime.now().strftime('%m-%d-%Y %H:%M:\n') + msg + '\n')
 
 def hash(filename):
-	'''returns string of MD5 hash of given filename'''
-	buffer_size = 10*1024*1024
-	m = hashlib.md5()
-	with open(filename) as f:
-		buff = f.read(buffer_size)
-		while len(buff)>0:
-			m.update(buff)
-			buff = f.read(buffer_size)			
-	dig = m.digest()
-	return ''.join(['%x' % ord(x) for x in dig])
+    '''returns string of MD5 hash of given filename'''
+    buffer_size = 10*1024*1024
+    m = hashlib.md5()
+    with open(filename) as f:
+        buff = f.read(buffer_size)
+        while len(buff)>0:
+            m.update(buff)
+            buff = f.read(buffer_size)          
+    dig = m.digest()
+    return ''.join(['%x' % ord(x) for x in dig])
 
 def hash_str(string):
-	'''returns string of MD5 hash of given string'''
-	m = hashlib.md5()
-	m.update(string)
-	dig = m.digest()
-	return ''.join(['%x' % ord(x) for x in dig])
+    '''returns string of MD5 hash of given string'''
+    m = hashlib.md5()
+    m.update(string)
+    dig = m.digest()
+    return ''.join(['%x' % ord(x) for x in dig])
 
 class simple_timer:
-	'''a simple way to time a single run of a function
-	
-	Example::
-		with simple_timer():
-			do_stuff()
-	'''
-	def __init__(self):
-		self.start_time = None
-	
-	def __enter__(self):
-		self.start_time = datetime.datetime.now()
-		print 'timer start time: %s' % self.start_time.strftime('%Y-%m-%d %H:%M:%S')
-	
-	def __exit__(self, type, value, traceback):
-		self.end_time = datetime.datetime.now()
-		print 'timer end time: %s' % self.end_time.strftime('%Y-%m-%d %H:%M:%S')
-		print 'time elapsed: %s' % str(self.end_time-self.start_time)
+    '''a simple way to time a single run of a function
+    
+    Example::
+        with simple_timer():
+            do_stuff()
+    '''
+    def __init__(self):
+        self.start_time = None
+    
+    def __enter__(self):
+        self.start_time = datetime.datetime.now()
+        print 'timer start time: %s' % self.start_time.strftime('%Y-%m-%d %H:%M:%S')
+    
+    def __exit__(self, type, value, traceback):
+        self.end_time = datetime.datetime.now()
+        print 'timer end time: %s' % self.end_time.strftime('%Y-%m-%d %H:%M:%S')
+        print 'time elapsed: %s' % str(self.end_time-self.start_time)
 
 def factor(n):
-	'''return set of all prime factors for a number'''
-	return set(reduce(list.__add__, ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+    '''return set of all prime factors for a number'''
+    return set(reduce(list.__add__, ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
 
 def compress(data, level=9):
-	''' return compressed, ASCII-encoded string '''
-	return base64.encodestring(zlib.compress(data,9))
+    ''' return compressed, ASCII-encoded string '''
+    return base64.encodestring(zlib.compress(data,9))
 
 def decompress(data):
-	''' return uncompressed string '''
-	return zlib.decompress(base64.decodestring(data))
+    ''' return uncompressed string '''
+    return zlib.decompress(base64.decodestring(data))
