@@ -80,7 +80,7 @@ def dset_info(dset):
     # Other info..
     details_regex = {
         'identifier': r'Identifier Code:\s+([^ ]+)',
-        'filetype': r'Storage Mode:\s+(.*?)'
+        'filetype': r'Storage Mode:\s+(.*)'
     }
     
     for d in details_regex:
