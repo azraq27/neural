@@ -80,13 +80,13 @@ def dset_info(dset):
     # Other info..
     details_regex = {
         'identifier': r'Identifier Code:\s+([^ ]+)',
-        'filetype': r'Storage Mode:\s+([^ ]+)$'
+        'filetype': r'Storage Mode:\s+([^ ]+)'
     }
     
     for d in details_regex:
-        m = re.search(details_regex[d],raw_info)
-        if m:
-            setattr(info,d,m.group(1))
+        m = re.findall(details_regex[d],raw_info)
+        if len(m):
+            setattr(info,d,m[0].group(1))
     
     return info
 
