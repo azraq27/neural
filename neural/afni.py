@@ -86,7 +86,7 @@ def dset_info(dset):
     for d in details_regex:
         m = re.findall(details_regex[d],raw_info)
         if len(m):
-            setattr(info,d,m[0].group(1))
+            setattr(info,d,m[0])
     
     return info
 
