@@ -2,6 +2,7 @@
 import re,subprocess,os,glob
 import multiprocessing
 import neural
+import neural as nl
 import platform
 from operator import mul
 
