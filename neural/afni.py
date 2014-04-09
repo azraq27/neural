@@ -119,18 +119,29 @@ def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False):
     i = info.subbrick_labeled(label)
     return '%s[%d]' % (dset,i)
 
-def calc(dsets,expr):
+def calc(dsets,expr,prefix=None):
     ''' returns a string of an inline 3dcalc expression
     
     ``dsets`` can be a single string, or list of strings. Each string in ``dsets`` will
-    be labeled 'a','b','c', sequentially. The expression ``expr`` is used directly'''
+    be labeled 'a','b','c', sequentially. The expression ``expr`` is used directly
+    
+    If ``prefix`` is not given, will return a 3dcalc string that can be passed to another 
+    AFNI program as a dataset. Otherwise, will create the dataset with the name ``prefix``'''
     if isinstance(dsets,basestring):
         dsets = [dsets]
-    cmd = '3dcalc( '
-    for i in xrange(len(dsets)):
-        cmd += '-%s %s ' % (chr(97+i),dsets[i])
-    cmd += '-expr %s )' % expr
-    return cmd
+    if prefix:
+        cmd = ['3dcalc']
+        for i in xrange(len(dsets)):
+            cmd += ['-%s'% chr(97+i),dsets[i]]
+        cmd += ['-expr',expr]
+        cmd += ['-prefix',prefix]
+        return nl.run(cmd,products=prefix)
+    else:
+        cmd = '3dcalc( '
+        for i in xrange(len(dsets)):
+            cmd += '-%s %s ' % (chr(97+i),dsets[i])
+        cmd += '-expr %s )' % expr
+        return cmd
 
 def cdf(dset,p,subbrick=0):
     ''' converts *p*-values to the appropriate statistic for the specified subbrick '''
