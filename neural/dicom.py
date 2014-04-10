@@ -2,6 +2,7 @@
 
 import subprocess,re,os,multiprocessing,glob
 import neural as nl
+import string
 
 def is_dicom(filename):
 	'''returns Boolean of whether the given file has the DICOM magic number'''
@@ -124,6 +125,10 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 							return_dict[fullname][tag] = tag_value['value']
 	return return_dict
 
+valid = '_.' + string.ascii_letters + string.digits
+def scrub_fname(fname):
+	return ''.join(c for c in fname.replace(' ','_') if c in valid).replace('__','_')
+	
 def find_dups(file_dict):
 	'''takes output from :meth:`scan_dir` and returns list of duplicate files'''
 	found_hashes = {}
