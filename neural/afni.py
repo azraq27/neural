@@ -199,7 +199,7 @@ def nifti_copy(filename):
     ''' creates a ``.nii.gz`` copy of the given dataset and returns the filename as a string '''
     nifti_filename = prefix(filename) + ".nii.gz"
     if not os.path.exists(nifti_filename):
-        subprocess.call(['3dcalc','-a',filename,'-expr','a','-prefix',nifti_filename])
+        subprocess.call(['3dAFNItoNIFTI',filename,'-prefix',nifti_filename])
     return nifti_filename
 
 def is_nifti(filename):
