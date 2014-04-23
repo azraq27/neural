@@ -165,6 +165,10 @@ def thresh_at(dset,p,subbrick=0,positive_only=False,output_suffix=None):
         return '3dcalc( %s %s -expr %s )' % (subref,dset,expr)
     neural.run(['3dcalc',subref,dset,'-expr',expr,'-prefix',suffix(dset,output_suffix)])
 
+def cluster(dset,min_distance,min_cluster_size,prefix):
+    ''' runs 3dmerge to cluster given dataset '''
+    neural.run(['3dmerge','-1clust',min_distance,min_cluster_size,'-prefix',prefix,dset])
+
 def voxel_count(dset,subbrick=0,p=None,positive_only=False):
     ''' returns the number of non-zero voxels, or number of voxels exceeding the given *p*-value threshold '''
     if p:
