@@ -133,7 +133,7 @@ def calc(dsets,expr,prefix=None,datum=None):
     if prefix:
         cmd = ['3dcalc']
     else:
-        cmd = '3dcalc( '
+        cmd = ['3dcalc( ']
     
     for i in xrange(len(dsets)):
         cmd += ['-%s'% chr(97+i),dsets[i]]
