@@ -161,7 +161,7 @@ def thresh_at(dset,p,subbrick=0,positive_only=False,output_suffix=None):
     t = cdf(dset,p,subbrick)
     expr = 'astep(a,%f)' % t
     if positive_only:
-        expr = 'step(a-%f)' % t
+        expr = 'abs(a)*step(a-%f)' % t
     subref = '-a%d' % subbrick
     if subbrick==0 and dset[-1]==']':
         subref = '-a'
@@ -187,19 +187,25 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
     else:
         if not dset.startswith('3dcalc('):
             dset = '%s[%d]' % (dset,subbrick)
+            if positive_only:
+                dset = calc(dset,'step(a)')
     
-    cmd = ['3dmaskave','-q','-mask']
+    count = 0
     if mask:
-        cmd += [mask]
-        if ROI:
-            cmd += ['-mrange',ROI,ROI]
+        cmd = ['3dROIstats','-1Dformat','-nomeanout','-nobriklab', '-nzvoxels']
+        cmd += ['-mask',mask]
+        out = subprocess.check_output(cmd).split('\n')
+        rois = [int(x.replace('NZcount_','')) for x in out[1].strip()[1:].split()]
+        counts = [int(x.replace('NZcount_','')) for x in out[3].strip().split()]
+        if ROI==None:
+            ROI = rois
+        for r in ROI:
+            if r in rois:
+                count += counts[rois.index(r)]
     else:
-        cmd += ['SELF']
-    if positive_only:
-        cmd += ['-drange','0','99999999']
-    cmd += [dset]
-    cmd = [str(x) for x in cmd]
-    return int(subprocess.check_output(cmd).strip())
+        cmd = ['3dBrickStat', '-slow', '-count', '-non-zero', dset]
+        count = int(subprocess.check_output(cmd).strip())
+    return count
 
 _afni_suffix_regex = r"((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\d+\])?$"
 
