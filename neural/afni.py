@@ -83,7 +83,7 @@ def dset_info(dset):
     slice_timing = re.findall('-time:[tz][tz] \d+ \d+ [0-9.]+ (.*) ',raw_info)
     if len(slice_timing):
         info.slice_timing = slice_timing[0]
-    TR = re.findall('Time step = ([0-9.]+)s',out)
+    TR = re.findall('Time step = ([0-9.]+)s',raw_info)
     if len(TR):
         info.TR = float(TR[0])
     
