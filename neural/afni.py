@@ -198,6 +198,7 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
     if positive_only:
         cmd += ['-drange','0','99999999']
     cmd += [dset]
+    cmd = [str(x) for x in cmd]
     return int(subprocess.check_output(cmd))
 
 _afni_suffix_regex = r"((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\d+\])?$"
