@@ -120,7 +120,7 @@ def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False):
     i = info.subbrick_labeled(label)
     return '%s[%d]' % (dset,i)
 
-def calc(dsets,expr,prefix=None):
+def calc(dsets,expr,prefix=None,datum=None):
     ''' returns a string of an inline 3dcalc expression
     
     ``dsets`` can be a single string, or list of strings. Each string in ``dsets`` will
@@ -132,15 +132,19 @@ def calc(dsets,expr,prefix=None):
         dsets = [dsets]
     if prefix:
         cmd = ['3dcalc']
-        for i in xrange(len(dsets)):
-            cmd += ['-%s'% chr(97+i),dsets[i]]
-        cmd += ['-expr',expr]
+    else:
+        cmd = '3dcalc( '
+    
+    for i in xrange(len(dsets)):
+        cmd += ['-%s'% chr(97+i),dsets[i]]
+    cmd += ['-expr',expr]
+    if datum:
+        cmd += ['-datum',datum]
+    
+    if prefix:
         cmd += ['-prefix',prefix]
         return nl.run(cmd,products=prefix)
     else:
-        cmd = '3dcalc( '
-        for i in xrange(len(dsets)):
-            cmd += '-%s %s ' % (chr(97+i),dsets[i])
         cmd += '-expr %s )' % expr
         return cmd
 
@@ -169,18 +173,32 @@ def cluster(dset,min_distance,min_cluster_size,prefix):
     ''' runs 3dmerge to cluster given dataset '''
     neural.run(['3dmerge','-1clust',min_distance,min_cluster_size,'-prefix',prefix,dset])
 
-def voxel_count(dset,subbrick=0,p=None,positive_only=False):
-    ''' returns the number of non-zero voxels, or number of voxels exceeding the given *p*-value threshold '''
+def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
+    ''' returns the number of non-zero voxels
+    
+    :subbrick:      use the given subbrick
+    :p:             threshold the dataset at the given *p*-value, then count
+    :positive_only: only count positive values
+    :mask:          count within the given mask
+    :ROI:           only use the ROI with the given value within the mask
+    '''
     if p:
         dset = thresh_at(dset,p,subbrick,positive_only)
     else:
         if not dset.startswith('3dcalc('):
             dset = '%s[%d]' % (dset,subbrick)
-    if positive_only:
-        opt = '-non-negative'
+    
+    cmd = ['3dmaskave','-q','-mask']
+    if mask:
+        cmd += [mask]
+        if ROI:
+            cmd += ['-mrange',ROI,ROI]
     else:
-        opt = '-non-zero'
-    return int(subprocess.check_output(['3dBrickStat','-slow','-count',opt,dset]))
+        cmd += ['SELF']
+    if positive_only:
+        cmd += ['-drange','0','99999999']
+    cmd += [dset]
+    return int(subprocess.check_output(cmd))
 
 _afni_suffix_regex = r"((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\d+\])?$"
 
@@ -199,9 +217,13 @@ def afni_copy(filename):
         subprocess.call(['3dcalc','-a',filename,'-expr','a','-prefix',prefix(filename)])
     return afni_filename
 
-def nifti_copy(filename):
-    ''' creates a ``.nii.gz`` copy of the given dataset and returns the filename as a string '''
+def nifti_copy(filename,copy_prefix=None):
+    ''' creates a ``.nii.gz`` copy of the given dataset and returns the filename as a string 
+    
+    If no prefix is given, will use prefix from ``filename``'''
     nifti_filename = prefix(filename) + ".nii.gz"
+    if prefix:
+        nifti_filename = prefix(copy_prefix) + ".nii.gz"
     if not os.path.exists(nifti_filename):
         subprocess.call(['3dAFNItoNIFTI',filename,'-prefix',nifti_filename])
     return nifti_filename
@@ -516,6 +538,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
         '3dQwarp',
         '-prefix', dset_qwarp,
         '-duplo', '-useweight', '-blur', '0', '3',
+        '-iwarp',
         '-base', dset_u(dset_source(dset_to)),
         '-source', dset_affine
     ]
