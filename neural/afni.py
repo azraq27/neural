@@ -46,6 +46,7 @@ class DsetInfo:
         self.spatial_from = []
         self.spatial_to = []
         self.slice_timing = None
+        self.TR = None
     
     def subbrick_labeled(self,label):
         for i in xrange(len(self.subbricks)):
@@ -82,6 +83,9 @@ def dset_info(dset):
     slice_timing = re.findall('-time:[tz][tz] \d+ \d+ [0-9.]+ (.*) ',raw_info)
     if len(slice_timing):
         info.slice_timing = slice_timing[0]
+    TR = re.findall('Time step = ([0-9.]+)s',out)
+    if len(TR):
+        info.TR = float(TR[0])
     
     # Other info..
     details_regex = {
