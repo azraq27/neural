@@ -45,6 +45,7 @@ class DsetInfo:
         self.voxel_dims = []
         self.spatial_from = []
         self.spatial_to = []
+        self.slice_timing = None
     
     def subbrick_labeled(self,label):
         for i in xrange(len(self.subbricks)):
@@ -77,6 +78,10 @@ def dset_info(dset):
             info.voxel_dims.append(float(m.group(4)))
     if len(info.voxel_size)==3:
         info.voxel_volume = reduce(mul,info.voxel_size)
+    
+    slice_timing = re.findall('-time:[tz][tz] \d+ \d+ [0-9.]+ (.*) ',raw_info)
+    if len(slice_timing):
+        info.slice_timing = slice_timing[0]
     
     # Other info..
     details_regex = {
