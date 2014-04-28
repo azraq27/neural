@@ -200,6 +200,8 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
         counts = [int(x.replace('NZcount_','')) for x in out[3].strip().split()]
         if ROI==None:
             ROI = rois
+        if not isinstance(ROI,list):
+            ROI = [ROI]
         for r in ROI:
             if r in rois:
                 count += counts[rois.index(r)]
