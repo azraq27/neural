@@ -15,4 +15,5 @@ import fsl
 import eprime
 import dicom
 
-
+# functions that are useful/general enough to be on top-level, not in a specific module:
+from afni import dset_info,subbrick,cdf,voxel_count,prefix,suffix
