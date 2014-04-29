@@ -128,6 +128,12 @@ a list of files that match</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="neural.dicom.create_dset">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">create_dset</tt><big>(</big><em>directory</em><big>)</big><a class="headerlink" href="#neural.dicom.create_dset" title="Permalink to this definition">¶</a></dt>
+<dd><p>tries to autocreate a dataset from images in the given directory</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="neural.dicom.find_dups">
 <tt class="descclassname">neural.dicom.</tt><tt class="descname">find_dups</tt><big>(</big><em>file_dict</em><big>)</big><a class="headerlink" href="#neural.dicom.find_dups" title="Permalink to this definition">¶</a></dt>
 <dd><p>takes output from <a class="reference internal" href="#neural.dicom.scan_dir" title="neural.dicom.scan_dir"><tt class="xref py py-meth docutils literal"><span class="pre">scan_dir()</span></tt></a> and returns list of duplicate files</p>
@@ -151,6 +157,13 @@ a list of files that match</p>
 <dd><p>calculates maximal voxel-wise difference in datasets</p>
 <p>Useful for checking if datasets have the same data. For example, if the maximum difference is
 &lt; 1.0, they&#8217;re probably the same dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neural.dicom.organize_dir">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">organize_dir</tt><big>(</big><em>orig_dir</em><big>)</big><a class="headerlink" href="#neural.dicom.organize_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>scans through the given directory and organizes DICOMs that look similar into subdirectories</p>
+<p>output directory is the <tt class="docutils literal"><span class="pre">orig_dir</span></tt> with <tt class="docutils literal"><span class="pre">-sorted</span></tt> appended to the end</p>
 </dd></dl>
 
 <dl class="function">

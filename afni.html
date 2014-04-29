@@ -134,10 +134,12 @@ appended to the label by 3dDeconvolve</p>
 
 <dl class="staticmethod">
 <dt id="neural.afni.calc">
-<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">calc</tt><big>(</big><em>dsets</em>, <em>expr</em><big>)</big><a class="headerlink" href="#neural.afni.calc" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">calc</tt><big>(</big><em>dsets</em>, <em>expr</em>, <em>prefix=None</em>, <em>datum=None</em><big>)</big><a class="headerlink" href="#neural.afni.calc" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a string of an inline 3dcalc expression</p>
 <p><tt class="docutils literal"><span class="pre">dsets</span></tt> can be a single string, or list of strings. Each string in <tt class="docutils literal"><span class="pre">dsets</span></tt> will
 be labeled &#8216;a&#8217;,&#8217;b&#8217;,&#8217;c&#8217;, sequentially. The expression <tt class="docutils literal"><span class="pre">expr</span></tt> is used directly</p>
+<p>If <tt class="docutils literal"><span class="pre">prefix</span></tt> is not given, will return a 3dcalc string that can be passed to another 
+AFNI program as a dataset. Otherwise, will create the dataset with the name <tt class="docutils literal"><span class="pre">prefix</span></tt></p>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -148,15 +150,32 @@ be labeled &#8216;a&#8217;,&#8217;b&#8217;,&#8217;c&#8217;, sequentially. The ex
 
 <dl class="staticmethod">
 <dt id="neural.afni.thresh_at">
-<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">thresh_at</tt><big>(</big><em>dset</em>, <em>p</em>, <em>subbrick=0</em>, <em>positive_only=False</em><big>)</big><a class="headerlink" href="#neural.afni.thresh_at" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">thresh_at</tt><big>(</big><em>dset</em>, <em>p</em>, <em>subbrick=0</em>, <em>positive_only=False</em>, <em>output_suffix=None</em><big>)</big><a class="headerlink" href="#neural.afni.thresh_at" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a string containing an inline <tt class="docutils literal"><span class="pre">3dcalc</span></tt> command that thresholds the 
-given dataset at the specified <em>p</em>-value</p>
+given dataset at the specified <em>p</em>-value, or will create a new dataset if a 
+suffix is given</p>
 </dd></dl>
 
 <dl class="staticmethod">
 <dt id="neural.afni.voxel_count">
-<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">voxel_count</tt><big>(</big><em>dset</em>, <em>subbrick=0</em>, <em>p=None</em>, <em>positive_only=False</em><big>)</big><a class="headerlink" href="#neural.afni.voxel_count" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the number of non-zero voxels, or number of voxels exceeding the given <em>p</em>-value threshold</p>
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">voxel_count</tt><big>(</big><em>dset</em>, <em>subbrick=0</em>, <em>p=None</em>, <em>positive_only=False</em>, <em>mask=None</em>, <em>ROI=None</em><big>)</big><a class="headerlink" href="#neural.afni.voxel_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the number of non-zero voxels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Subbrick:</th><td class="field-body">use the given subbrick</td>
+</tr>
+<tr class="field-even field"><th class="field-name">P:</th><td class="field-body">threshold the dataset at the given <em>p</em>-value, then count</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Positive_only:</th><td class="field-body">only count positive values</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Mask:</th><td class="field-body">count within the given mask</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">ROI:</th><td class="field-body">only use the ROI with the given value within the mask</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -181,8 +200,9 @@ A-P axis, then I-S axis)</p>
 
 <dl class="staticmethod">
 <dt id="neural.afni.nifti_copy">
-<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">nifti_copy</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#neural.afni.nifti_copy" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">nifti_copy</tt><big>(</big><em>filename</em>, <em>copy_prefix=None</em><big>)</big><a class="headerlink" href="#neural.afni.nifti_copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates a <tt class="docutils literal"><span class="pre">.nii.gz</span></tt> copy of the given dataset and returns the filename as a string</p>
+<p>If no prefix is given, will use prefix from <tt class="docutils literal"><span class="pre">filename</span></tt></p>
 </dd></dl>
 
 <dl class="class">
@@ -251,28 +271,28 @@ is a symbolic statement</td>
 <dt>Options that are obvious:</dt>
 <dd>nfirst (default: 3), censor_file, polort (default: &#8216;A&#8217;), tout, vout, rout, prefix</dd>
 </dl>
-<p>opts            = list of extra things to put in the command</p>
+<p>opts        = list of extra things to put in the command</p>
 <p><strong>Example:</strong>:</p>
 <div class="last highlight-python"><div class="highlight"><pre><span class="n">decon</span> <span class="o">=</span> <span class="n">neural</span><span class="o">.</span><span class="n">afni</span><span class="o">.</span><span class="n">Decon</span><span class="p">()</span>
 <span class="n">decon</span><span class="o">.</span><span class="n">input_dsets</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;dset_run1.nii.gz&#39;</span><span class="p">,</span> <span class="s">&#39;dset_run2.nii.gz&#39;</span><span class="p">]</span>
 <span class="n">decon</span><span class="o">.</span><span class="n">censor_file</span> <span class="o">=</span> <span class="s">&#39;subject_censor.1D&#39;</span>
 <span class="n">decon</span><span class="o">.</span><span class="n">stim_files</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s">&#39;motion_1&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[0]&#39;</span><span class="p">,</span>
-        <span class="s">&#39;motion_2&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[1]&#39;</span><span class="p">,</span>
-        <span class="s">&#39;motion_3&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[2]&#39;</span><span class="p">,</span>
-        <span class="s">&#39;motion_4&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[3]&#39;</span><span class="p">,</span>
-        <span class="s">&#39;motion_5&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[4]&#39;</span><span class="p">,</span>
-        <span class="s">&#39;motion_6&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[5]&#39;</span>
+    <span class="s">&#39;motion_1&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[0]&#39;</span><span class="p">,</span>
+    <span class="s">&#39;motion_2&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[1]&#39;</span><span class="p">,</span>
+    <span class="s">&#39;motion_3&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[2]&#39;</span><span class="p">,</span>
+    <span class="s">&#39;motion_4&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[3]&#39;</span><span class="p">,</span>
+    <span class="s">&#39;motion_5&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[4]&#39;</span><span class="p">,</span>
+    <span class="s">&#39;motion_6&#39;</span><span class="p">:</span> <span class="s">&#39;motion_file.1D[5]&#39;</span>
 <span class="p">}</span>
 <span class="n">decon</span><span class="o">.</span><span class="n">stim_base</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;motion_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">)]</span>
 <span class="n">decon</span><span class="o">.</span><span class="n">stim_times</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s">&#39;stim_a&#39;</span><span class="p">:</span> <span class="s">&#39;stim_a.stimtimes&#39;</span><span class="p">,</span>
-        <span class="s">&#39;stim_b&#39;</span><span class="p">:</span> <span class="s">&#39;stim_b.stimtimes&#39;</span><span class="p">,</span>
-        <span class="s">&#39;stim_c&#39;</span><span class="p">:</span> <span class="s">&#39;stim_c.stimtimes&#39;</span><span class="p">,</span>
+    <span class="s">&#39;stim_a&#39;</span><span class="p">:</span> <span class="s">&#39;stim_a.stimtimes&#39;</span><span class="p">,</span>
+    <span class="s">&#39;stim_b&#39;</span><span class="p">:</span> <span class="s">&#39;stim_b.stimtimes&#39;</span><span class="p">,</span>
+    <span class="s">&#39;stim_c&#39;</span><span class="p">:</span> <span class="s">&#39;stim_c.stimtimes&#39;</span><span class="p">,</span>
 <span class="p">}</span>
 <span class="n">decon</span><span class="o">.</span><span class="n">glts</span> <span class="o">=</span><span class="p">{</span>
-        <span class="s">&#39;a-b&#39;</span><span class="p">:</span> <span class="s">&#39;1*stim_a + -1*stim_b&#39;</span><span class="p">,</span>
-        <span class="s">&#39;ab-c&#39;</span><span class="p">:</span> <span class="s">&#39;0.5*stim_a + 0.5*stim_b + -1*stim_c&#39;</span>
+    <span class="s">&#39;a-b&#39;</span><span class="p">:</span> <span class="s">&#39;1*stim_a + -1*stim_b&#39;</span><span class="p">,</span>
+    <span class="s">&#39;ab-c&#39;</span><span class="p">:</span> <span class="s">&#39;0.5*stim_a + 0.5*stim_b + -1*stim_c&#39;</span>
 <span class="p">}</span>
 <span class="n">decon</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;subject_decon.nii.gz&#39;</span>
 <span class="n">decon</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
@@ -343,17 +363,20 @@ the suffix <tt class="docutils literal"><span class="pre">_qwarp_WARP</span></tt
 the given suffixes (<tt class="docutils literal"><span class="pre">affine_suffix</span></tt> and <tt class="docutils literal"><span class="pre">qwarp_suffix</span></tt>) to the <tt class="docutils literal"><span class="pre">dset_from</span></tt> file</p>
 <p>If <tt class="docutils literal"><span class="pre">skull_strip</span></tt> is a string instead of <tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>, it will only skull strip the given
 dataset instead of both of them</p>
+<p># TODO: currently does not work with +tlrc datasets because the filenames get mangled</p>
 </dd></dl>
 
 <dl class="staticmethod">
 <dt id="neural.afni.qwarp_apply">
-<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">qwarp_apply</tt><big>(</big><em>dset_from</em>, <em>dset_warp</em>, <em>affine=None</em>, <em>warp_suffix='_warp'</em>, <em>master='WARP'</em><big>)</big><a class="headerlink" href="#neural.afni.qwarp_apply" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descclassname">afni.</tt><tt class="descname">qwarp_apply</tt><big>(</big><em>dset_from</em>, <em>dset_warp</em>, <em>affine=None</em>, <em>warp_suffix='_warp'</em>, <em>master='WARP'</em>, <em>interp=None</em><big>)</big><a class="headerlink" href="#neural.afni.qwarp_apply" title="Permalink to this definition">¶</a></dt>
 <dd><p>applies the transform from a previous qwarp</p>
 <p>Uses the warp parameters from the dataset listed in 
 <tt class="docutils literal"><span class="pre">dset_warp</span></tt> (usually the dataset name ends in <tt class="docutils literal"><span class="pre">_WARP</span></tt>) 
 to the dataset <tt class="docutils literal"><span class="pre">dset_from</span></tt>. If a <tt class="docutils literal"><span class="pre">.1D</span></tt> file is given
 in the <tt class="docutils literal"><span class="pre">affine</span></tt> parameter, it will be applied simultaneously
 with the qwarp.</p>
+<p>If the parameter <tt class="docutils literal"><span class="pre">interp</span></tt> is given, will use as interpolation method,
+otherwise it will just use the default (currently wsinc5)</p>
 <p>Output dataset with have the <tt class="docutils literal"><span class="pre">warp_suffix</span></tt> suffix added to its name</p>
 </dd></dl>
 
