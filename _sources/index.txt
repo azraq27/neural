@@ -19,12 +19,14 @@ General Structure
 The library is organized into functional modules either by task category (e.g., :mod:`neural.dicom`) or software package (e.g., :mod:`neural.afni`). Functions that are
 generally useful also are copied to the root level (e.g., :meth:`neural.prefix`)
 
-Contents:
+Contents
+=========
 
 .. toctree::
    :maxdepth: 2
    
    afni
+   fsl
    dicom
    eprime
    utils
