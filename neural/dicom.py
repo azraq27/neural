@@ -253,5 +253,7 @@ def organize_dir(orig_dir):
 					if dset_fname[0]=='.':
 						dset_fname[0]='_'
 					os.rename(f,os.path.join(run_dir,dset_fname))
+                    if len(os.listdir(os.path.dirname(f)))==0:
+                        os.remove(os.path.dirname(f))
 				except IOError:
 					pass
