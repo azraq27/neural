@@ -255,5 +255,5 @@ def organize_dir(orig_dir):
                     os.rename(f,os.path.join(run_dir,dset_fname))
                     if len(os.listdir(os.path.dirname(f)))==0:
                         os.remove(os.path.dirname(f))
-                except IOError:
+                except (IOError, OSError):
                     pass

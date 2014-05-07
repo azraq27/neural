@@ -189,7 +189,9 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
     :p:             threshold the dataset at the given *p*-value, then count
     :positive_only: only count positive values
     :mask:          count within the given mask
-    :ROI:           only use the ROI with the given value within the mask
+    :ROI:           only use the ROI with the given value (or list of values) within the mask
+                    if ROI is 'all' then return the voxel count of each ROI
+                    as a dictionary
     '''
     if p:
         dset = thresh_at(dset,p,subbrick,positive_only)
@@ -206,16 +208,27 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
         out = subprocess.check_output(cmd).split('\n')
         rois = [int(x.replace('NZcount_','')) for x in out[1].strip()[1:].split()]
         counts = [int(x.replace('NZcount_','')) for x in out[3].strip().split()]
+        count_dict = None
         if ROI==None:
             ROI = rois
-        if not isinstance(ROI,list):
-            ROI = [ROI]
+        if ROI=='all':
+            count_dict = {}
+            ROI = rois
+        else:
+            if not isinstance(ROI,list):
+                ROI = [ROI]
         for r in ROI:
             if r in rois:
-                count += counts[rois.index(r)]
+                roi_count = counts[rois.index(r)]
+                if count_dict:
+                    count_dict[r] = roi_count
+                else:
+                    count += roi_count
     else:
         cmd = ['3dBrickStat', '-slow', '-count', '-non-zero', dset]
         count = int(subprocess.check_output(cmd).strip())
+    if count_dict:
+        return count_dict
     return count
 
 _afni_suffix_regex = r"((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\d+\])?$"
