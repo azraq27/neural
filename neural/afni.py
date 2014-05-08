@@ -209,6 +209,7 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
         rois = [int(x.replace('NZcount_','')) for x in out[1].strip()[1:].split()]
         counts = [int(x.replace('NZcount_','')) for x in out[3].strip().split()]
         count_dict = None
+        print repr(ROI)
         if ROI==None:
             ROI = rois
         if ROI=='all':
@@ -220,7 +221,7 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
         for r in ROI:
             if r in rois:
                 roi_count = counts[rois.index(r)]
-                if count_dict:
+                if count_dict!=None:
                     count_dict[r] = roi_count
                 else:
                     count += roi_count
