@@ -1,9 +1,10 @@
 from distutils.core import setup
 setup(
-  name = 'neural',
-  packages = ['neural'], # this must be the same as the name above
+  name = 'neural-fmri',
+  packages = ['neural-fmri'], # this must be the same as the name above
   version = '0.4',
   description = 'Neuroimaging Analysis Library',
+  long_description = open('README.md').read(),
   author = 'Bill Gross',
   author_email = 'bill.gross@me.com',
   url = 'https://github.com/azraq27/neural', # use the URL to the github repo
