@@ -1,4 +1,4 @@
-NeuroAL - a neuroimaging analysis library
+NeurAL - a neuroimaging analysis library
 -------------------------------------------------------
 
 **Documentation and examples:**
