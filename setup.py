@@ -3,7 +3,7 @@ setup(
   name = 'neural',
   packages = ['neural'], # this must be the same as the name above
   version = '0.4',
-  description = 'Neuroimaing Analysis Library',
+  description = 'Neuroimaging Analysis Library',
   author = 'Bill Gross',
   author_email = 'bill.gross@me.com',
   url = 'https://github.com/azraq27/neural', # use the URL to the github repo
