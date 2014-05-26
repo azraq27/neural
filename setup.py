@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'neural-fmri',
   packages = ['neural'], # this must be the same as the name above
-  version = '0.4.1',
+  version = '0.4.2',
   description = 'Neuroimaging Analysis Library',
   long_description = '''NeurAL - a neuroimaging analysis library
 -------------------------------------------------------

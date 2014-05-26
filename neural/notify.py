@@ -3,69 +3,89 @@
 The functions will try to detect the specific system and situation to tailor
 the notification to the most appropriate method
 '''
-import sys
+import sys,os
 import platform
+import random,string
 
-level_interactive = 0	#! Only notify to an interactive system
-level_normal = 1		#! Print things out to the active user
-level_log = 2			#! Don't print now, but add to the log, notify per schedule
-level_important = 3		#! Print, and try to add it to the list of significant events for this run
-level_critical = 4		#! Try to alert user by all means necessary
+# Log levels:
+class level:
+    debug, informational, warning, error, critical = range(5)
 
 interactive_enabled = False
 
-def notify(text,level=level_normal):
-	if level==level_interactive:
-		notify_interactive(text)
-		return
-	if level==level_normal:
-		if interactive_enabled:
-			notify_interactive(text)
-		else:
-			notify_normal(text)
-		return
+#! variable to hold list of nested notifications
+_notify_tree = []
 
-def notify_interactive(text):
-	pass
+class notify:
+    def __init__(self,text,log=False,email=False,level=level.informational):
+        '''notify user or log information
+    
+        :text:      the content of the message
+        :log:       if ``True``, will save the message
+        :email:     add to email digests
+        :level:     priority of message, should be '''
+        self.text = text
+        self.log = log
+        self.email = email
+        self.level = level
+        self.id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+        if interactive_enabled:
+            notify_interactive(self)
+        else:
+            notify_normal(self)
+        return
+    
+    def __enter__(self):
+        _notify_tree.append(self)
+    
+    def __exit__(self, type, value, traceback):
+        _notify_tree.pop()
 
-def notify_normal(text):
-	sys.stderr.write(text + '\n')
-	sys.stderr.flush()
+def notify_interactive(n):
+    pass
 
-def notify_log(text):
-	pass
-
-def notify_critical(text):
-	pass
+def notify_normal(n):
+    prefix = '## '
+    if(len(_notify_tree) > 0):
+        prefix += '|' + '-'*len(_notify_tree) + ' '
+    sys.stderr.write(prefix + n.text + '\n')
+    sys.stderr.flush()
 
 ### Platform-specific methods:
 
 if platform.system() == 'Darwin':
-	if platform.release().split(".")[0]=='12':
-		try:
-			from pync import Notifier
-		except ImportError: 
-			pass
-		else:
-			def notify_mountainlion(text):
-				Notifier.notify(text,title='Jarvis')	
-			notify_interactive = notify_mountainlion
-			interactive_enabled = True
+    if int(platform.release().split(".")[0])>=12:
+        try:
+            from pync import Notifier
+        except ImportError: 
+            pass
+        else:
+            def notify_mountainlion(n):
+                group_id = '%d-%s' % (os.getpid(),n.id)
+                text = n.text
+                if len(_notify_tree):
+                    temp_tree = [x.text for x in _notify_tree] + [text]
+                    text = '\n'.join(['%s%s' % ('\t'*i,temp_tree[i]) for i in xrange(len(temp_tree))])
+                    group_id = '%d-%s' % (os.getpid(),_notify_tree[0].id)
+                    Notifier.remove(group_id)
+                Notifier.notify(text,title='Jarvis',group=group_id)
+            notify_interactive = notify_mountainlion
+            interactive_enabled = True
 
 try:
-	in_ipython = isinstance(sys.stdout,IPython.kernel.zmq.iostream.OutStream)
+    in_ipython = isinstance(sys.stdout,IPython.kernel.zmq.iostream.OutStream)
 except NameError:
-	pass
+    pass
 else:
-	if in_ipython:
-		# We're inside iPython Notebook
-		try:
-			import IPython.display
-		except ImportError:
-			pass
-		else:
-			def notify_ipython_html(text):
-				html = IPython.display.HTML( '<b>:: %s</b>' % text)
-				IPython.display.display_html(html)
-			notify_interactive = notify_ipython_html
-			interactive_enabled = True
+    if in_ipython:
+        # We're inside iPython Notebook
+        try:
+            import IPython.display
+        except ImportError:
+            pass
+        else:
+            def notify_ipython_html(text):
+                html = IPython.display.HTML( '<b>:: %s</b>' % text)
+                IPython.display.display_html(html)
+            notify_interactive = notify_ipython_html
+            interactive_enabled = True

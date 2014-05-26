@@ -2,7 +2,7 @@
 
 Many of these are imported into the root-level of the package to make accessing them easier '''
 import neural
-from notify import notify
+#from notify import notify
 import os,subprocess
 import datetime
 import hashlib
@@ -106,13 +106,13 @@ def run(command,products=None,working_directory='.',force_local=False):
         command = flatten(command)
         command = [str(x) for x in command]
         if(neural.verbose):
-            notify('Running %s...' % command[0])
+            neural.notify('Running %s...' % command[0])
         out = None
         returncode = 0
         try:
             out = subprocess.check_output(command)
         except subprocess.CalledProcessError, e:
-            notify('''ERROR: %s returned a non-zero status
+            neural.notify('''ERROR: %s returned a non-zero status
 
 ----COMMAND------------
 %s
