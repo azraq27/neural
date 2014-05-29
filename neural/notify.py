@@ -45,9 +45,9 @@ def notify_interactive(n):
     pass
 
 def notify_normal(n):
-    prefix = '## '
+    prefix = ''
     if(len(_notify_tree) > 0):
-        prefix += '|' + '-'*len(_notify_tree) + ' '
+        prefix += '  '*len(_notify_tree) + '- '
     sys.stderr.write(prefix + n.text + '\n')
     sys.stderr.flush()
 
@@ -65,7 +65,7 @@ if platform.system() == 'Darwin':
                 text = n.text
                 if len(_notify_tree):
                     temp_tree = [x.text for x in _notify_tree] + [text]
-                    text = '\n'.join(['%s%s' % ('\t'*i,temp_tree[i]) for i in xrange(len(temp_tree))])
+                    text = '\n'.join(['%s%s' % ('  '*i,temp_tree[i]) for i in xrange(len(temp_tree))])
                     group_id = '%d-%s' % (os.getpid(),_notify_tree[0].id)
                     Notifier.remove(group_id)
                 Notifier.notify(text,title='Jarvis',group=group_id)
