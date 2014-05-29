@@ -6,12 +6,28 @@
 Welcome to NeurAL's documentation!
 ==================================
 
-Contents:
+This library is designed to provide easy *shortcut* methods for processing neuroimaging data
+with Python. The functions are simply meant as wrappers for different command line programs
+and simple functions to replace common scripts.
+
+For a more comprehensive analysis library, see the NIPy project: http://nipy.org
+
+
+General Structure
+====================
+
+The library is organized into functional modules either by task category (e.g., :mod:`neural.dicom`) or software package (e.g., :mod:`neural.afni`). Functions that are
+generally useful also are copied to the root level (e.g., :meth:`neural.prefix`)
+
+Contents
+=========
 
 .. toctree::
    :maxdepth: 2
    
+   top_level
    afni
+   fsl
    dicom
    eprime
    utils
