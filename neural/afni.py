@@ -80,7 +80,7 @@ def dset_info(dset):
     if len(info.voxel_size)==3:
         info.voxel_volume = reduce(mul,info.voxel_size)
     
-    slice_timing = re.findall('-time:[tz][tz] \d+ \d+ [0-9.]+ (.*) ',raw_info)
+    slice_timing = re.findall('-time:[tz][tz] \d+ \d+ [0-9.]+ (.*?) ',raw_info)
     if len(slice_timing):
         info.slice_timing = slice_timing[0]
     TR = re.findall('Time step = ([0-9.]+)s',raw_info)
