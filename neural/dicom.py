@@ -251,7 +251,7 @@ def organize_dir(orig_dir):
                 try:
                     dset_fname = os.path.split(f)[1]
                     if dset_fname[0]=='.':
-                        dset_fname[0]='_'
+                        dset_fname = '_' + dset_fname[1:]
                     os.rename(f,os.path.join(run_dir,dset_fname))
                     if len(os.listdir(os.path.dirname(f)))==0:
                         os.remove(os.path.dirname(f))
