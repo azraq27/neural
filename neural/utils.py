@@ -56,6 +56,7 @@ class run_in:
     '''
     def __init__(self,working_directory,create=False):
         self.working_directory = working_directory
+        self.create = create
 
     def __enter__(self):
         self.old_cwd = os.getcwd()
@@ -66,7 +67,7 @@ class run_in:
                 # Silly, we're already in that directory
                 pass
             else:
-                if create:
+                if self.create:
                     os.makedirs(self.working_directory)
                 else:
                     raise IOError('Attempting to run_in the non-existent directory "%s"' % self.working_directory)
