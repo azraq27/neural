@@ -69,6 +69,7 @@ class run_in:
             else:
                 if self.create:
                     os.makedirs(self.working_directory)
+                    os.chdir(self.working_directory)
                 else:
                     raise IOError('Attempting to run_in the non-existent directory "%s"' % self.working_directory)
     
