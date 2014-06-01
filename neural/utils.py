@@ -47,13 +47,14 @@ class run_in:
     
     If the directory name you pass doesn't exist, but matches the current directory
     you are in, it will silently ignore your silliness. Otherwise, it will raise an
-    ``OSError``
+    ``OSError``. If the argument ``create`` is True, it will create the directory instead
+    of raising an error.
     
     Example::   
         with run_in('another_directory'):
             do_some_stuff_there()
     '''
-    def __init__(self,working_directory):
+    def __init__(self,working_directory,create=False):
         self.working_directory = working_directory
 
     def __enter__(self):
@@ -65,7 +66,10 @@ class run_in:
                 # Silly, we're already in that directory
                 pass
             else:
-                raise IOError('Attempting to run_in the non-existent directory "%s"' % self.working_directory)
+                if create:
+                    os.makedirs(self.working_directory)
+                else:
+                    raise IOError('Attempting to run_in the non-existent directory "%s"' % self.working_directory)
     
     def __exit__(self, type, value, traceback):
         os.chdir(self.old_cwd)
