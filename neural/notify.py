@@ -69,6 +69,7 @@ if platform.system() == 'Darwin':
                     group_id = '%d-%s' % (os.getpid(),_notify_tree[0].id)
                     Notifier.remove(group_id)
                 Notifier.notify(text,title='Jarvis',group=group_id)
+                notify_normal(n)
             notify_interactive = notify_mountainlion
             interactive_enabled = True
 
