@@ -15,8 +15,8 @@ smtp_username = None
 smtp_password = None
 smtp_SSL = None
 
-def enable_email(from,server,username=None,password=None,SSL=False):
-    from_addr = from
+def enable_email(from_email,server,username=None,password=None,SSL=False):
+    from_addr = from_email
     smtp_server = server
     smtp_username = username
     smtp_password = password
