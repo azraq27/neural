@@ -9,7 +9,7 @@ version = 0.43
 verbose = True
 
 import neural
-from notify import level,notify
+from notification import level,notify
 
 from utils import *
 
@@ -17,6 +17,7 @@ import afni
 import fsl
 import eprime
 import dicom
+import notification
 
 
 # functions that are useful/general enough to be on top-level, not in a specific module:

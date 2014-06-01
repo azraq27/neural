@@ -6,6 +6,37 @@ the notification to the most appropriate method
 import sys,os
 import platform
 import random,string
+import smtplib
+from email.mime.text import MIMEText
+
+from_addr = None
+smtp_server = None
+smtp_username = None
+smtp_password = None
+smtp_SSL = None
+
+def enable_email(from,server,username=None,password=None,SSL=False):
+    from_addr = from
+    smtp_server = server
+    smtp_username = username
+    smtp_password = password
+    smtp_SSL = SSL
+
+def email(to,msg,subject='Neural notification'):
+    if smtp_server==None:
+        raise RuntimeError('Email not enabled, must run ``enable_email`` first!')
+    msg = MIMEText(msg)
+    msg['Subject'] = subject
+    msg['From'] = from_addr
+    msg['To'] = to
+    if smtp_SSL:
+        s = smtplib.SMTP_SSL(smtp_server)
+    else:
+        s = smtplib.SMTP(smtp_server)
+    if smtp_username:
+        s.login(smtp_username,smtp_password)
+    s.sendmail(to,from_addr,msg.as_string())
+    s.quit()
 
 # Log levels:
 class level:
