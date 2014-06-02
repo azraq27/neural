@@ -182,7 +182,7 @@ def _create_dset_dicom(directory):
         nl.notify('Error: could not find %s')
         return
     
-    nl.run([
+    out = nl.run([
         'Dimon',
         '-infile_prefix','%s/' % directory,
         '-dicom_org', '-GERT_Reco', 
@@ -191,9 +191,12 @@ def _create_dset_dicom(directory):
         '-max_images','100000',
         '-quit'])
     
+    return_val = out.output
+    
     out_file = '%s.nii' % nl.afni.prefix(d)
     if os.path.exists(out_file):
         nl.run(['gzip',out_file])
+        return_val = True
     
     for junk in ['dimon.files.run.*','GERT_Reco_dicom_*']:
         for fname in glob.glob(junk):

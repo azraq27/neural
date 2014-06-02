@@ -93,6 +93,8 @@ if platform.system() == 'Darwin':
             pass
         else:
             def notify_mountainlion(n):
+                notify_normal(n)
+                return
                 group_id = '%d-%s' % (os.getpid(),n.id)
                 text = n.text
                 if len(_notify_tree):
@@ -100,9 +102,7 @@ if platform.system() == 'Darwin':
                     text = '\n'.join(['%s%s' % ('  '*i,temp_tree[i]) for i in xrange(len(temp_tree))])
                     group_id = '%d-%s' % (os.getpid(),_notify_tree[0].id)
                     Notifier.remove(group_id)
-                a = Notifier.notify(text,title='Jarvis',group=group_id)
-                del(a)
-                notify_normal(n)
+                Notifier.notify(text,title='Jarvis',group=group_id)
             notify_interactive = notify_mountainlion
             interactive_enabled = True
 
