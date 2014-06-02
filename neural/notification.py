@@ -9,33 +9,34 @@ import random,string
 import smtplib
 from email.mime.text import MIMEText
 
-from_addr = None
-smtp_server = None
-smtp_username = None
-smtp_password = None
-smtp_SSL = None
+class SMTPServer:
+    def __init__(self,from_addr,server,username=None,password=None,SSL=False):
+        self.from_addr = from_addr
+        self.server = server
+        self.username = username
+        self.password = password
+        self.SSL = SSL
+
+default_SMTP = None
 
 def enable_email(from_email,server,username=None,password=None,SSL=False):
-    from_addr = from_email
-    smtp_server = server
-    smtp_username = username
-    smtp_password = password
-    smtp_SSL = SSL
+    global default_SMTP
+    default_SMTP = SMTPServer(from_email,server,username,password,SSL)
 
 def email(to,msg,subject='Neural notification'):
-    if smtp_server==None:
+    if default_SMTP==None:
         raise RuntimeError('Email not enabled, must run ``enable_email`` first!')
     msg = MIMEText(msg)
     msg['Subject'] = subject
-    msg['From'] = from_addr
+    msg['From'] = default_SMTP.from_addr
     msg['To'] = to
-    if smtp_SSL:
-        s = smtplib.SMTP_SSL(smtp_server)
+    if default_SMTP.SSL:
+        s = smtplib.SMTP_SSL(default_SMTP.server)
     else:
-        s = smtplib.SMTP(smtp_server)
-    if smtp_username:
-        s.login(smtp_username,smtp_password)
-    s.sendmail(to,from_addr,msg.as_string())
+        s = smtplib.SMTP(default_SMTP.server)
+    if default_SMTP.username:
+        s.login(default_SMTP.username,default_SMTP.password)
+    s.sendmail(to,default_SMTP.from_addr,msg.as_string())
     s.quit()
 
 # Log levels:
@@ -99,7 +100,8 @@ if platform.system() == 'Darwin':
                     text = '\n'.join(['%s%s' % ('  '*i,temp_tree[i]) for i in xrange(len(temp_tree))])
                     group_id = '%d-%s' % (os.getpid(),_notify_tree[0].id)
                     Notifier.remove(group_id)
-                Notifier.notify(text,title='Jarvis',group=group_id)
+                a = Notifier.notify(text,title='Jarvis',group=group_id)
+                del(a)
                 notify_normal(n)
             notify_interactive = notify_mountainlion
             interactive_enabled = True
