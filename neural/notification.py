@@ -8,6 +8,7 @@ import platform
 import random,string
 import smtplib
 from email.mime.text import MIMEText
+import neural.term
 
 class SMTPServer:
     def __init__(self,from_addr,server,username=None,password=None,SSL=False):
@@ -80,7 +81,15 @@ def notify_normal(n):
     prefix = ''
     if(len(_notify_tree) > 0):
         prefix += '  '*len(_notify_tree) + '- '
-    sys.stderr.write(prefix + n.text + '\n')
+    n_prefixed = prefix + n.text + '\n'
+    if os.isatty(sys.stderr.fileno()):
+        color = 'green'
+        if n.level >= level.warning:
+            color = 'yellow'
+        if n.level >= level.error:
+            color = 'red'
+        n_prefixed = neural.term.color(n_prefixed,color)
+    sys.stderr.write(n_prefixed)
     sys.stderr.flush()
 
 ### Platform-specific methods:
