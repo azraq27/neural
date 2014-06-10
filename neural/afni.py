@@ -644,8 +644,8 @@ def align_epi_anat(anatomy,epi_dsets):
     
     if isinstance(epi_dsets,basestring):
         epi_dsets = [epi_dsets]
-    
-    if os.path.exists(suffix(epi_dsets[0],'_al')):
+        
+    if len(epi_dsets)==0 or epi_dsets[0]=='' or os.path.exists(suffix(epi_dsets[0],'_al')):
         return
     
     anatomy_use = anatomy
@@ -662,12 +662,11 @@ def align_epi_anat(anatomy,epi_dsets):
     if len(epi_dsets_use)>1:
         cmd += ['-child_epi'] + epi_dsets_use[1:]
     out = neural.run(cmd)
-    print out.output
     
     for dset in ([anatomy] + epi_dsets):
         if is_nifti(dset):
             if dset!=anatomy:
-                nifti_copy(prefix(dset)+'_al+orig')            
+                nifti_copy(prefix(dset)+'_al+orig')) 
             if dset==anatomy or os.path.exists(suffix(dset,'_al')):
                 for s in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
                     for d in glob.glob(prefix(dset) + s):

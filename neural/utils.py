@@ -23,6 +23,13 @@ def is_archive(filename):
             return True
     return False
 
+def archive_basename(filename):
+    '''returns the basename (name without extension) of a recognized archive file'''
+    for archive in archive_formats:
+        if filename.endswith(archive_formats[archive]['suffix']):
+            return filename.rstrip('.' + archive_formats[archive]['suffix'])
+    return False
+
 def unarchive(filename,output_dir='.'):
     '''unpacks the given archive into ``output_dir``'''
     if not os.path.exists(output_dir):

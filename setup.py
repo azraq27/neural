@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'neural-fmri',
   packages = ['neural'], # this must be the same as the name above
-  version = '0.4.2',
+  version = '0.4.4',
   description = 'Neuroimaging Analysis Library',
   long_description = '''NeurAL - a neuroimaging analysis library
 -------------------------------------------------------
@@ -23,9 +23,9 @@ but don't specifically have to be that way...
 ''',
   author = 'Bill Gross',
   author_email = 'bill.gross@me.com',
-  url = 'https://github.com/azraq27/neural', # use the URL to the github repo
-  download_url = 'https://github.com/azraq27/neural/tarball/0.4', # I'll explain this in a second
-  keywords = ['neuroimaing', 'afni', 'fsl', 'fmri'], # arbitrary keywords
+  url = 'https://github.com/azraq27/neural',
+  download_url = 'https://github.com/azraq27/neural/tarball/0.4.4',
+  keywords = ['neuroimaing', 'afni', 'fsl', 'fmri'],
   classifiers = [
       'Topic :: Scientific/Engineering',
       'Intended Audience :: Science/Research',
