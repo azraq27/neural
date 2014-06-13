@@ -45,6 +45,7 @@ class level:
     debug, informational, warning, error, critical = range(5)
 
 interactive_enabled = False
+email_digest = None
 
 #! variable to hold list of nested notifications
 _notify_tree = []
@@ -91,6 +92,24 @@ def notify_normal(n):
         n_prefixed = neural.term.color(n_prefixed,color)
     sys.stderr.write(n_prefixed)
     sys.stderr.flush()
+
+### Email notification
+
+class email_digest:
+    def __init__(self,email_address,level=None):
+        '''start an email digest
+        
+        Will try to capture all notifications sent within the following code block that are
+        sent with ``email=True``. In addition, if ``level`` is given, will only collect notifications
+        with the given level or higher'''
+        pass
+    
+    def __enter__(self):
+        pass
+    
+    def __exit__(self, type, value, traceback):
+        pass
+    
 
 ### Platform-specific methods:
 

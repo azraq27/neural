@@ -1,8 +1,11 @@
 '''methods to analyze DICOM format images'''
 
+from __future__ import absolute_import
 import subprocess,re,os,multiprocessing,glob
 import neural as nl
 import string
+# No, I'm not importing myself... this is actually the pydicom library
+import dicom as pydicom
 
 def is_dicom(filename):
     '''returns Boolean of whether the given file has the DICOM magic number'''
@@ -73,8 +76,15 @@ def info(filename):
     sex_info = {}
     for i in re.findall(r'^(.*?)\s+= (.*)$',out,re.M):
         sex_info[i[0]] = i[1]
-    
+
     return DicomInfo(frames,sex_info,slice_timing)
+
+def info_for_tags(filename,tags):
+    '''return a dictionary for the given ``tags`` in the header of the DICOM file ``filename``
+    
+    basically a rewrite of :meth:`info` because it's so slow'''
+    d = pydicom.read_file(filename)
+    return {k:d[k].value for k in tags}
 
 def scan_dir(dirname,tags=None,md5_hash=False):
     '''scans a directory tree and returns a dictionary with files and key DICOM tags
@@ -114,15 +124,9 @@ def scan_dir(dirname,tags=None,md5_hash=False):
         for filename in files:
             fullname = os.path.join(root,filename)
             if is_dicom(fullname):
-                dinfo = info(fullname)
-                if(dinfo):
-                    return_dict[fullname] = {}
-                    if md5_hash:
-                        return_dict[fullname]['md5'] = nl.hash(fullname)
-                    for tag in tags:
-                        tag_value = dinfo.addr(tag)
-                        if tag_value:
-                            return_dict[fullname][tag] = tag_value['value']
+                return_dict[fullname] = info_for_tags(fullname,tags)
+                if md5_hash:
+                    return_dict[fullname]['md5'] = nl.hash(fullname)
     return return_dict
 
 valid = '_.' + string.ascii_letters + string.digits
@@ -256,7 +260,10 @@ def organize_dir(orig_dir):
                     if dset_fname[0]=='.':
                         dset_fname = '_' + dset_fname[1:]
                     os.rename(f,os.path.join(run_dir,dset_fname))
-                    if len(os.listdir(os.path.dirname(f)))==0:
-                        os.remove(os.path.dirname(f))
                 except (IOError, OSError):
                     pass
+    for r,ds,fs in os.walk(output_dir,topdown=False):
+        for d in ds:
+            dname = os.path.join(r,d)
+            if len(os.listdir(dname))==0:
+                os.remove(dname)
