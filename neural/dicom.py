@@ -84,7 +84,7 @@ def info_for_tags(filename,tags):
     
     basically a rewrite of :meth:`info` because it's so slow'''
     d = pydicom.read_file(filename)
-    return {k:d[k].value for k in tags}
+    return {k:d[k].value for k in tags if k in d}
 
 def scan_dir(dirname,tags=None,md5_hash=False):
     '''scans a directory tree and returns a dictionary with files and key DICOM tags
