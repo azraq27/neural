@@ -178,40 +178,46 @@ def max_diff(dset_a,dset_b):
         return float('inf')
 
 def _create_dset_dicom(directory):
-    d = str(directory)
-    while d.endswith('/'):
-        d = d[:1]
+    with nl.notify('Trying to create datasets from %s' % directory):
+        d = str(directory)
+        while d.endswith('/'):
+            d = d[:1]
     
-    if not os.path.exists(directory):
-        nl.notify('Error: could not find %s')
-        return
-    
-    out = nl.run([
-        'Dimon',
-        '-infile_prefix','%s/' % directory,
-        '-dicom_org', '-GERT_Reco', 
-        '-gert_to3d_prefix', nl.afni.prefix(d),
-        '-gert_create_dataset', '-gert_write_as_nifti', '-gert_quit_on_err',
-        '-max_images','100000',
-        '-quit'])
-    
-    return_val = out.output
-    
-    out_file = '%s.nii' % nl.afni.prefix(d)
-    if os.path.exists(out_file):
-        nl.run(['gzip',out_file])
-        return_val = True
-    
-    for junk in ['dimon.files.run.*','GERT_Reco_dicom_*']:
-        for fname in glob.glob(junk):
-            try:
-                os.remove(fname)
-            except IOError:
-                pass
+        if not os.path.exists(directory):
+            nl.notify('Error: could not find %s',level=nl.level.error)
+            return False
+        
+        out_file = '%s.nii' % nl.afni.prefix(d)
+        return_val = out_file + '.gz'
+        try:
+            out = subprocess.check_output([
+            'Dimon',
+            '-infile_prefix','%s/' % directory,
+            '-dicom_org', '-GERT_Reco', 
+            '-gert_to3d_prefix', nl.afni.prefix(d),
+            '-gert_create_dataset', '-gert_write_as_nifti', '-gert_quit_on_err',
+            '-max_images','100000',
+            '-quit'],stderr=subprocess.STDIN)
+        except subprocess.CalledProcessError, e:
+            nl.notify('Error: Dimon returned an error while creating dataset',level=nl.level.error)
+            return_val = False
+        
+        if os.path.exists(out_file):
+            nl.run(['gzip',out_file])
+        else:
+            return_val = False
+        
+        for junk in ['dimon.files.run.*','GERT_Reco_dicom_*']:
+            for fname in glob.glob(junk):
+                try:
+                    os.remove(fname)
+                except IOError:
+                    pass
+        return return_val
 
 def create_dset(directory):
     '''tries to autocreate a dataset from images in the given directory'''
-    _create_dset_dicom(directory)
+    return _create_dset_dicom(directory)
     # Add more options for GE I-files, and other non-DICOM data formats
 
 def organize_dir(orig_dir):

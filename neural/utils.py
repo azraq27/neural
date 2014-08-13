@@ -118,14 +118,13 @@ def run(command,products=None,working_directory='.',force_local=False):
         
         command = flatten(command)
         command = [str(x) for x in command]
-        if(neural.verbose):
-            neural.notify('Running %s...' % command[0])
-        out = None
-        returncode = 0
-        try:
-            out = subprocess.check_output(command)
-        except subprocess.CalledProcessError, e:
-            neural.notify('''ERROR: %s returned a non-zero status
+        with neural.notify('Running %s...' % command[0]):
+            out = None
+            returncode = 0
+            try:
+                out = subprocess.check_output(command)
+            except subprocess.CalledProcessError, e:
+                neural.notify('''ERROR: %s returned a non-zero status
 
 ----COMMAND------------
 %s
@@ -136,12 +135,12 @@ def run(command,products=None,working_directory='.',force_local=False):
 %s
 -----------------------
 Return code: %d
-''' % (command[0],' '.join(command),e.output,e.returncode))
-            returncode = e.returncode
-        result = RunResult(out,returncode)
-        if products and returncode==0:
-            result.output_filename = products[0]
-        return result
+''' % (command[0],' '.join(command),e.output,e.returncode),level=nl.level.error)
+                returncode = e.returncode
+            result = RunResult(out,returncode)
+            if products and returncode==0:
+                result.output_filename = products[0]
+            return result
 
 def log(fname,msg):
     ''' generic logging function '''
