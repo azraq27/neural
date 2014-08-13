@@ -4,12 +4,13 @@ NeurAL - a neuroimaging analysis library
 **Documentation and examples:**
 http://neural-fmri.readthedocs.org/
 
-**How to Install**
+**How to Install:**
+
 Manually:
-    git clone http://github.com/azraq27/neural
+  git clone http://github.com/azraq27/neural
 
 Using PyPI:
-    pip install neural-fmri
+  pip install neural-fmri
 
 This library contains helper functions for doing analyses on fMRI data in Python.
 
