@@ -197,7 +197,7 @@ def _create_dset_dicom(directory):
             '-gert_to3d_prefix', nl.afni.prefix(d),
             '-gert_create_dataset', '-gert_write_as_nifti', '-gert_quit_on_err',
             '-max_images','100000',
-            '-quit'],stderr=subprocess.STDIN)
+            '-quit'],stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError, e:
             nl.notify('Error: Dimon returned an error while creating dataset',level=nl.level.error)
             return_val = False
