@@ -135,7 +135,7 @@ def run(command,products=None,working_directory='.',force_local=False):
 %s
 -----------------------
 Return code: %d
-''' % (command[0],' '.join(command),e.output,e.returncode),level=nl.level.error)
+''' % (command[0],' '.join(command),e.output,e.returncode),level=neural.level.error)
                 returncode = e.returncode
             result = RunResult(out,returncode)
             if products and returncode==0:
