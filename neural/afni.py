@@ -666,7 +666,8 @@ def align_epi_anat(anatomy,epi_dsets):
     for dset in ([anatomy] + epi_dsets):
         if is_nifti(dset):
             if dset!=anatomy:
-                nifti_copy(prefix(dset)+'_al+orig') 
+                dset_nifti = nifti_copy(prefix(dset)+'_al+orig')
+                nl.run(['gzip',dset_nifti])
             if dset==anatomy or os.path.exists(suffix(dset,'_al')):
                 for s in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
                     for d in glob.glob(prefix(dset) + s):
