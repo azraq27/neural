@@ -697,7 +697,7 @@ def align_epi_anat(anatomy,epi_dsets):
 
 def auto_polort(dset):
     '''a copy of 3dDeconvolve's ``-polort A`` option'''
-    info = dset_info(input_dset)
+    info = dset_info(dset)
     return 1 + round(info.reps/150.0)
 
 class AFNI_Censor_TooManyOutliers (RuntimeError):
