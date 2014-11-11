@@ -8,7 +8,7 @@
     
     <title>neural.afni - Wrapper methods for AFNI functions &mdash; NeurAL 0.3 documentation</title>
     
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,8 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="NeurAL 0.3 documentation" href="index.html" />
-    <link rel="next" title="neural.dicom - Functions to interact with DICOM images" href="dicom.html" />
-    <link rel="prev" title="Welcome to NeurAL’s documentation!" href="index.html" /> 
+    <link rel="next" title="neural.fsl - Wrapper functions for FSL" href="fsl.html" />
+    <link rel="prev" title="Top level functions" href="top_level.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,52 +38,14 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="dicom.html" title="neural.dicom - Functions to interact with DICOM images"
+          <a href="fsl.html" title="neural.fsl - Wrapper functions for FSL"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to NeurAL’s documentation!"
+          <a href="top_level.html" title="Top level functions"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">neural.afni - Wrapper methods for AFNI functions</a><ul>
-<li><a class="reference internal" href="#generic-utilities">Generic Utilities</a></li>
-<li><a class="reference internal" href="#deconvolution-helpers">Deconvolution Helpers</a></li>
-<li><a class="reference internal" href="#alignment-helpers">Alignment Helpers</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to NeurAL&#8217;s documentation!</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="dicom.html"
-                        title="next chapter">neural.dicom - Functions to interact with DICOM images</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/afni.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -172,7 +134,9 @@ suffix is given</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Mask:</th><td class="field-body">count within the given mask</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">ROI:</th><td class="field-body">only use the ROI with the given value within the mask</td>
+<tr class="field-odd field"><th class="field-name">ROI:</th><td class="field-body">only use the ROI with the given value (or list of values) within the mask
+if ROI is &#8216;all&#8217; then return the voxel count of each ROI
+as a dictionary</td>
 </tr>
 </tbody>
 </table>
@@ -394,6 +358,44 @@ outputs the inverted warp + affine to <tt class="docutils literal"><span class="
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">neural.afni - Wrapper methods for AFNI functions</a><ul>
+<li><a class="reference internal" href="#generic-utilities">Generic Utilities</a></li>
+<li><a class="reference internal" href="#deconvolution-helpers">Deconvolution Helpers</a></li>
+<li><a class="reference internal" href="#alignment-helpers">Alignment Helpers</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="top_level.html"
+                        title="previous chapter">Top level functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fsl.html"
+                        title="next chapter">neural.fsl - Wrapper functions for FSL</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/afni.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related">
@@ -406,10 +408,10 @@ outputs the inverted warp + affine to <tt class="docutils literal"><span class="
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="dicom.html" title="neural.dicom - Functions to interact with DICOM images"
+          <a href="fsl.html" title="neural.fsl - Wrapper functions for FSL"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to NeurAL’s documentation!"
+          <a href="top_level.html" title="Top level functions"
              >previous</a> |</li>
         <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
       </ul>

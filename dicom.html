@@ -8,7 +8,7 @@
     
     <title>neural.dicom - Functions to interact with DICOM images &mdash; NeurAL 0.3 documentation</title>
     
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="NeurAL 0.3 documentation" href="index.html" />
     <link rel="next" title="neural.eprime - E-Prime logfile parsing" href="eprime.html" />
-    <link rel="prev" title="neural.afni - Wrapper methods for AFNI functions" href="afni.html" /> 
+    <link rel="prev" title="neural.fsl - Wrapper functions for FSL" href="fsl.html" /> 
   </head>
   <body>
     <div class="related">
@@ -41,39 +41,11 @@
           <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="afni.html" title="neural.afni - Wrapper methods for AFNI functions"
+          <a href="fsl.html" title="neural.fsl - Wrapper functions for FSL"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="afni.html"
-                        title="previous chapter">neural.afni - Wrapper methods for AFNI functions</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="eprime.html"
-                        title="next chapter">neural.eprime - E-Prime logfile parsing</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/dicom.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -146,6 +118,13 @@ a list of files that match</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="neural.dicom.info_for_tags">
+<tt class="descclassname">neural.dicom.</tt><tt class="descname">info_for_tags</tt><big>(</big><em>filename</em>, <em>tags</em><big>)</big><a class="headerlink" href="#neural.dicom.info_for_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a dictionary for the given <tt class="docutils literal"><span class="pre">tags</span></tt> in the header of the DICOM file <tt class="docutils literal"><span class="pre">filename</span></tt></p>
+<p>basically a rewrite of <a class="reference internal" href="#neural.dicom.info" title="neural.dicom.info"><tt class="xref py py-meth docutils literal"><span class="pre">info()</span></tt></a> because it&#8217;s so slow</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="neural.dicom.is_dicom">
 <tt class="descclassname">neural.dicom.</tt><tt class="descname">is_dicom</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#neural.dicom.is_dicom" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns Boolean of whether the given file has the DICOM magic number</p>
@@ -205,6 +184,34 @@ for detecting duplicate files</p>
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fsl.html"
+                        title="previous chapter">neural.fsl - Wrapper functions for FSL</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="eprime.html"
+                        title="next chapter">neural.eprime - E-Prime logfile parsing</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/dicom.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related">
@@ -220,7 +227,7 @@ for detecting duplicate files</p>
           <a href="eprime.html" title="neural.eprime - E-Prime logfile parsing"
              >next</a> |</li>
         <li class="right" >
-          <a href="afni.html" title="neural.afni - Wrapper methods for AFNI functions"
+          <a href="fsl.html" title="neural.fsl - Wrapper functions for FSL"
              >previous</a> |</li>
         <li><a href="index.html">NeurAL 0.3 documentation</a> &raquo;</li> 
       </ul>
