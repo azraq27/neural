@@ -206,6 +206,8 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
         cmd = ['3dROIstats','-1Dformat','-nomeanout','-nobriklab', '-nzvoxels']
         cmd += ['-mask',mask,dset]
         out = subprocess.check_output(cmd).split('\n')
+        if len(out)<4:
+            return 0
         rois = [int(x.replace('NZcount_','')) for x in out[1].strip()[1:].split()]
         counts = [int(x.replace('NZcount_','')) for x in out[3].strip().split()]
         count_dict = None
