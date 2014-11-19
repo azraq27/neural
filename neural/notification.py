@@ -3,7 +3,7 @@
 The functions will try to detect the specific system and situation to tailor
 the notification to the most appropriate method
 '''
-import sys,os
+import sys,os,io
 import platform
 import random,string
 import smtplib
@@ -91,7 +91,7 @@ def notify_normal(n):
             if n.level >= level.error:
                 color = 'red'
             n_prefixed = neural.term.color(n_prefixed,color)
-    except UnsupportedOperation:
+    except io.UnsupportedOperation:
         pass
     sys.stderr.write(n_prefixed)
     sys.stderr.flush()
