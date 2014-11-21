@@ -83,13 +83,16 @@ def notify_normal(n):
     if(len(_notify_tree) > 0):
         prefix += '  '*len(_notify_tree) + '- '
     n_prefixed = prefix + n.text + '\n'
-    if os.isatty(sys.stderr.fileno()):
-        color = 'green'
-        if n.level >= level.warning:
-            color = 'yellow'
-        if n.level >= level.error:
-            color = 'red'
-        n_prefixed = neural.term.color(n_prefixed,color)
+    try:
+        if os.isatty(sys.stderr.fileno()):
+            color = 'green'
+            if n.level >= level.warning:
+                color = 'yellow'
+            if n.level >= level.error:
+                color = 'red'
+            n_prefixed = neural.term.color(n_prefixed,color)
+    except UnsupportedOperation:
+        pass
     sys.stderr.write(n_prefixed)
     sys.stderr.flush()
 

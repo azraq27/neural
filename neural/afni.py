@@ -206,6 +206,8 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
         cmd = ['3dROIstats','-1Dformat','-nomeanout','-nobriklab', '-nzvoxels']
         cmd += ['-mask',mask,dset]
         out = subprocess.check_output(cmd).split('\n')
+        if len(out)<4:
+            return 0
         rois = [int(x.replace('NZcount_','')) for x in out[1].strip()[1:].split()]
         counts = [int(x.replace('NZcount_','')) for x in out[3].strip().split()]
         count_dict = None
@@ -714,7 +716,7 @@ def align_epi_anat(anatomy,epi_dsets):
 
 def auto_polort(dset):
     '''a copy of 3dDeconvolve's ``-polort A`` option'''
-    info = dset_info(input_dset)
+    info = dset_info(dset)
     return 1 + round(info.reps/150.0)
 
 class AFNI_Censor_TooManyOutliers (RuntimeError):
