@@ -3,7 +3,7 @@
 Library to provide helper functions to make analyzing
 neuroimaging data in python a little easier'''
 
-version = 0.46
+version = 0.48
 
 #! flag to indicate whether most functions should be verbose or not
 verbose = True

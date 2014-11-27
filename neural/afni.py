@@ -17,7 +17,7 @@ def _open_X11_ports():
         local_sockets = [x[1:] for x in os.listdir('/tmp/.X11-unix/')]
     return ['localhost:%d' % (int(x)-6000) for x in tcp_ports] + [':%s' % x for x in local_sockets]
     
-def open(dsets=[]):
+def openX11(dsets=[]):
     ''' hack-y style method to try to open an AFNI window with the directory or datasets given 
     
     if this function is useful, it should be made more stable/portable'''
@@ -202,16 +202,16 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
                 dset = calc(dset,'step(a)')
     
     count = 0
+    devnull = open(os.devnull,"w")
     if mask:
         cmd = ['3dROIstats','-1Dformat','-nomeanout','-nobriklab', '-nzvoxels']
         cmd += ['-mask',mask,dset]
-        out = subprocess.check_output(cmd).split('\n')
+        out = subprocess.check_output(cmd,stderr=devnull).split('\n')
         if len(out)<4:
             return 0
         rois = [int(x.replace('NZcount_','')) for x in out[1].strip()[1:].split()]
         counts = [int(x.replace('NZcount_','')) for x in out[3].strip().split()]
         count_dict = None
-        print repr(ROI)
         if ROI==None:
             ROI = rois
         if ROI=='all':
@@ -229,7 +229,7 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
                     count += roi_count
     else:
         cmd = ['3dBrickStat', '-slow', '-count', '-non-zero', dset]
-        count = int(subprocess.check_output(cmd).strip())
+        count = int(subprocess.check_output(cmd,stderr=devnull).strip())
     if count_dict:
         return count_dict
     return count
