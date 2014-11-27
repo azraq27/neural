@@ -482,12 +482,20 @@ class Decon:
             for stim in stim_sds_list:
                 self.stim_sds[stim[1]] = float(stim[-1])
 
+def tshift(dset,suffix='_tshft',initial_ignore=3):
+    neural.run(['3dTshift','-prefix',neural.suffix(dset,suffix),'-ignore',initial_ignore,dset],products=neural.suffix(dset,suffix))
+
+def volreg(dset,suffix='_volreg',base_subbrick=3,tshift=True):
+    cmd = ['3dvolreg','-prefix',neural.suffix(dset,suffix),'-base',base_subbrick]
+    if tshift:
+        cmd += ['-tshift',base_subbrick]
+    cmd += [dset]
+    neural.run(cmd,products=neural.suffix(dset,suffix))
+
 def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff'):
-    ''' interface to 3dAllineate to align anatomies and EPIs
-    will align all of the datasets in the list ``epi_dsets`` to ``anatomy``'''
+    ''' interface to 3dAllineate to align anatomies and EPIs '''
     
     dset_ss = lambda dset: os.path.split(suffix(dset,'_ns'))[1]
-    dset_u = lambda dset: os.path.split(suffix(dset,'_u'))[1]
     def dset_source(dset):      
         if skull_strip==True or skull_strip==dset:
             return dset_ss(dset)
@@ -505,12 +513,6 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
         if skull_strip==True or skull_strip==dset:
             neural.fsl.skull_strip(dset,'_ns')
         
-        neural.run([
-            '3dUnifize',
-            '-prefix', dset_u(dset_source(dset)),
-            '-input', dset_source(dset)
-        ],products=[dset_u(dset_source(dset))])
-    
     mask_use = mask
     if mask:
         # the mask was probably made in the space of the original dset_to anatomy,
@@ -523,9 +525,8 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
     all_cmd = [
         '3dAllineate',
         '-prefix', dset_affine,
-        '-base', dset_u(dset_source(dset_to)),
-        '-source', dset_u(dset_source(dset_from)),
-        '-twopass',
+        '-base', dset_source(dset_to),
+        '-source', dset_source(dset_from),
         '-cost', 'lpa',
         '-1Dmatrix_save', dset_affine_1D,
         '-autoweight',
@@ -588,7 +589,23 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
         return
     
     affine_align(dset_from,dset_to,skull_strip,mask,affine_suffix)
-        
+      
+    for dset in [dset_from,dset_to]:  
+        neural.run([
+            '3dUnifize',
+            '-prefix', dset_u(dset_source(dset)),
+            '-input', dset_source(dset)
+        ],products=[dset_u(dset_source(dset))])
+    
+    mask_use = mask
+    if mask:
+        # the mask was probably made in the space of the original dset_to anatomy,
+        # which has now been cropped from the skull stripping. So the lesion mask
+        # needs to be resampled to match the corresponding mask
+        if skull_strip==True or skull_strip==dset_to:
+            neural.run(['3dresample','-master',dset_u(dset_ss(dset)),'-inset',mask,'-prefix',neural.afni.suffix(mask,'_resam')],products=neural.afni.suffix(mask,'_resam'))
+            mask_use = neural.afni.suffix(mask,'_resam')
+    
     warp_cmd = [
         '3dQwarp',
         '-prefix', dset_qwarp,
