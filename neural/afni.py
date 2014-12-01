@@ -31,7 +31,7 @@ def openX11(dsets=[]):
 
 def _dset_raw_info(dset):
     ''' returns raw output from running ``3dinfo`` '''
-    return subprocess.check_output(['3dinfo','-verb',dset],stderr=subprocess.STDOUT)
+    return subprocess.check_output(['3dinfo','-verb',str(dset)],stderr=subprocess.STDOUT)
 
 class DsetInfo:
     ''' contains organized output from ``3dinfo`` 
@@ -205,7 +205,7 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
     devnull = open(os.devnull,"w")
     if mask:
         cmd = ['3dROIstats','-1Dformat','-nomeanout','-nobriklab', '-nzvoxels']
-        cmd += ['-mask',mask,dset]
+        cmd += ['-mask',str(mask),str(dset)]
         out = subprocess.check_output(cmd,stderr=devnull).split('\n')
         if len(out)<4:
             return 0
@@ -228,7 +228,7 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
                 else:
                     count += roi_count
     else:
-        cmd = ['3dBrickStat', '-slow', '-count', '-non-zero', dset]
+        cmd = ['3dBrickStat', '-slow', '-count', '-non-zero', str(dset)]
         count = int(subprocess.check_output(cmd,stderr=devnull).strip())
     if count_dict:
         return count_dict
@@ -248,7 +248,7 @@ def afni_copy(filename):
     ''' creates a ``+orig`` copy of the given dataset and returns the filename as a string '''
     afni_filename = "%s+orig" % prefix(filename)
     if not os.path.exists(afni_filename + ".HEAD"):
-        subprocess.call(['3dcalc','-a',filename,'-expr','a','-prefix',prefix(filename)])
+        subprocess.call(['3dcalc','-a',str(filename),'-expr','a','-prefix',prefix(filename)])
     return afni_filename
 
 def nifti_copy(filename,copy_prefix=None):
@@ -259,7 +259,7 @@ def nifti_copy(filename,copy_prefix=None):
     if prefix:
         nifti_filename = prefix(copy_prefix) + ".nii.gz"
     if not os.path.exists(nifti_filename):
-        subprocess.call(['3dAFNItoNIFTI',filename,'-prefix',nifti_filename])
+        subprocess.call(['3dAFNItoNIFTI',str(filename),'-prefix',nifti_filename])
     return nifti_filename
 
 def is_nifti(filename):
@@ -737,7 +737,7 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
     '''
     polort = auto_polort(input_dset)
     info = dset_info(input_dset)
-    outcount = [float(x.split()[0]) for x in subprocess.check_output(['3dToutcount','-fraction','-automask','-polort',polort,input_dset]).split('\n')]
+    outcount = [float(x.split()[0]) for x in subprocess.check_output(['3dToutcount','-fraction','-automask','-polort',str(polort),str(input_dset)]).split('\n')]
     binary_outcount = [x<fraction for x in outcount]
     perc_outliers = sum(binary_outcount)/float(info.reps)
     if max_exclude and perc_outliers > max_exclude:
