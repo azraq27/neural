@@ -640,7 +640,10 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP
     out_dset = os.path.split(suffix(dset_from,warp_suffix))[1]
     cmd = [
         '3dNwarpApply',
-        '-nwarp', ' '.join(warp),
+        '-nwarp', warp]
+    if affine:
+        cmd += ['-affter', affine]
+    cmd += [
         '-source', dset_from,
         '-master',master,
         '-prefix', out_dset
