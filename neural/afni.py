@@ -634,13 +634,10 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP
     
     Output dataset with have the ``warp_suffix`` suffix added to its name
     '''
-    warp = [dset_warp]
-    if affine:
-        warp.append(affine)
     out_dset = os.path.split(suffix(dset_from,warp_suffix))[1]
     cmd = [
         '3dNwarpApply',
-        '-nwarp', warp]
+        '-nwarp', dset_warp]
     if affine:
         cmd += ['-affter', affine]
     cmd += [
