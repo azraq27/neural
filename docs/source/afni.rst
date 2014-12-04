@@ -15,6 +15,8 @@ Generic Utilities
 
 .. automethod:: neural.afni.cdf
 
+.. automethod:: neural.auto_polort
+
 .. automethod:: neural.afni.thresh_at
 
 .. automethod:: neural.afni.voxel_count
@@ -30,6 +32,8 @@ Generic Utilities
 
 .. autoclass:: neural.afni.temp_afni_copy
 	:members:
+	
+.. autoclass:: neural.skull_strip
 
 Deconvolution Helpers
 ----------------------------
@@ -40,8 +44,22 @@ Deconvolution Helpers
 Alignment Helpers
 --------------------------
 	
+.. automethod:: neural.align_epi_anat
+
 .. automethod:: neural.afni.qwarp_align	
 
 .. automethod:: neural.afni.qwarp_apply
 
 .. automethod:: neural.afni.qwarp_invert
+
+.. automethod:: neural.volreg
+
+.. automethod:: neural.affine_align
+
+.. automethod:: neural.tshift
+
+
+Simple Analyses
+------------------
+
+.. automethod:: neural.create_censor_file
