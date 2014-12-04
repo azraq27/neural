@@ -71,7 +71,7 @@ def dset_info(dset):
     info.reps = len(info.subbricks)
     # Dimensions:
     
-    orient = re.search('\[-orient ([A-Z]+)\]',sub_info)
+    orient = re.search('\[-orient ([A-Z]+)\]',raw_info)
     if orient:
         info.orient = orient.group(1)
     for axis in ['RL','AP','IS']:
