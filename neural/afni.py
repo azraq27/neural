@@ -644,7 +644,7 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP
     dset_warp_info = dset_info(dset_warp)
     if(dset_from_info.orient!=dset_warp_info.orient):
         # If the datasets are different orientations, the transform won't be applied correctly
-        nl.run(['3dresample','-orient',dset_warp_info.orient,'-prefix',suffix(dset_from,'_reorient'),dset_from])
+        nl.run(['3dresample','-orient',dset_warp_info.orient,'-prefix',suffix(dset_from,'_reorient'),'-inset',dset_from])
         dset_from = suffix(dset_from,'_reorient')
     cmd = [
         '3dNwarpApply',
