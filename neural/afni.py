@@ -47,6 +47,7 @@ class DsetInfo:
         self.spatial_to = []
         self.slice_timing = None
         self.TR = None
+        self.orient = None
     
     def subbrick_labeled(self,label):
         for i in xrange(len(self.subbricks)):
@@ -70,6 +71,9 @@ def dset_info(dset):
     info.reps = len(info.subbricks)
     # Dimensions:
     
+    orient = re.search('\[-orient ([A-Z]+)\]',sub_info)
+    if orient:
+        info.orient = orient.group(1)
     for axis in ['RL','AP','IS']:
         m = re.search(r'%s-to-%s extent:\s+([0-9-.]+) \[%s\] -to-\s+([0-9-.]+) \[%s\] -step-\s+([0-9-.]+) mm \[([0-9]+) voxels\]' % (axis[0],axis[1],axis[0],axis[1]),raw_info)
         if m:
@@ -486,6 +490,7 @@ def tshift(dset,suffix='_tshft',initial_ignore=3):
     neural.run(['3dTshift','-prefix',neural.suffix(dset,suffix),'-ignore',initial_ignore,dset],products=neural.suffix(dset,suffix))
 
 def volreg(dset,suffix='_volreg',base_subbrick=3,tshift=True):
+    ''' simple interface to 3dvolreg (recommend looking at align_epi_anat instead of using this) '''
     cmd = ['3dvolreg','-prefix',neural.suffix(dset,suffix),'-base',base_subbrick]
     if tshift:
         cmd += ['-tshift',base_subbrick]
@@ -635,6 +640,12 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP
     Output dataset with have the ``warp_suffix`` suffix added to its name
     '''
     out_dset = os.path.split(suffix(dset_from,warp_suffix))[1]
+    dset_from_info = dset_info(dset_from)
+    dset_warp_info = dset_info(dset_warp)
+    if(dset_from_info.orient!=dset_warp_info.orient):
+        # If the datasets are different orientations, the transform won't be applied correctly
+        nl.run(['3dresample','-orient',dset_warp_info.orient,'-prefix',suffix(dset_from,'_reorient'),dset_from])
+        dset_from = suffix(dset_from,'_reorient')
     cmd = [
         '3dNwarpApply',
         '-nwarp', dset_warp]
@@ -665,7 +676,7 @@ def qwarp_invert(warp_param_dset,output_dset,affine_1Dfile=None):
     neural.run(cmd,products=output_dset)
 
 def skull_strip(dset,out_suffix='_ns'):
-    ''' runs 3dSkullStrip '''
+    ''' runs 3dSkullStrip (I would recommend looking at fsl.bet instead)'''
     neural.run([
         '3dSkullStrip',
         '-input', dset,
