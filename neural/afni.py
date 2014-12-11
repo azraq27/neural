@@ -279,6 +279,12 @@ def is_nifti(filename):
         else:
             return False
 
+def is_dset(filename):
+    '''just checks if the filename has the format of an fMRI dataset'''
+    afni_dset = '^.*\+(orig|acpc|tlrc)\.?(HEAD|BRIK)?(.gz|.bz)?$'
+    nifti_dset = '^.*\.nii(.gz|.bz)?$'
+    return (re.match(afni_dset,filename) or re.match(nifti_dset,filename))!=None
+
 class temp_afni_copy:
     ''' used within a ``with`` block, will create a temporary ``+orig`` copy of dataset
     
