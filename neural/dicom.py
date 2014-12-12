@@ -6,6 +6,7 @@ import neural as nl
 import string
 # No, I'm not importing myself... this is actually the pydicom library
 import dicom as pydicom
+from fuzzywuzzy import process
 
 def is_dicom(filename):
     '''returns Boolean of whether the given file has the DICOM magic number'''
@@ -82,7 +83,9 @@ def info(filename):
 def info_for_tags(filename,tags):
     '''return a dictionary for the given ``tags`` in the header of the DICOM file ``filename``
     
-    basically a rewrite of :meth:`info` because it's so slow'''
+    ``tags`` is expected to be a list of tuples that contains the DICOM address in hex values.
+    
+    basically a rewrite of :meth:`info` because it's so slow. This is a lot faster and more reliable'''
     d = pydicom.read_file(filename)
     return {k:d[k].value for k in tags if k in d}
 
@@ -273,3 +276,67 @@ def organize_dir(orig_dir):
             dname = os.path.join(r,d)
             if len(os.listdir(dname))==0:
                 os.remove(dname)
+                
+def classify(image_fname,label_dict):
+    '''tries to classify a DICOM image based on known string patterns (with fuzzy matching)
+    
+    Takes the label from the DICOM header and compares to the entries in ``label_dict``. If it finds something close
+    it will return the image type, otherwise it will return ``None``
+    
+    ``label_dict`` is a dictionary where the keys are dataset types and the values are lists of strings that match that type.
+    For example::
+    
+        {
+            'anatomy': ['SPGR','MPRAGE','anat','anatomy'],
+            'dti': ['DTI'],
+            'field_map': ['fieldmap','TE7','B0']
+        }
+    '''
+    min_acceptable_match = 80
+    label_info = info_for_tags(image_fname,[(0x8,0x103e)])
+    label = label_info[(0x8,0x103e)]
+    # creates a list of tuples: (type, keyword)
+    flat_dict = [i for j in [[(b,x) for x in label_dict[b]]  for b in label_dict] for i in j]
+    best_match = process.extractOne(label,[x[1] for x in flat_dict])
+    if best_match[1]<min_acceptable_match:
+        return None
+    else:
+        return [x[0] for x in flat_dict if x[1]==best_match[0]][0]
+
+def unpack_archive(fname,out_dir):
+    '''unpacks the archive file ``fname`` and reconstructs datasets into ``out_dir``
+    
+    Datasets are reconstructed and auto-named using :meth:`create_dset`. The raw directories
+    that made the datasets are archive with the dataset name suffixed by ``tgz``, and any other
+    files found in the archive are put into ``other_files.tgz``'''
+    with nl.notify('Unpacking archive %s' % fname):
+        tmp_dir = tempfile.mkdtemp()
+        tmp_unpack = os.path.join(tmp_dir,'unpack')
+        os.makedirs(tmp_unpack)
+        nl.utils.unarchive(fname,tmp_unpack)
+        reconstruct_files(tmp_unpack)
+        out_dir = os.path.abspath(out_dir)
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+        if not os.path.exists(tmp_unpack+'-sorted'):
+            return
+        with nl.run_in(tmp_unpack+'-sorted'):
+            for fname in glob.glob('*.nii'):
+                nl.run(['gzip',fname])
+            for fname in glob.glob('*.nii.gz'):
+                new_file = os.path.join(out_dir,fname)
+                if not os.path.exists(new_file):
+                    shutil.move(fname,new_file)
+            raw_out = os.path.join(out_dir,'raw')
+            if not os.path.exists(raw_out):
+                os.makedirs(raw_out)
+            for rawdir in os.listdir('.'):
+                rawdir_tgz = os.path.join(raw_out,rawdir+'.tgz')
+                if not os.path.exists(rawdir_tgz):
+                    with tarfile.open(rawdir_tgz,'w:gz') as tgz:
+                        tgz.add(rawdir)
+        if len(os.listdir(tmp_unpack))!=0:
+            # There are still raw files left
+            with tarfile.open(os.path.join(raw_out,'other_files.tgz'),'w:gz') as tgz:
+                tgz.add(tmp_unpack)
+    shutil.rmtree(tmp_dir)
