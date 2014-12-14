@@ -1,7 +1,8 @@
 '''methods to analyze DICOM format images'''
 
 from __future__ import absolute_import
-import subprocess,re,os,multiprocessing,glob
+import subprocess,re,os,multiprocessing,glob,itertools
+from datetime import datetime
 import neural as nl
 import string
 # No, I'm not importing myself... this is actually the pydicom library
@@ -222,6 +223,25 @@ def create_dset(directory):
     '''tries to autocreate a dataset from images in the given directory'''
     return _create_dset_dicom(directory)
     # Add more options for GE I-files, and other non-DICOM data formats
+
+def date_for_str(date_str):
+    '''tries to guess date from ambiguous date string'''
+    try:
+        for date_format in itertools.permutations(['%Y','%m','%d']):
+            try:
+                date = datetime.strptime(date_str,''.join(date_format))
+                raise StopIteration
+            except ValueError:
+                pass
+        return None
+    except StopIteration:
+        return date
+
+def date_for_image(image_fname):
+    '''returns date from DICOM header of ``image_fname`` as datetime object'''
+    date_info = info_for_tags(image_fname,[(0x8,0x21)])
+    date_str = date_info[(0x8,0x21)]
+    return date_for_str(date_str)
 
 def organize_dir(orig_dir):
     '''scans through the given directory and organizes DICOMs that look similar into subdirectories
