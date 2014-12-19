@@ -33,7 +33,7 @@ Generic Utilities
 .. autoclass:: neural.afni.temp_afni_copy
 	:members:
 	
-.. autoclass:: neural.afni.skull_strip
+.. automethod:: neural.afni.skull_strip
 
 Deconvolution Helpers
 ----------------------------
