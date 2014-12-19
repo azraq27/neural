@@ -31,4 +31,9 @@ but don't specifically have to be that way...
       'Intended Audience :: Science/Research',
       'Development Status :: 3 - Alpha'
   ],
+  install_requires=[
+      'pydicom',
+      'fuzzywuzzy',
+      'python-Levenshtein'
+  ]
 )
