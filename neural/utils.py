@@ -104,7 +104,7 @@ def run(command,products=None,working_directory='.',force_local=False):
     :products:          string or list of files that are the products of this command
                         if all products exist, the command will not be run, and False returned
     :working_directory: will chdir to this directory
-    :force_local:       when used with :module:`neural.scheduler`, setting to ``True`` will disable
+    :force_local:       when used with `neural.scheduler`, setting to ``True`` will disable
                         all job distribution functions
     
     Returns result in form of :class:`RunResult`
