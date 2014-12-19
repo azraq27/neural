@@ -33,7 +33,7 @@ Generic Utilities
 .. autoclass:: neural.afni.temp_afni_copy
 	:members:
 	
-.. autoclass:: neural.skull_strip
+.. autoclass:: neural.afni.skull_strip
 
 Deconvolution Helpers
 ----------------------------
@@ -44,7 +44,7 @@ Deconvolution Helpers
 Alignment Helpers
 --------------------------
 	
-.. automethod:: neural.align_epi_anat
+.. automethod:: neural.afni.align_epi_anat
 
 .. automethod:: neural.afni.qwarp_align	
 
@@ -52,14 +52,14 @@ Alignment Helpers
 
 .. automethod:: neural.afni.qwarp_invert
 
-.. automethod:: neural.volreg
+.. automethod:: neural.afni.volreg
 
-.. automethod:: neural.affine_align
+.. automethod:: neural.afni.affine_align
 
-.. automethod:: neural.tshift
+.. automethod:: neural.afni.tshift
 
 
 Simple Analyses
 ------------------
 
-.. automethod:: neural.create_censor_file
+.. automethod:: neural.afni.create_censor_file
