@@ -15,7 +15,7 @@ Generic Utilities
 
 .. automethod:: neural.afni.cdf
 
-.. automethod:: neural.auto_polort
+.. automethod:: neural.afni.auto_polort
 
 .. automethod:: neural.afni.thresh_at
 
