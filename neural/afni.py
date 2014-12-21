@@ -344,7 +344,10 @@ class Decon:
         :stim_files:        dictionary where keys are used as stimulus labels
                             and the values are taken as 1D files
         :stim_times:        same as stim_files, but used as a stim_times file
-        :stim_times_model:  default model to use for each stim_times
+        :models:            dictionary of model names to use for each of the
+                            listed stimuli (optional)
+        :model_default:     default model to use for each ``stim_times`` stimulus if nothing
+                            is listed in ``models``
         :stim_base:         list of names of stimuli (defined either in stim_files or 
                             stim_times) that should be considered in the baseline instead
                             of full model
@@ -391,7 +394,8 @@ class Decon:
         self.input_dsets=[]
         self.stim_files={}
         self.stim_times={}
-        self.stim_times_model = 'GAM'
+        self.model_default = 'GAM'
+        self.models = {}
         self.stim_base = []
         self.stim_am1 = []
         self.stim_am2 = []
@@ -452,7 +456,12 @@ class Decon:
                 opt = '-stim_times_AM1'
             if stim in self.stim_am2:
                 opt = '-stim_times_AM2'
-            cmd += [opt,stim_num,self.stim_times[stim],self.stim_times_model,'-stim_label',stim_num,stim]
+            cmd += [opt,stim_num,self.stim_times[stim]]
+            if stim in self.models:
+                cmd += [self.models[stim]]
+            else:
+                cmd += [self.model_default]
+            cmd += ['-stim_label',stim_num,stim]
             if stim in self.stim_base:
                 cmd += ['-stim_base',stim_num]
             stim_num += 1
