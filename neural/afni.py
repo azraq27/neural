@@ -661,11 +661,12 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP
         # If the datasets are different orientations, the transform won't be applied correctly
         nl.run(['3dresample','-orient',dset_warp_info.orient,'-prefix',suffix(dset_from,'_reorient'),'-inset',dset_from])
         dset_from = suffix(dset_from,'_reorient')
+    warp_opt = str(dset_warp)
+    if affine:
+        warp_opt += ' ' + affine
     cmd = [
         '3dNwarpApply',
-        '-nwarp', dset_warp]
-    if affine:
-        cmd += ['-affter', affine]
+        '-nwarp', warp_opt]
     cmd += [
         '-source', dset_from,
         '-master',master,
