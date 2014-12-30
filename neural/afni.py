@@ -31,7 +31,7 @@ def openX11(dsets=[]):
 
 def _dset_raw_info(dset):
     ''' returns raw output from running ``3dinfo`` '''
-    return subprocess.check_output(['3dinfo','-verb',str(dset)],stdin=subprocess.STDOUT)
+    return subprocess.check_output(['3dinfo','-verb',str(dset)],stderr=subprocess.STDOUT)
 
 class DsetInfo:
     ''' contains organized output from ``3dinfo`` 
