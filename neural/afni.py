@@ -853,7 +853,7 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
     with open(out_prefix,'w') as f:
         f.write('\n'.join([str(int(x)) for x in binary_outcount]))
 
-def smooth_decon_to_fwhm(decon,fhwm):
+def smooth_decon_to_fwhm(decon,fwhm):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
     returns the final measured fwhm'''
     tmpdir = tempfile.mkdtemp()
@@ -871,6 +871,7 @@ def smooth_decon_to_fwhm(decon,fhwm):
                 nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)])
                 nl.run(['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_input(i),'-automask','-FWHM',fwhm])
                 os.rename(blur_input(i),os.path.join(cwd,blur_input(i)))
+                running_reps += info.reps
         decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
         decon.run()
     finally:
