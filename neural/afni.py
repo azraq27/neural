@@ -863,7 +863,6 @@ def smooth_decon_to_fwhm(decon,fwhm):
         files_to_copy = [x for x in random_files if os.path.exists(x) and x[0]!='/']
         # copy crap
         for file in files_to_copy:
-            print 'copying %s' % file
             try:
                 shutil.copytree(file,tmpdir)
             except OSError as e:
