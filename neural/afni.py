@@ -864,7 +864,11 @@ def smooth_decon_to_fwhm(decon,fwhm):
         # copy crap
         for file in files_to_copy:
             print 'copying %s' % file
-            shutil.copytree(file,tmpdir)
+            try:
+                shutil.copytree(file,tmpdir)
+            except OSError as e:
+                shutil.copy(file,tmpdir)
+            shutil.copy(file,tmpdir)
         with nl.run_in(tmpdir):
             decon.errts = 'residual.nii.gz'
             decon.run()
