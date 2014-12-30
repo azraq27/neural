@@ -865,6 +865,7 @@ def smooth_decon_to_fwhm(decon,fwhm):
             random_files = [re.sub(r'\[\d+\]$','',x) for x in nl.flatten([x for x in d.__dict__.values() if isinstance(x,basestring) or isinstance(x,list)]+[x.values() for x in d.__dict__.values() if isinstance(x,dict)])]
             files_to_copy = [x for x in random_files if os.path.exists(x) and x[0]!='/']
             for file in files_to_copy:
+                print 'copying %s' % file
                 shutil.copytree(file,tmpdir)
             decon.run()
             running_reps = 0
