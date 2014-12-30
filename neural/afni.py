@@ -881,6 +881,6 @@ def smooth_decon_to_fwhm(decon,fwhm):
         decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
         decon.run()
     except Exception as e:
-        raise e
+        raise
     finally:
         shutil.rmtree(tmpdir,True)
