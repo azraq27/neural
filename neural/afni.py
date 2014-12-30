@@ -856,23 +856,22 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
 def smooth_decon_to_fwhm(decon,fhwm):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
     returns the final measured fwhm'''
-    d = copy.deepcopy(decon)
     tmpdir = tempfile.mkdtemp()
     try:
         cwd = os.getcwd()
         with nl.run_in(tmpdir):
-            d.errts = 'residual.nii.gz'
-            d.run()
+            decon.errts = 'residual.nii.gz'
+            decon.run()
             running_reps = 0
             blur_input = lambda i: 'input_blur-part%d.nii.gz'%(i+1)
-            for i in xrange(len(d.input_dsets)):
-                dset = d.input_dsets[i]
+            for i in xrange(len(decon.input_dsets)):
+                dset = decon.input_dsets[i]
                 info = dset_info(dset)
                 residual_dset = 'residual-part%d.nii.gz'%(i+1)
-                nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(d.errts,running_reps,running_reps+info.reps-1)])
+                nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)])
                 nl.run(['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_input(i),'-automask','-FWHM',fwhm])
                 os.rename(blur_input(i),os.path.join(cwd,blur_input(i)))
-        d.input_dsets = [blur_input(i) for i in xrange(len(d.input_dsets))]
-        d.run()
+        decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
+        decon.run()
     finally:
         shutil.rmtree(tmpdir,True)
