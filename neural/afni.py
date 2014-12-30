@@ -870,7 +870,7 @@ def smooth_decon_to_fwhm(decon,fwhm):
                 residual_dset = 'residual-part%d.nii.gz'%(i+1)
                 nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)])
                 nl.run(['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_input(i),'-automask','-FWHM',fwhm])
-                os.rename(blur_input(i),os.path.join(cwd,blur_input(i)))
+                shutil.copy(blur_input(i),os.path.join(cwd,blur_input(i)))
                 running_reps += info.reps
         decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
         decon.run()
