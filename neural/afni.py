@@ -869,6 +869,8 @@ def smooth_decon_to_fwhm(decon,fwhm):
                 shutil.copy(file,tmpdir)
             shutil.copy(file,tmpdir)
         with nl.run_in(tmpdir):
+            if os.path.exists(decon.prefix):
+                os.remove(decon.prefix)
             decon.errts = 'residual.nii.gz'
             decon.run()
             running_reps = 0
