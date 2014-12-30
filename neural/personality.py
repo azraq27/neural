@@ -49,7 +49,7 @@ def _unic_bub_print(msg):
 		msg = msg[:_unic_bub_z_maxchars]
 	msg = msg + ' '*(_unic_bub_z_maxchars - len(msg))
 	msg = decompress(_unic_bub_z) % msg
-	print msg		
+	return msg		
 
 if __name__ == "__main__":
 	notify = _unic_bub_print

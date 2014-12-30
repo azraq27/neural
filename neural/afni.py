@@ -1,5 +1,5 @@
 ''' wrapper functions for common AFNI tasks '''
-import re,subprocess,os,glob
+import re,subprocess,os,glob,copy,tempfile,shutil
 import multiprocessing
 import neural
 import neural as nl
@@ -31,7 +31,7 @@ def openX11(dsets=[]):
 
 def _dset_raw_info(dset):
     ''' returns raw output from running ``3dinfo`` '''
-    return subprocess.check_output(['3dinfo','-verb',str(dset)],stderr=subprocess.STDOUT)
+    return subprocess.check_output(['3dinfo','-verb',str(dset)],std=subprocess.STDOUT)
 
 class DsetInfo:
     ''' contains organized output from ``3dinfo`` 
@@ -186,6 +186,13 @@ def cluster(dset,min_distance,min_cluster_size,prefix):
     ''' runs 3dmerge to cluster given dataset '''
     neural.run(['3dmerge','-1clust',min_distance,min_cluster_size,'-prefix',prefix,dset])
 
+def blur(dset,fwhm,prefix=None):
+    ''' runs 3dmerge to blur dataset to given ``fwhm``
+    default ``prefix`` is to suffix ``dset`` with ``_blur%dmm``'''
+    if prefix==None:
+        prefix = suffix(dset,'_blur%dmm'%fwhm)
+    neural.run(['3dmerge','-1blur_fwhm',fwhm,'-prefix',prefix,dset],products=prefix)
+
 def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
     ''' returns the number of non-zero voxels
     
@@ -237,6 +244,68 @@ def voxel_count(dset,subbrick=0,p=None,positive_only=False,mask=None,ROI=None):
     if count_dict:
         return count_dict
     return count
+
+def ROIstats(mask,dsets):
+    '''runs 3dROIstats on ``dsets`` using ``mask`` as the mask
+    returns a dictionary with the structure::
+    
+        {
+            ROI: {
+                dset: [
+                    # list of dset subbricks:
+                    {keys: stat},
+                    ...
+                ],
+                ...
+            },
+            ...
+        }
+    
+    keys::
+    
+        :mean:
+        :median:
+        :mode:
+        :nzmean:
+        :nzmedian:
+        :nzmode:
+        :min:
+        :max:
+        :nzmin:
+        :nzmax:
+        :sigma:
+        :nzsigma:
+        :sum:
+        :nzsum:
+    '''
+    out_dict = {}
+    values = [{'Med': 'median', 'Min': 'min', 'Max': 'max', 'NZVoxels': 'nzvoxels', 
+               'NZMean': 'nzmean', 'NZSum': 'nzsum', 'NZSigma': 'nzsigma', 
+               'Mean': 'mean', 'Sigma': 'sigma', 'Mod': 'mode','NZcount':'nzcount'},
+              {'NZMod': 'nzmode', 'NZMed': 'nzmedian', 'NZMax': 'nzmax', 'NZMin': 'nzmin','Mean':'mean'}]
+    options = [['-nzmean','-nzsum','-nzvoxels','-minmax','-sigma','-nzsigma','-median','-mode'],
+               ['-nzminmax','-nzmedian','-nzmode']]
+    for i in xrange(2):
+        cmd = ['3dROIstats','-1Dformat','-nobriklab','-mask',mask] + options[i] + dsets
+        out = subprocess.check_output(cmd).split('\n')
+        header = [(values[i][x.split('_')[0]],int(x.split('_')[1])) for x in out[1].split()[1:]]
+        for j in xrange(len(out)/2-1):
+            dset_subbrick = out[(j+1)*2][1:].split()
+            stats = [float(x) for x in out[(j+1)*2+1][1:].split()]
+            for s in xrange(len(stats)):
+                roi = header[s][1]
+                stat_name = header[s][0]
+                stat = stats[s]
+                if roi not in out_dict:
+                    out_dict[roi] = {}
+                if dset_subbrick[0] not in out_dict[roi]:
+                    out_dict[roi][dset_subbrick[0]] = []
+                subbrick = int(dset_subbrick[1])
+                if subbrick>=len(out_dict[roi][dset_subbrick[0]]):
+                    for diff in xrange(subbrick-len(out_dict[roi][dset_subbrick[0]])+1):
+                        out_dict[roi][dset_subbrick[0]].append({})
+                out_dict[roi][dset_subbrick[0]][subbrick][stat_name] = stat
+    return out_dict
 
 _afni_suffix_regex = r"((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\d+\])?$"
 
@@ -358,6 +427,7 @@ class Decon:
         :glts:              dictionary where keys are GLT labels, and the value
                             is a symbolic statement
         :mask:              either a mask file, or "auto", which will use "-automask"
+        :errts:             name of file to save residual time series to
         
         Options that are obvious:
             nfirst (default: 3), censor_file, polort (default: 'A'), tout, vout, rout, prefix
@@ -412,6 +482,7 @@ class Decon:
         self.reps = None
         self.TR = None
         self.stim_sds = None
+        self.errts = None
     
     def command_list(self):
         '''returns the 3dDeconvolve command as a list
@@ -479,6 +550,9 @@ class Decon:
             cmd += ['-vout']
         if self.rout:
             cmd += ['-rout']
+        
+        if self.errts:
+            cmd += ['-errts', self.errts]
         
         if self.prefix:
             cmd += ['-bucket', self.prefix]
@@ -778,3 +852,14 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
         out_prefix = prefix(input_dset) + '.1D'
     with open(out_prefix,'w') as f:
         f.write('\n'.join([str(int(x)) for x in binary_outcount]))
+
+def smooth_decon_to_fwhm(decon,fhwm):
+    '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
+    returns the final measured fwhm'''
+    d = copy.deepcopy(decon)
+    tmpdir = tempfile.mkdtemp()
+    try:
+        with nl.run_in(tmpdir):
+            d.errts = 'residual.nii.gz'
+    finally:
+        shutil.rmtree(tmpdir,True)
