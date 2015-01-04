@@ -196,3 +196,22 @@ def compress(data, level=9):
 def decompress(data):
     ''' return uncompressed string '''
     return zlib.decompress(base64.decodestring(data))
+
+def which(program):
+    '''returns full path to program name or ``None`` if not found
+    taken from: http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python'''
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None

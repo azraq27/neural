@@ -2,7 +2,11 @@
 import neural as nl
 
 fsl_dir = None
-bet2 = None
+
+# Try to find bet
+bet2 = nl.utils.which('bet2')
+if bet2==None:
+    bet2 = nl.utils.which('fsl5.0-bet2')
 
 def skull_strip(dset,suffix='_ns'):
     ''' use bet to strip skull from given anatomy '''
