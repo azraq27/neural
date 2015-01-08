@@ -285,6 +285,8 @@ def ROIstats(mask,dsets):
               {'NZMod': 'nzmode', 'NZMed': 'nzmedian', 'NZMax': 'nzmax', 'NZMin': 'nzmin','Mean':'mean'}]
     options = [['-nzmean','-nzsum','-nzvoxels','-minmax','-sigma','-nzsigma','-median','-mode'],
                ['-nzminmax','-nzmedian','-nzmode']]
+    if isinstance(dsets,basestring):
+        dsets = [dsets]
     for i in xrange(2):
         cmd = ['3dROIstats','-1Dformat','-nobriklab','-mask',mask] + options[i] + dsets
         out = subprocess.check_output(cmd).split('\n')
@@ -605,7 +607,7 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
     
     for dset in [dset_from,dset_to]:
         if skull_strip==True or skull_strip==dset:
-            neural.fsl.skull_strip(dset,'_ns')
+            neural.default.skull_strip(dset,'_ns')
         
     mask_use = mask
     if mask:
@@ -775,10 +777,11 @@ def skull_strip(dset,out_suffix='_ns'):
         '-ld', '40'
     ],products=suffix(dset,out_suffix))
 
-def align_epi_anat(anatomy,epi_dsets):
+def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
     ''' aligns epis to anatomy using ``align_epi_anat.py`` script
     
     :epi_dsets:       can be either a string or list of strings of the epi child datasets
+    :skull_strip_anat:     if ``True``, ``anatomy`` will be skull-stripped using the default method (in ``neural.default``)
     
     The default output suffix is "_al"
     '''
@@ -790,6 +793,11 @@ def align_epi_anat(anatomy,epi_dsets):
         return
     
     anatomy_use = anatomy
+    
+    if skull_strip_anat:
+        nl.default.skull_strip(anatomy,'_ns')
+        anatomy_use = suffix(anatomy,'_ns')
+        
     if is_nifti(anatomy):
         anatomy_use = afni_copy(anatomy)
     epi_dsets_use = []
