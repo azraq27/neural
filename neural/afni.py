@@ -568,9 +568,9 @@ class Decon:
         '''
         return ' '.join(self.command_list())
     
-    def run(self,working_directory='.'):
+    def run(self):
         '''runs 3dDeconvolve through the neural.utils.run shortcut'''
-        out = neural.run(self.command_list(),working_directory=working_directory,products=self.prefix)
+        out = neural.run(self.command_list(),products=self.prefix)
         if out and out.output:
             stim_sds_list = [x.split() for x in out.output.strip().split('\n\n')]
             self.stim_sds = {}
