@@ -816,7 +816,8 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
         if is_nifti(dset):
             if dset!=anatomy:
                 dset_nifti = nifti_copy(prefix(dset)+'_al+orig')
-                nl.run(['gzip',dset_nifti])
+                if dset_nifti:
+                    nl.run(['gzip',dset_nifti])
             if dset==anatomy or os.path.exists(suffix(dset,'_al')):
                 for s in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
                     for d in glob.glob(prefix(dset) + s):
@@ -879,7 +880,10 @@ def smooth_decon_to_fwhm(decon,fwhm):
         with nl.run_in(tmpdir):
             if os.path.exists(decon.prefix):
                 os.remove(decon.prefix)
+            old_errts = decon.errts
             decon.errts = 'residual.nii.gz'
+            decon.prefix = os.path.basename(decon.prefix)
+            # Run once in place to get the residual dataset
             decon.run()
             running_reps = 0
             blur_input = lambda i: 'input_blur-part%d.nii.gz'%(i+1)
@@ -889,10 +893,20 @@ def smooth_decon_to_fwhm(decon,fwhm):
                 residual_dset = 'residual-part%d.nii.gz'%(i+1)
                 nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)],products=residual_dset)
                 nl.run(['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_input(i),'-automask','-FWHM',fwhm],products=blur_input(i))
-                shutil.copy(blur_input(i),cwd)
                 running_reps += info.reps
-        decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
-        decon.run()
+            decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
+            for d in [decon.prefix,decon.errts]:
+                if os.path.exists(d):
+                    try:
+                        os.remove(d)
+                    except:
+                        pass
+            decon.errts = old_errts
+            decon.run()
+            if os.path.exists(decon.prefix):
+                shutil.copy(decon.prefix,cwd)
+            else:
+                nl.notify('Warning: deconvolve did not produce expected file %s' % decon.prefix,level=nl.level.warning)
     except Exception as e:
         raise
     finally:
