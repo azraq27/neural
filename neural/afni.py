@@ -807,7 +807,7 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
         else:
             epi_dsets_use.append(dset)
     
-    cmd = ["align_epi_anat.py", "-epi2anat", "-anat", anatomy_use, "-epi_base", "5", "-epi", epi_dsets_use[0]]
+    cmd = ["align_epi_anat.py", "-epi2anat", "-anat_has_skull", "no", "-anat", anatomy_use, "-epi_base", "5", "-epi", epi_dsets_use[0]]
     if len(epi_dsets_use)>1:
         cmd += ['-child_epi'] + epi_dsets_use[1:]
     out = neural.run(cmd)
