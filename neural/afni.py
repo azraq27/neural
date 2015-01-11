@@ -816,7 +816,7 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
         if is_nifti(dset):
             if dset!=anatomy:
                 dset_nifti = nifti_copy(prefix(dset)+'_al+orig')
-                if dset_nifti:
+                if dset_nifti and os.path.exists(dset_nifti):
                     nl.run(['gzip',dset_nifti])
             if dset==anatomy or os.path.exists(suffix(dset,'_al')):
                 for s in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
