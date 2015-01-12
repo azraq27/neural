@@ -7,7 +7,7 @@ import os,subprocess
 import datetime
 import hashlib
 import zlib, base64
-import tempfile,shutil
+import tempfile,shutil,re,glob
 
 #! A list of archives this library understands
 archive_formats = {
@@ -219,7 +219,16 @@ def which(program):
 
 def dset_copy(dset,to_dir):
     '''robust way to copy a dataset (including AFNI briks)'''
-    
+    if neural.afni.is_afni(dset):
+        dset_strip = re.sub(r'\.(HEAD|BRIK)?(\.(gz|bz))?','',dset)
+        for dset_file in [dset_strip + '.HEAD'] + glob.glob(dset_strip + '.BRIK*'):
+            if os.path.exists(dset_file):
+                shutil.copy(dset_file,to_dir)
+    else:
+        if os.path.exists(dset):
+            shutil.copy(dset,to_dir)
+        else:
+            neural.notify('Warning: couldn\'t find file %s to copy to %s' %(dset,to_dir))
 
 class run_in_tmp:
     '''creates a temporary directory to run the code block in'''
@@ -235,9 +244,9 @@ class run_in_tmp:
         self.cwd = os.getcwd()
         for file in self.inputs:
             try:
-                shutil.copytree(file,self.tmp_dir)
-            except OSError as e:
-                shutil.copy(file,self.tmp_dir)
+                dset_copy(file,self.tmp_dir)
+            except (OSError,IOError):
+                pass
         os.chdir(self.tmp_dir)
         return self
     
@@ -246,7 +255,7 @@ class run_in_tmp:
             self.products = [self.products]
         for file in self.products:
             try:
-                shutil.copy(file,self.cwd)
+                dset_copy(file,self.cwd)
             except (OSError,IOError):
                 pass
         os.chdir(self.cwd)

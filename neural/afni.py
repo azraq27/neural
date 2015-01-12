@@ -341,10 +341,10 @@ afni_dset_regex = r'^.*\+(orig|acpc|tlrc)\.?(HEAD|BRIK)?(.gz|.bz)?$'
 nifti_dset_regex = r'^.*\.nii(.gz|.bz)?$'
 
 def is_nifti(filename):
-    return re.match(nifti_dset_regex,filename))!=None
+    return re.match(nifti_dset_regex,filename)!=None
 
 def is_afni(filename):
-    return re.match(afni_dset_regex,filename))!=None
+    return re.match(afni_dset_regex,filename)!=None
     
 def is_dset(filename):
     '''just checks if the filename has the format of an fMRI dataset'''
@@ -814,18 +814,10 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
             out = nl.run(cmd)
         
         for dset in epi_dsets:
-            if is_nifti(dset)
-    for dset in ([anatomy] + epi_dsets):
-        if is_nifti(dset):
-            if dset!=anatomy:
+            if is_nifti(dset):
                 dset_nifti = nifti_copy(prefix(dset)+'_al+orig')
-                if dset_nifti and os.path.exists(dset_nifti):
+                if dset_nifti and os.path.exists(dset_nifti) and dset_nifti.endswith('.nii') and dset.endswith('.gz'):
                     nl.run(['gzip',dset_nifti])
-            if dset==anatomy or os.path.exists(suffix(dset,'_al')):
-                for s in ['_al+orig.HEAD','_al+orig.BRIK*','+orig.HEAD','+orig.BRIK*']:
-                    for d in glob.glob(prefix(dset) + s):
-                        if os.path.exists(d):
-                            os.remove(d)
 
 def auto_polort(dset):
     '''a copy of 3dDeconvolve's ``-polort A`` option'''
