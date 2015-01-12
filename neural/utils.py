@@ -217,6 +217,10 @@ def which(program):
 
     return None
 
+def dset_copy(dset,to_dir):
+    '''robust way to copy a dataset (including AFNI briks)'''
+    
+
 class run_in_tmp:
     '''creates a temporary directory to run the code block in'''
     def __init__(self,inputs=[],products=[]):
