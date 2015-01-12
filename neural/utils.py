@@ -7,6 +7,7 @@ import os,subprocess
 import datetime
 import hashlib
 import zlib, base64
+import tempfile,shutil
 
 #! A list of archives this library understands
 archive_formats = {
@@ -215,3 +216,34 @@ def which(program):
                 return exe_file
 
     return None
+
+class run_in_tmp:
+    '''creates a temporary directory to run the code block in'''
+    def __init__(self,inputs=[],products=[]):
+        self.tmp_dir = tempfile.mkdtemp()
+        self.cwd = None
+        self.inputs = inputs
+        self.products = products
+    
+    def __enter__(self):
+        if not isinstance(self.inputs,list):
+            self.inputs = [self.inputs]
+        self.cwd = os.getcwd()
+        for file in self.inputs:
+            try:
+                shutil.copytree(file,self.tmp_dir)
+            except OSError as e:
+                shutil.copy(file,self.tmp_dir)
+        os.chdir(self.tmp_dir)
+        return self
+    
+    def __exit__(self, type, value, traceback):
+        if not isinstance(self.products,list):
+            self.products = [self.products]
+        for file in self.products:
+            try:
+                shutil.copy(file,self.cwd)
+            except (OSError,IOError):
+                pass
+        os.chdir(self.cwd)
+        shutil.rmtree(self.tmp_dir,True)
