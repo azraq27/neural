@@ -331,10 +331,10 @@ def nifti_copy(filename,copy_prefix=None):
     
     If no prefix is given, will use prefix from ``filename``'''
     nifti_filename = prefix(filename) + ".nii.gz"
-    if prefix:
-        nifti_filename = prefix(copy_prefix) + ".nii.gz"
+    if copy_prefix:
+        nifti_filename = copy_prefix + ".nii.gz"
     if not os.path.exists(nifti_filename):
-        subprocess.call(['3dAFNItoNIFTI',str(filename),'-prefix',nifti_filename])
+        subprocess.check_call(['3dAFNItoNIFTI','-prefix',nifti_filename,str(filename)])
     return nifti_filename
 
 afni_dset_regex = r'^.*\+(orig|acpc|tlrc)\.?(HEAD|BRIK)?(.gz|.bz)?$'

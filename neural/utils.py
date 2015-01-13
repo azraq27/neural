@@ -228,7 +228,7 @@ def dset_copy(dset,to_dir):
         if os.path.exists(dset):
             shutil.copy(dset,to_dir)
         else:
-            neural.notify('Warning: couldn\'t find file %s to copy to %s' %(dset,to_dir))
+            neural.notify('Warning: couldn\'t find file %s to copy to %s' %(dset,to_dir),level=nl.level.warning)
 
 class run_in_tmp:
     '''creates a temporary directory to run the code block in'''
