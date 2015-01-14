@@ -860,49 +860,52 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
 def smooth_decon_to_fwhm(decon,fwhm):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
     returns the final measured fwhm'''
-    tmpdir = tempfile.mkdtemp()
-    try:
-        cwd = os.getcwd()
-        random_files = [re.sub(r'\[\d+\]$','',x) for x in nl.flatten([x for x in decon.__dict__.values() if isinstance(x,basestring) or isinstance(x,list)]+[x.values() for x in decon.__dict__.values() if isinstance(x,dict)])]
-        files_to_copy = [x for x in random_files if os.path.exists(x) and x[0]!='/']
-        # copy crap
-        for file in files_to_copy:
-            try:
-                shutil.copytree(file,tmpdir)
-            except OSError as e:
+    if os.path.exists(decon.prefix):
+        return
+    with nl.notify('Running smooth_decon_to_fwhm analysis (with %.2fmm blur)' % fwhm):
+        tmpdir = tempfile.mkdtemp()
+        try:
+            cwd = os.getcwd()
+            random_files = [re.sub(r'\[\d+\]$','',x) for x in nl.flatten([x for x in decon.__dict__.values() if isinstance(x,basestring) or isinstance(x,list)]+[x.values() for x in decon.__dict__.values() if isinstance(x,dict)])]
+            files_to_copy = [x for x in random_files if os.path.exists(x) and x[0]!='/']
+            # copy crap
+            for file in files_to_copy:
+                try:
+                    shutil.copytree(file,tmpdir)
+                except OSError as e:
+                    shutil.copy(file,tmpdir)
                 shutil.copy(file,tmpdir)
-            shutil.copy(file,tmpdir)
-        with nl.run_in(tmpdir):
-            if os.path.exists(decon.prefix):
-                os.remove(decon.prefix)
-            old_errts = decon.errts
-            decon.errts = 'residual.nii.gz'
-            decon.prefix = os.path.basename(decon.prefix)
-            # Run once in place to get the residual dataset
-            decon.run()
-            running_reps = 0
-            blur_input = lambda i: 'input_blur-part%d.nii.gz'%(i+1)
-            for i in xrange(len(decon.input_dsets)):
-                dset = decon.input_dsets[i]
-                info = dset_info(dset)
-                residual_dset = 'residual-part%d.nii.gz'%(i+1)
-                nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)],products=residual_dset)
-                nl.run(['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_input(i),'-automask','-FWHM',fwhm],products=blur_input(i))
-                running_reps += info.reps
-            decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
-            for d in [decon.prefix,decon.errts]:
-                if os.path.exists(d):
-                    try:
-                        os.remove(d)
-                    except:
-                        pass
-            decon.errts = old_errts
-            decon.run()
-            if os.path.exists(decon.prefix):
-                shutil.copy(decon.prefix,cwd)
-            else:
-                nl.notify('Warning: deconvolve did not produce expected file %s' % decon.prefix,level=nl.level.warning)
-    except Exception as e:
-        raise
-    finally:
-        shutil.rmtree(tmpdir,True)
+            with nl.run_in(tmpdir):
+                if os.path.exists(decon.prefix):
+                    os.remove(decon.prefix)
+                old_errts = decon.errts
+                decon.errts = 'residual.nii.gz'
+                decon.prefix = os.path.basename(decon.prefix)
+                # Run once in place to get the residual dataset
+                decon.run()
+                running_reps = 0
+                blur_input = lambda i: 'input_blur-part%d.nii.gz'%(i+1)
+                for i in xrange(len(decon.input_dsets)):
+                    dset = decon.input_dsets[i]
+                    info = dset_info(dset)
+                    residual_dset = 'residual-part%d.nii.gz'%(i+1)
+                    nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)],products=residual_dset)
+                    nl.run(['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_input(i),'-automask','-FWHM',fwhm],products=blur_input(i))
+                    running_reps += info.reps
+                decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
+                for d in [decon.prefix,decon.errts]:
+                    if os.path.exists(d):
+                        try:
+                            os.remove(d)
+                        except:
+                            pass
+                decon.errts = old_errts
+                decon.run()
+                if os.path.exists(decon.prefix):
+                    shutil.copy(decon.prefix,cwd)
+                else:
+                    nl.notify('Warning: deconvolve did not produce expected file %s' % decon.prefix,level=nl.level.warning)
+        except Exception as e:
+            raise
+        finally:
+            shutil.rmtree(tmpdir,True)
