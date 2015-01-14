@@ -119,21 +119,22 @@ class collect_digest(object):
     def __exit__(self,type,value,traceback):
         if self in _digest_list:
             _digest_list[:] = [x for x in _digest_list if x!=self]
-        notify('\n\nSummary of previous notifications:\n' + '-'*20 + '\n')
         if self.print_summary:
-            old_tree = []
-            for n in self._notifications:
-                new_tree = n[0]
-                for i in reversed(range(len(old_tree))):
-                    try:
-                        if new_tree[i]!=old_tree[i]:
-                            del(old_tree[i])
-                    except IndexError:
-                        pass
-                for new_n in new_tree[len(old_tree):]:
-                    notify_normal(new_n,old_tree)
-                    old_tree.append(new_n)
-                notify_normal(n[1],old_tree)
+            if len(self._notifications)>0:
+                notify('\n\nSummary of previous notifications:\n' + '-'*20 + '\n')
+                old_tree = []
+                for n in self._notifications:
+                    new_tree = n[0]
+                    for i in reversed(range(len(old_tree))):
+                        try:
+                            if new_tree[i]!=old_tree[i]:
+                                del(old_tree[i])
+                        except IndexError:
+                            pass
+                    for new_n in new_tree[len(old_tree):]:
+                        notify_normal(new_n,old_tree)
+                        old_tree.append(new_n)
+                    notify_normal(n[1],old_tree)
 
 
 ### Email notification
