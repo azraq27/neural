@@ -5,7 +5,7 @@ the notification to the most appropriate method
 '''
 import sys,os,io
 import platform
-import random,string
+import random,string,copy
 import smtplib
 from email.mime.text import MIMEText
 import neural.term
@@ -49,6 +49,7 @@ email_digest = None
 
 #! variable to hold list of nested notifications
 _notify_tree = []
+_digest_list = []
 
 class notify:
     def __init__(self,text,log=False,email=False,level=level.informational):
@@ -63,6 +64,9 @@ class notify:
         self.email = email
         self.level = level
         self.id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+        for d in _digest_list:
+            if d.level==None or level>=d.level:
+                d._notifications.append((copy.copy(_notify_tree),self))
         if interactive_enabled:
             notify_interactive(self)
         else:
@@ -78,10 +82,12 @@ class notify:
 def notify_interactive(n):
     pass
 
-def notify_normal(n):
+def notify_normal(n,notify_tree=None):
     prefix = ''
-    if(len(_notify_tree) > 0):
-        prefix += '  '*len(_notify_tree) + '- '
+    if notify_tree==None:
+        notify_tree=_notify_tree
+    if(len(notify_tree) > 0):
+        prefix += '  '*len(notify_tree) + '- '
     n_prefixed = prefix + n.text + '\n'
     try:
         if os.isatty(sys.stderr.fileno()):
@@ -91,10 +97,44 @@ def notify_normal(n):
             if n.level >= level.error:
                 color = 'red'
             n_prefixed = neural.term.color(n_prefixed,color)
-    except io.UnsupportedOperation:
+    except:
         pass
     sys.stderr.write(n_prefixed)
     sys.stderr.flush()
+
+### Digesting methods
+
+class collect_digest(object):
+    '''generic object to collect notifications within a block and then do something with them
+    when the block exits'''
+    def __init__(self,level=level.warning,email=False,print_summary=False):
+        self._notifications = []
+        self.level = level
+        self.email = email
+        self.print_summary = print_summary
+    
+    def __enter__(self):
+        _digest_list.append(self)
+    
+    def __exit__(self,type,value,traceback):
+        if self in _digest_list:
+            _digest_list[:] = [x for x in _digest_list if x!=self]
+        notify('\n\nSummary of previous notifications:\n' + '-'*20 + '\n')
+        if self.print_summary:
+            old_tree = []
+            for n in self._notifications:
+                new_tree = n[0]
+                for i in reversed(range(len(old_tree))):
+                    try:
+                        if new_tree[i]!=old_tree[i]:
+                            del(old_tree[i])
+                    except IndexError:
+                        pass
+                for new_n in new_tree[len(old_tree):]:
+                    notify_normal(new_n,old_tree)
+                    old_tree.append(new_n)
+                notify_normal(n[1],old_tree)
+
 
 ### Email notification
 
