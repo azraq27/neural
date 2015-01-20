@@ -167,10 +167,10 @@ def cdf(dset,p,subbrick=0):
     command = ['cdf','-p2t',info.subbricks[subbrick]['stat'],str(p)] + info.subbricks[subbrick]['params']
     return float(subprocess.check_output(command).split()[2])
 
-def thresh_at(dset,p,subbrick=0,positive_only=False,output_suffix=None):
+def thresh_at(dset,p,subbrick=0,positive_only=False,output_suffix=None,prefix=None):
     ''' returns a string containing an inline ``3dcalc`` command that thresholds the 
         given dataset at the specified *p*-value, or will create a new dataset if a 
-        suffix is given '''
+        suffix or prefix is given '''
     t = cdf(dset,p,subbrick)
     expr = 'astep(a,%f)' % t
     if positive_only:
@@ -178,9 +178,13 @@ def thresh_at(dset,p,subbrick=0,positive_only=False,output_suffix=None):
     subref = '-a%d' % subbrick
     if subbrick==0 and dset[-1]==']':
         subref = '-a'
-    if output_suffix==None:
+    if prefix:
+        dset_out = prefix
+    elif output_suffix:
+        dset_out = suffix(dset,output_suffix)
+    else:
         return '3dcalc( %s %s -expr %s )' % (subref,dset,expr)
-    neural.run(['3dcalc',subref,dset,'-expr',expr,'-prefix',suffix(dset,output_suffix)])
+    neural.run(['3dcalc',subref,dset,'-expr',expr,'-prefix',dset_out])
 
 def cluster(dset,min_distance,min_cluster_size,prefix):
     ''' runs 3dmerge to cluster given dataset '''
@@ -627,7 +631,19 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
         all_cmd += ['-emask', mask_use]
     
     neural.run(all_cmd,products=dset_affine)
-    
+
+def affine_apply(dset_from,affine_1D,master,affine_suffix='_aff',interp='NN',inverse=False):
+    '''apply the 1D file from a previously aligned dataset
+    Applies the matrix in ``affine_1D`` to ``dset_from`` and makes the final grid look like the dataset ``master``
+    using the interpolation method ``interp``. If ``inverse`` is True, will apply the inverse of ``affine_1D`` instead'''
+    affine_1D_use = affine_1D
+    if inverse:
+        with tempfile.NamedTemporaryFile(delete=False) as temp:
+            o = nl.run(['cat_matvec',affine_1D,'-I'])
+            temp.write(o.output)
+            affine_1D_use = temp.name
+    nl.run(['3dAllineate','-1Dmatrix_apply',affine_1D_use,'-input',dset_from,'-prefix',suffix(dset_from,affine_suffix),'-master',master,'-final',interp],products=suffix(dset_from,affine_suffix))
+
 
 def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',qwarp_suffix='_qwarp'):
     '''aligns ``dset_from`` to ``dset_to`` using 3dQwarp
