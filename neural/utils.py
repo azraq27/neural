@@ -123,7 +123,7 @@ def run(command,products=None,working_directory='.',force_local=False):
             out = None
             returncode = 0
             try:
-                out = subprocess.check_output(command)
+                out = subprocess.check_output(command,stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError, e:
                 neural.notify('''ERROR: %s returned a non-zero status
 
