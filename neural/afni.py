@@ -75,7 +75,7 @@ def dset_info(dset):
     if orient:
         info.orient = orient.group(1)
     for axis in ['RL','AP','IS']:
-        m = re.search(r'%s-to-%s extent:\s+([0-9-.]+) \[%s\] -to-\s+([0-9-.]+) \[%s\] -step-\s+([0-9-.]+) mm \[([0-9]+) voxels\]' % (axis[0],axis[1],axis[0],axis[1]),raw_info)
+        m = re.search(r'%s-to-%s extent:\s+([0-9-.]+) \[%s\] -to-\s+([0-9-.]+) \[%s\] -step-\s+([0-9-.]+) mm \[\s*([0-9]+) voxels\]' % (axis[0],axis[1],axis[0],axis[1]),raw_info)
         if m:
             info.spatial_from.append(float(m.group(1)))
             info.spatial_to.append(float(m.group(2)))
