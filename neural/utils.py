@@ -97,7 +97,7 @@ class RunResult:
     def __str__(self):
         return self.output_filename
 
-def run(command,products=None,working_directory='.',force_local=False):
+def run(command,products=None,working_directory='.',force_local=False,stderr=True):
     '''wrapper to run external programs
     
     :command:           list containing command and parameters 
@@ -107,6 +107,7 @@ def run(command,products=None,working_directory='.',force_local=False):
     :working_directory: will chdir to this directory
     :force_local:       when used with `neural.scheduler`, setting to ``True`` will disable
                         all job distribution functions
+    :stderr:            forward stderr into the output
     
     Returns result in form of :class:`RunResult`
     '''
@@ -123,7 +124,10 @@ def run(command,products=None,working_directory='.',force_local=False):
             out = None
             returncode = 0
             try:
-                out = subprocess.check_output(command,stderr=subprocess.STDOUT)
+                if stderr:
+                    out = subprocess.check_output(command,stderr=subprocess.STDOUT)
+                else:
+                    out = subprocess.check_output(command)                    
             except subprocess.CalledProcessError, e:
                 neural.notify('''ERROR: %s returned a non-zero status
 

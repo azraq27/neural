@@ -569,12 +569,12 @@ class Decon:
     def run(self):
         '''runs 3dDeconvolve through the neural.utils.run shortcut'''
         out = neural.run(self.command_list(),products=self.prefix)
-        if out and out.output:
+        # Not sure where the SDs went in the deconvolve output... but they aren't there for me now
+        '''if out and out.output:
             stim_sds_list = [x.split() for x in out.output.strip().split('\n\n')]
             self.stim_sds = {}
             for stim in stim_sds_list:
-                self.stim_sds[stim[1]] = float(stim[-1])
-
+                self.stim_sds[stim[1]] = float(stim[-1])'''
 def tshift(dset,suffix='_tshft',initial_ignore=3):
     neural.run(['3dTshift','-prefix',neural.suffix(dset,suffix),'-ignore',initial_ignore,dset],products=neural.suffix(dset,suffix))
 
@@ -639,8 +639,7 @@ def affine_apply(dset_from,affine_1D,master,affine_suffix='_aff',interp='NN',inv
     affine_1D_use = affine_1D
     if inverse:
         with tempfile.NamedTemporaryFile(delete=False) as temp:
-            o = nl.run(['cat_matvec',affine_1D,'-I'])
-            temp.write(o.output)
+            temp.write(subprocess.check_output(['cat_matvec',affine_1D,'-I']))
             affine_1D_use = temp.name
     nl.run(['3dAllineate','-1Dmatrix_apply',affine_1D_use,'-input',dset_from,'-prefix',suffix(dset_from,affine_suffix),'-master',master,'-final',interp],products=suffix(dset_from,affine_suffix))
 
@@ -745,7 +744,7 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP
     dset_warp_info = dset_info(dset_warp)
     if(dset_from_info.orient!=dset_warp_info.orient):
         # If the datasets are different orientations, the transform won't be applied correctly
-        nl.run(['3dresample','-orient',dset_warp_info.orient,'-prefix',suffix(dset_from,'_reorient'),'-inset',dset_from])
+        nl.run(['3dresample','-orient',dset_warp_info.orient,'-prefix',suffix(dset_from,'_reorient'),'-inset',dset_from],products=suffix(dset_from,'_reorient'))
         dset_from = suffix(dset_from,'_reorient')
     warp_opt = str(dset_warp)
     if affine:
