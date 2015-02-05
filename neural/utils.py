@@ -4,7 +4,7 @@ Many of these are imported into the root-level of the package to make accessing 
 import neural
 #from notify import notify
 import os,subprocess
-import datetime
+import datetime,random,string
 import hashlib
 import zlib, base64
 import tempfile,shutil,re,glob
@@ -264,3 +264,7 @@ class run_in_tmp:
                 pass
         os.chdir(self.cwd)
         shutil.rmtree(self.tmp_dir,True)
+
+def random_string(length):
+    '''Returns random string of letters'''
+    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(length))

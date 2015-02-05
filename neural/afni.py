@@ -476,6 +476,7 @@ class Decon:
         self.mask = 'auto'
         self.polort = 'A'
         self.prefix = None
+        self.bout = True
         self.tout = True
         self.vout = True
         self.rout = True
@@ -544,6 +545,8 @@ class Decon:
             cmd += ['-gltsym','SYM: %s' % self.glts[glt],'-glt_label',glt_num,glt]
             glt_num += 1
         
+        if self.bout:
+            cmd += ['-bout']
         if self.tout:
             cmd += ['-tout']
         if self.vout:
@@ -575,6 +578,7 @@ class Decon:
             self.stim_sds = {}
             for stim in stim_sds_list:
                 self.stim_sds[stim[1]] = float(stim[-1])'''
+
 def tshift(dset,suffix='_tshft',initial_ignore=3):
     neural.run(['3dTshift','-prefix',neural.suffix(dset,suffix),'-ignore',initial_ignore,dset],products=neural.suffix(dset,suffix))
 
@@ -632,7 +636,7 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
     
     neural.run(all_cmd,products=dset_affine)
 
-def affine_apply(dset_from,affine_1D,master,affine_suffix='_aff',interp='NN',inverse=False):
+def affine_apply(dset_from,affine_1D,master,affine_suffix='_aff',interp='NN',inverse=False,prefix=None):
     '''apply the 1D file from a previously aligned dataset
     Applies the matrix in ``affine_1D`` to ``dset_from`` and makes the final grid look like the dataset ``master``
     using the interpolation method ``interp``. If ``inverse`` is True, will apply the inverse of ``affine_1D`` instead'''
@@ -641,7 +645,9 @@ def affine_apply(dset_from,affine_1D,master,affine_suffix='_aff',interp='NN',inv
         with tempfile.NamedTemporaryFile(delete=False) as temp:
             temp.write(subprocess.check_output(['cat_matvec',affine_1D,'-I']))
             affine_1D_use = temp.name
-    nl.run(['3dAllineate','-1Dmatrix_apply',affine_1D_use,'-input',dset_from,'-prefix',suffix(dset_from,affine_suffix),'-master',master,'-final',interp],products=suffix(dset_from,affine_suffix))
+    if prefix==None:
+        prefix = suffix(dset_from,affine_suffix)
+    nl.run(['3dAllineate','-1Dmatrix_apply',affine_1D_use,'-input',dset_from,'-prefix',prefix,'-master',master,'-final',interp],products=suffix(dset_from,affine_suffix))
 
 
 def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',qwarp_suffix='_qwarp'):
@@ -916,11 +922,27 @@ def smooth_decon_to_fwhm(decon,fwhm):
                             pass
                 decon.errts = old_errts
                 decon.run()
-                if os.path.exists(decon.prefix):
-                    shutil.copy(decon.prefix,cwd)
-                else:
-                    nl.notify('Warning: deconvolve did not produce expected file %s' % decon.prefix,level=nl.level.warning)
+                for copyfile in [decon.prefix,decon.errts]:
+                    if os.path.exists(copyfile):
+                        shutil.copy(copyfile,cwd)
+                    else:
+                        nl.notify('Warning: deconvolve did not produce expected file %s' % decon.prefix,level=nl.level.warning)
         except Exception as e:
             raise
         finally:
             shutil.rmtree(tmpdir,True)
+
+def temporal_snr(signal_dset,noise_dset,mask=None,prefix='temporal_snr.nii.gz'):
+    '''Calculates temporal SNR by dividing average signal of ``signal_dset`` by SD of ``noise_dset``.
+    ``signal_dset`` should be a dataset that contains the average signal value (i.e., nothing that has
+    been detrended by removing the mean), and ``noise_dset`` should be a dataset that has all possible
+    known signal fluctuations (e.g., task-related effects) removed from it (the residual dataset from a 
+    deconvolve works well)'''
+    for d in [('mean',signal_dset), ('stdev',noise_dset)]:
+        new_d = suffix(d[1],'_%s' % d[0])
+        cmd = ['3dTstat','-%s' % d[0],'-prefix',new_d]
+        if mask:
+            cmd += ['-mask',mask]
+        cmd += [d[1]]
+        nl.run(cmd,products=new_d)
+    calc([suffix(signal_dset,'_mean'),suffix(noise_dset,'_stdev')],'a/b',prefix=prefix)
