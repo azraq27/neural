@@ -227,7 +227,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order='zt'):
                 cmd = ['to3d','-skip_outliers','-quit_on_err','-prefix',out_file]
                 
                 i = info(file_list[0])
-                if i.addr(tags['num_reps']):
+                if i.addr(tags['num_reps']) and int(i.addr(tags['num_reps'])['value'])>1:
                     # This is a time-dependent dataset
                     cmd += ['-time:' + sort_order]
                     num_reps = int(i.addr(tags['num_reps'])['value'])
@@ -243,9 +243,8 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order='zt'):
                         cmd += [str(num_reps),str(num_files/num_reps)]
                     cmd += [i.addr(tags['TR'])['value'],slice_order]
                 
-                print 'to3d command: %s' % ' '.join(cmd)
                 cmd += ['-@']
-                p = subprocess.Popen(cmd,stdin=subprocess.PIPE)
+                p = subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
                 p.communicate('\n'.join(file_list))
                 
                 if os.path.exists(out_file):
