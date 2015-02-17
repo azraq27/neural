@@ -87,6 +87,8 @@ def info_for_tags(filename,tags):
     ``tags`` is expected to be a list of tuples that contains the DICOM address in hex values.
     
     basically a rewrite of :meth:`info` because it's so slow. This is a lot faster and more reliable'''
+    if isinstance(tags,tuple):
+        tags = [tags]
     d = pydicom.read_file(filename)
     return {k:d[k].value for k in tags if k in d}
 
@@ -183,6 +185,7 @@ def max_diff(dset_a,dset_b):
 
 def _create_dset_dicom(directory,slice_order='alt+z',sort_order='zt'):
     tags = {
+        'num_rows': (0x0028,0x0010),
         'num_reps': (0x0020,0x0105),
         'num_frames': (0x0028,0x0008),
         'TR': (0x0018,0x0080)
@@ -206,10 +209,22 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order='zt'):
                 file_list = glob.glob(directory + '/*')
                 num_reps = None
                 
+                new_file_list = []
+                for f in file_list:
+                    if len(info_for_tags(f,tags['num_rows']))>0:
+                        # Only include DICOMs that actually have image information
+                        new_file_list.append(f)
+                file_list = new_file_list
+                if len(file_list)==0:
+                    nl.notify('Error: Couldn\'t find any valid DICOM images',level=nl.level.error)
+                    return False
+                
+                with open('file_list.txt','w') as f:
+                    f.write('\n'.join(file_list))
                 try:
                     subprocess.check_output([
                     'Dimon',
-                    '-infile_prefix','%s/' % directory,
+                    '-infile_list','file_list.txt',
                     '-dicom_org', 
                     '-save_details','details',
                     '-max_images','100000',
