@@ -1,7 +1,7 @@
 '''methods to analyze DICOM format images'''
 
 from __future__ import absolute_import
-import subprocess,re,os,multiprocessing,glob,itertools
+import subprocess,re,os,multiprocessing,glob,itertools,tempfile,shutil
 from datetime import datetime
 import neural as nl
 import string
@@ -181,47 +181,84 @@ def max_diff(dset_a,dset_b):
     except subprocess.CalledProcessError:
         return float('inf')
 
-def _create_dset_dicom(directory):
+def _create_dset_dicom(directory,slice_order='alt+z',sort_order='zt'):
+    tags = {
+        'num_reps': (0x0020,0x0105),
+        'num_frames': (0x0028,0x0008),
+        'TR': (0x0018,0x0080)
+    }
     with nl.notify('Trying to create datasets from %s' % directory):
-        d = str(directory)
-        while d.endswith('/'):
-            d = d[:1]
-    
+        directory = os.path.abspath(directory)
+            
         if not os.path.exists(directory):
-            nl.notify('Error: could not find %s',level=nl.level.error)
+            nl.notify('Error: could not find %s' % directory,level=nl.level.error)
             return False
         
-        out_file = '%s.nii' % nl.afni.prefix(d)
-        return_val = out_file + '.gz'
-        try:
-            out = subprocess.check_output([
-            'Dimon',
-            '-infile_prefix','%s/' % directory,
-            '-dicom_org', '-GERT_Reco', 
-            '-gert_to3d_prefix', nl.afni.prefix(d),
-            '-gert_create_dataset', '-gert_write_as_nifti', '-gert_quit_on_err',
-            '-max_images','100000',
-            '-quit'],stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError, e:
-            nl.notify('Error: Dimon returned an error while creating dataset',level=nl.level.error)
-            return_val = False
-        
+        out_file = '%s.nii.gz' % nl.afni.prefix(os.path.basename(directory))
         if os.path.exists(out_file):
-            nl.run(['gzip',out_file])
-        else:
-            return_val = False
-        
-        for junk in ['dimon.files.run.*','GERT_Reco_dicom_*']:
-            for fname in glob.glob(junk):
-                try:
-                    os.remove(fname)
-                except IOError:
-                    pass
-        return return_val
+            nl.notify('Error: file "%s" already exists!' % out_file,level=nl.level.error)
+            return False
 
-def create_dset(directory):
+        cwd = os.getcwd()
+        sorted_dir = tempfile.mkdtemp()
+        try:
+            with nl.run_in(sorted_dir):
+                file_list = glob.glob(directory + '/*')
+                num_reps = None
+                
+                try:
+                    subprocess.check_output([
+                    'Dimon',
+                    '-infile_prefix','%s/' % directory,
+                    '-dicom_org', 
+                    '-save_details','details',
+                    '-max_images','100000',
+                    '-quit'],stderr=subprocess.STDOUT)
+                except subprocess.CalledProcessError, e:
+                    nl.notify('Warning: Dimon returned an error while sorting images',level=nl.level.warning)
+                else:
+                    if os.path.exists('details.2.final_list.txt'):
+                        with open('details.2.final_list.txt') as f:
+                            details = [x.strip().split() for x in f.readlines() if x[0]!='#']
+                            file_list = [x[0] for x in details]
+                    else:
+                        nl.notify('Warning: Dimon didn\'t return expected output, unable to sort images',level=nl.level.warning)
+                
+                cmd = ['to3d','-skip_outliers','-quit_on_err','-prefix',out_file]
+                
+                i = info(file_list[0])
+                if i.addr(tags['num_reps']):
+                    # This is a time-dependent dataset
+                    cmd += ['-time:' + sort_order]
+                    num_reps = int(i.addr(tags['num_reps'])['value'])
+                    num_files = len(file_list)
+                    for f in file_list:
+                        # Take into account multi-frame DICOMs
+                        num_frames_info = info_for_tags(f,[tags['num_frames']])
+                        if tags['num_frames'] in num_frames_info:
+                            num_files += num_frames_info[tags['num_frames']] - 1
+                    if sort_order=='zt':
+                        cmd += [str(num_files/num_reps),str(num_reps)]
+                    else:
+                        cmd += [str(num_reps),str(num_files/num_reps)]
+                    cmd += [i.addr(tags['TR'])['value'],slice_order]
+                
+                print 'to3d command: %s' % ' '.join(cmd)
+                cmd += ['-@']
+                p = subprocess.Popen(cmd,stdin=subprocess.PIPE)
+                p.communicate('\n'.join(file_list))
+                
+                if os.path.exists(out_file):
+                    shutil.copy(out_file,cwd)
+                    return out_file
+                
+                return False
+        finally:
+            shutil.rmtree(sorted_dir)
+
+def create_dset(directory,slice_order='alt+z',sort_order='zt'):
     '''tries to autocreate a dataset from images in the given directory'''
-    return _create_dset_dicom(directory)
+    return _create_dset_dicom(directory,slice_order,sort_order)
     # Add more options for GE I-files, and other non-DICOM data formats
 
 def date_for_str(date_str):
