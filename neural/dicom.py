@@ -8,6 +8,8 @@ import string
 # No, I'm not importing myself... this is actually the pydicom library
 import dicom as pydicom
 from fuzzywuzzy import process
+import nibabel as nib
+import numpy as np
 
 def is_dicom(filename):
     '''returns Boolean of whether the given file has the DICOM magic number'''
@@ -169,18 +171,26 @@ def cluster_files(file_dict):
         return_dict[dict_key]['files'].append(filename)
     return return_dict
 
-def max_diff(dset_a,dset_b):
+def max_diff(dset1,dset2):
     '''calculates maximal voxel-wise difference in datasets
     
     Useful for checking if datasets have the same data. For example, if the maximum difference is
     < 1.0, they're probably the same dataset'''
-    for dset in [dset_a,dset_b]:
+    for dset in [dset1,dset2]:
         if not os.path.exists(dset):
-            raise IOError('Could not find file: %s' % dset)
+            nl.notify('Error: Could not find file: %s' % dset,level=nl.level.error)
+            return float('inf')
     try:
-        with open(os.devnull,'w') as null:
-            return float(subprocess.check_output(['3dBrickStat','-max','3dcalc( -a %s -b %s -expr abs(a-b) )' %(dset_a,dset_b)],stderr=null).split()[0])
-    except subprocess.CalledProcessError:
+        dset1_d = nib.load(dset1)
+        dset2_d = nib.load(dset2)
+        dset1_data = dset1_d.get_data()
+        dset2_data = dset2_d.get_data()
+    except IOError:
+        nl.notify('Error: Could not read files %s and %s' % (dset1,dset2),level=nl.level.error)
+        return float('inf')
+    try:
+        return np.max(dset1_data-dset2_data)
+    except ValueError:
         return float('inf')
 
 def _create_dset_dicom(directory,slice_order='alt+z',sort_order='zt'):
