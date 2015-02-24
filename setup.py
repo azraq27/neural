@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-version = '0.7.1'
+version = '0.7.3'
 
 setup(
   name = 'neural-fmri',

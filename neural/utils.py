@@ -2,6 +2,7 @@
 
 Many of these are imported into the root-level of the package to make accessing them easier '''
 import neural
+import neural as nl
 #from notify import notify
 import os,subprocess
 import datetime,random,string
