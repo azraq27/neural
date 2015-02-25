@@ -276,7 +276,6 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                 if num_reps:
                     # This is a time-dependent dataset
                     cmd += ['-time:' + sort_order]
-                    num_reps = int(i.addr(tags['num_reps'])['value'])
                     num_files = len(file_list)
                     for f in file_list:
                         # Take into account multi-frame DICOMs
