@@ -280,7 +280,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                     num_files = len(file_list)
                     for f in file_list:
                         # Take into account multi-frame DICOMs
-                        num_frames_info = info_for_tags(f,[tags['num_frames']])
+                        num_frames_info = info_for_tags(f,[tags['num_frames'],tags['siemens_slices']])
                         if tags['num_frames'] in num_frames_info:
                             num_files += num_frames_info[tags['num_frames']] - 1
                         if tags['siemens_slices'] in num_frames_info:
