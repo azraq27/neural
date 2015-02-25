@@ -193,11 +193,12 @@ def max_diff(dset1,dset2):
     except ValueError:
         return float('inf')
 
-def _create_dset_dicom(directory,slice_order='alt+z',sort_order='zt'):
+def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
     tags = {
         'num_rows': (0x0028,0x0010),
         'num_reps': (0x0020,0x0105),
         'num_frames': (0x0028,0x0008),
+        'acq_time': (0x0008,0x0032),
         'TR': (0x0018,0x0080)
     }
     with nl.notify('Trying to create datasets from %s' % directory):
@@ -251,8 +252,25 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order='zt'):
                 
                 cmd = ['to3d','-skip_outliers','-quit_on_err','-prefix',out_file]
                 
+                num_reps = None
                 i = info(file_list[0])
                 if i.addr(tags['num_reps']) and int(i.addr(tags['num_reps'])['value'])>1:
+                    # multiple reps per file
+                    num_reps = int(i.addr(tags['num_reps'])['value'])
+                    # probably makes sense to default to "tz"
+                    if sort_order==None:
+                        sort_order='tz'
+                else:
+                    if i.addr(tags['acq_time']) and len(file_list)>1:
+                        i2 = info(file_list[1])
+                        if i.addr(tags['acq_time']) == i2.addr(tags['acq_time']):
+                            # each file is a different rep
+                            num_reps = len(file_list)
+                            # "zt" sounds like a good default
+                            if sort_order==None:
+                                sort_order='zt'
+                    
+                if num_reps:
                     # This is a time-dependent dataset
                     cmd += ['-time:' + sort_order]
                     num_reps = int(i.addr(tags['num_reps'])['value'])
