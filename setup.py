@@ -37,6 +37,7 @@ but don't specifically have to be that way...
   install_requires=[
       'pydicom',
       'fuzzywuzzy',
-      'python-Levenshtein'
+      'python-Levenshtein',
+      'chardet'
   ]
 )

@@ -9,6 +9,7 @@ import datetime,random,string
 import hashlib
 import zlib, base64
 import tempfile,shutil,re,glob
+import chardet
 
 #! A list of archives this library understands
 archive_formats = {
@@ -269,3 +270,10 @@ class run_in_tmp:
 def random_string(length):
     '''Returns random string of letters'''
     return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(length))
+
+def universal_read(fname):
+    '''Will open and read a file with universal line endings, trying to decode whatever format it's in (e.g., utf8 or utf16)'''
+    with open(fname,'rU') as f:
+        data = f.read()
+    enc_guess = chardet.detect(data)
+    return data.decode(enc_guess['encoding'])
