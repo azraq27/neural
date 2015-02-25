@@ -199,6 +199,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
         'num_reps': (0x0020,0x0105),
         'num_frames': (0x0028,0x0008),
         'acq_time': (0x0008,0x0032),
+        'siemens_slices': (0x0019, 0x100a),
         'TR': (0x0018,0x0080)
     }
     with nl.notify('Trying to create datasets from %s' % directory):
@@ -282,6 +283,8 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                         num_frames_info = info_for_tags(f,[tags['num_frames']])
                         if tags['num_frames'] in num_frames_info:
                             num_files += num_frames_info[tags['num_frames']] - 1
+                        if tags['siemens_slices'] in num_frames_info:
+                            num_files += num_frames_info[tags['siemens_slices']] - 1                            
                     if sort_order=='zt':
                         cmd += [str(num_files/num_reps),str(num_reps)]
                     else:
