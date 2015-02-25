@@ -266,7 +266,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                 else:
                     if i.addr(tags['acq_time']) and len(file_list)>1:
                         i2 = info(file_list[1])
-                        if i.addr(tags['acq_time']) == i2.addr(tags['acq_time']):
+                        if i.addr(tags['acq_time'])['value'] != i2.addr(tags['acq_time'])['value']:
                             # each file is a different rep
                             num_reps = len(file_list)
                             # "zt" sounds like a good default
