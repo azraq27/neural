@@ -222,9 +222,12 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                 
                 new_file_list = []
                 for f in file_list:
-                    if len(info_for_tags(f,tags['num_rows']))>0:
-                        # Only include DICOMs that actually have image information
-                        new_file_list.append(f)
+                    try:
+                        if len(info_for_tags(f,tags['num_rows']))>0:
+                            # Only include DICOMs that actually have image information
+                            new_file_list.append(f)
+                    except InvalidDicomError:
+                        pass
                 file_list = new_file_list
                 if len(file_list)==0:
                     nl.notify('Error: Couldn\'t find any valid DICOM images',level=nl.level.error)
