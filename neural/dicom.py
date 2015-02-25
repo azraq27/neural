@@ -338,6 +338,7 @@ def organize_dir(orig_dir):
         (0x8,0x31),     # Time
         (0x8,0x103e)    # Descr
     ]
+    orig_dir = orig_dir.rstrip('/')
     files = scan_dir(orig_dir,tags=tags,md5_hash=True)
     dups = find_dups(files)
     for dup in dups:
