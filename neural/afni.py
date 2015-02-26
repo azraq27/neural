@@ -31,7 +31,13 @@ def openX11(dsets=[]):
 
 def _dset_raw_info(dset):
     ''' returns raw output from running ``3dinfo`` '''
-    return subprocess.check_output(['3dinfo','-verb',str(dset)],stderr=subprocess.STDOUT)
+    if not os.path.exists(dset):
+        nl.notify('Error: Trying to get info for non-existant dset "%s"' % dset,level=nl.level.error)
+        return None
+    try:
+        return subprocess.check_output(['3dinfo','-verb',str(dset)],stderr=subprocess.STDOUT)
+    except:
+        return None
 
 class DsetInfo:
     ''' contains organized output from ``3dinfo`` 
@@ -59,6 +65,8 @@ def dset_info(dset):
     ''' runs ``3dinfo`` and returns a :class:`DsetInfo` object containing the results '''
     info = DsetInfo()
     raw_info = _dset_raw_info(dset)
+    if raw_info==None:
+        return None
     # Subbrick info:
     sub_info = re.findall(r'At sub-brick #(\d+) \'([^\']+)\' datum type is (\w+).*(\n.*statcode = (\w+);  statpar = (.*)|)',raw_info)
     for brick in sub_info:
