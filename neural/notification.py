@@ -11,8 +11,11 @@ from email.mime.text import MIMEText
 import neural.term
 
 class SMTPServer:
-    def __init__(self,from_addr,server,username=None,password=None,SSL=False):
+    def __init__(self,from_addr,server,username=None,password=None,SSL=False,from_name=None):
         self.from_addr = from_addr
+        if from_name==None:
+            from_name = from_addr
+        self.from_name = from_name
         self.server = server
         self.username = username
         self.password = password
@@ -20,16 +23,16 @@ class SMTPServer:
 
 default_SMTP = None
 
-def enable_email(from_email,server,username=None,password=None,SSL=False):
+def enable_email(from_email,server,username=None,password=None,SSL=False,from_name=None):
     global default_SMTP
-    default_SMTP = SMTPServer(from_email,server,username,password,SSL)
+    default_SMTP = SMTPServer(from_email,server,username,password,SSL,from_name)
 
 def email(to,msg,subject='Neural notification'):
     if default_SMTP==None:
         raise RuntimeError('Email not enabled, must run ``enable_email`` first!')
     msg = MIMEText(msg)
     msg['Subject'] = subject
-    msg['From'] = default_SMTP.from_addr
+    msg['From'] = default_SMTP.from_name
     msg['To'] = to
     if default_SMTP.SSL:
         s = smtplib.SMTP_SSL(default_SMTP.server)
