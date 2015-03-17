@@ -957,3 +957,12 @@ def temporal_snr(signal_dset,noise_dset,mask=None,prefix='temporal_snr.nii.gz'):
         cmd += [d[1]]
         nl.run(cmd,products=new_d)
     calc([suffix(signal_dset,'_mean'),suffix(noise_dset,'_stdev')],'a/b',prefix=prefix)
+
+'''def connectivity_analysis(residual_dset,coord,radius=None):
+    tmpdir = tempfile.mkdtemp()
+    try:
+        
+    except Exception as e:
+        raise
+    finally:
+        shutil.rmtree(tmpdir,True)'''
