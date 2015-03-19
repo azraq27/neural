@@ -29,11 +29,14 @@ def enable_email(from_email,server,username=None,password=None,SSL=False,from_na
 
 def email(to,msg,subject='Neural notification'):
     if default_SMTP==None:
-        raise RuntimeError('Email not enabled, must run ``enable_email`` first!')
+        raise RuntimeError('Email not enabled, must run "enable_email" first!')
     msg = MIMEText(msg)
     msg['Subject'] = subject
     msg['From'] = default_SMTP.from_name
-    msg['To'] = to
+    if isinstance(to,basestring):
+        msg['To'] = to
+    else:
+        msg['To'] = ','.join(to)
     if default_SMTP.SSL:
         s = smtplib.SMTP_SSL(default_SMTP.server)
     else:
