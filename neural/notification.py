@@ -43,7 +43,7 @@ def email(to,msg,subject='Neural notification'):
         s = smtplib.SMTP(default_SMTP.server)
     if default_SMTP.username:
         s.login(default_SMTP.username,default_SMTP.password)
-    s.sendmail(to,default_SMTP.from_addr,msg.as_string())
+    s.sendmail(default_SMTP.from_addr,to,msg.as_string())
     s.quit()
 
 # Log levels:
