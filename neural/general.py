@@ -1,6 +1,5 @@
-''' generic imaging routines not specifically tied to any analysis packages '''
-
 import nibabel as nib
+import neural as nl
 
 class Analyze:
     ''' class to do arbitrary analyses on datasets
