@@ -1,9 +1,5 @@
-''' This module contains generic helper functions
-
-Many of these are imported into the root-level of the package to make accessing them easier '''
-import neural
+''' This module contains generic helper functions, not related to imaging specifically'''
 import neural as nl
-#from notify import notify
 import os,subprocess
 import datetime,random,string
 import hashlib
@@ -122,7 +118,7 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
         
         command = flatten(command)
         command = [str(x) for x in command]
-        with neural.notify('Running %s...' % command[0]):
+        with nl.notify('Running %s...' % command[0]):
             out = None
             returncode = 0
             try:
@@ -131,7 +127,7 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
                 else:
                     out = subprocess.check_output(command)                    
             except subprocess.CalledProcessError, e:
-                neural.notify('''ERROR: %s returned a non-zero status
+                nl.notify('''ERROR: %s returned a non-zero status
 
 ----COMMAND------------
 %s
@@ -142,7 +138,7 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
 %s
 -----------------------
 Return code: %d
-''' % (command[0],' '.join(command),e.output,e.returncode),level=neural.level.error)
+''' % (command[0],' '.join(command),e.output,e.returncode),level=nl.level.error)
                 returncode = e.returncode
             result = RunResult(out,returncode)
             if products and returncode==0:
@@ -222,19 +218,6 @@ def which(program):
                 return exe_file
 
     return None
-
-def dset_copy(dset,to_dir):
-    '''robust way to copy a dataset (including AFNI briks)'''
-    if neural.afni.is_afni(dset):
-        dset_strip = re.sub(r'\.(HEAD|BRIK)?(\.(gz|bz))?','',dset)
-        for dset_file in [dset_strip + '.HEAD'] + glob.glob(dset_strip + '.BRIK*'):
-            if os.path.exists(dset_file):
-                shutil.copy(dset_file,to_dir)
-    else:
-        if os.path.exists(dset):
-            shutil.copy(dset,to_dir)
-        else:
-            neural.notify('Warning: couldn\'t find file %s to copy to %s' %(dset,to_dir),level=nl.level.warning)
 
 class run_in_tmp:
     '''creates a temporary directory to run the code block in'''
