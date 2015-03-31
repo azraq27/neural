@@ -1,3 +1,4 @@
 pydicom
 fuzzywuzzy
 chardet
+nibabel

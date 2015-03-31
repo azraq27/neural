@@ -38,6 +38,8 @@ but don't specifically have to be that way...
       'pydicom',
       'fuzzywuzzy',
       'python-Levenshtein',
-      'chardet'
+      'chardet',
+      'nibabel'
   ]
 )
+
