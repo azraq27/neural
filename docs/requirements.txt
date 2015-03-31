@@ -2,3 +2,4 @@ pydicom
 fuzzywuzzy
 chardet
 nibabel
+numpy

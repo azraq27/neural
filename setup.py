@@ -39,7 +39,8 @@ but don't specifically have to be that way...
       'fuzzywuzzy',
       'python-Levenshtein',
       'chardet',
-      'nibabel'
+      'nibabel',
+      'numpy'
   ]
 )
 
