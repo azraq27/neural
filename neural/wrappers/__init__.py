@@ -1,1 +1,1 @@
-from neural.wrappers.common import *
+from common import *
