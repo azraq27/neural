@@ -71,10 +71,10 @@ class temp_afni_copy:
         self.afni_filenames = []
         if isinstance(self.in_dset,list):
             for dset in self.in_dset:
-                self.afni_filenames.append(afni_copy(dset))
+                self.afni_filenames.append(nl.afni_copy(dset))
             return self.afni_filenames
         else:
-            self.afni_filenames.append(afni_copy(self.in_dset))
+            self.afni_filenames.append(nl.afni_copy(self.in_dset))
             return self.afni_filenames[0]
 
     def __exit__(self, type, value, traceback):
