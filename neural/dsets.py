@@ -1,6 +1,6 @@
 '''methods to do simple manipulations of datasets'''
 import neural as nl
-import shutil,os,glob,re
+import shutil,os,glob,re,subprocess
 
 _afni_suffix_regex = r"((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\d+\])?$"
 
