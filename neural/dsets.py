@@ -88,7 +88,7 @@ class temp_afni_copy:
             if isinstance(self.out_dsets,basestring):
                 self.out_dsets = [self.out_dsets]
             for out_dset in self.out_dsets:
-                nifti_dset = nifti_copy(out_dset)
+                nifti_dset = nl.nifti_copy(out_dset)
                 if os.path.exists(nifti_dset):
                     for dset in [out_dset,out_dset+'.HEAD']:
                         try:
