@@ -25,7 +25,7 @@ def nifti_copy(filename,prefix=None,gzip=True):
     # I know, my argument ``prefix`` clobbers the global method... but it makes my arguments look nice and clean
     if prefix==None:
         prefix = filename
-    prefix = globals()['prefix'](filename) + ".nii"
+    nifti_filename = globals()['prefix'](prefix) + ".nii"
     if gzip:
         nifti_filename += '.gz'
     if not os.path.exists(nifti_filename):
