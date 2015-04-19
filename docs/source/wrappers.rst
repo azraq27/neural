@@ -1,5 +1,5 @@
 neural.wrappers - Wrappers for generic imaging functions
 ===========================================================
 
-.. automodule:: common
+.. automodule:: neural.wrappers.common
 	:members:
