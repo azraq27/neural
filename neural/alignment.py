@@ -231,11 +231,11 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
     products = nl.flatten([dset_products(dset) for dset in epi_dsets])
     with nl.run_in_tmp(inputs,products): 
         if nl.is_nifti(anatomy_use):
-            anatomy_use = afni_copy(anatomy_use)
+            anatomy_use = nl.afni_copy(anatomy_use)
         epi_dsets_use = []
         for dset in epi_dsets:
             if nl.is_nifti(dset):
-                epi_dsets_use.append(afni_copy(dset))
+                epi_dsets_use.append(nl.afni_copy(dset))
             else:
                 epi_dsets_use.append(dset)
         cmd = ["align_epi_anat.py", "-epi2anat", "-anat_has_skull", "no", "-epi_strip", "3dAutomask","-anat", anatomy_use, "-epi_base", "5", "-epi", epi_dsets_use[0]]
