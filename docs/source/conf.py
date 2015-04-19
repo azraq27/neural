@@ -22,8 +22,6 @@ import os
 
 sys.path.append(os.path.abspath('../../neural'))
 sys.path.append(os.path.abspath('../../neural/neural'))
-import wrappers.common
-#import neural.wrappers.common
 
 # -- General configuration ------------------------------------------------
 
