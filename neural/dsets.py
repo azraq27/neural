@@ -98,7 +98,7 @@ class temp_afni_copy:
 
 def dset_copy(dset,to_dir):
     '''robust way to copy a dataset (including AFNI briks)'''
-    if nl.afni.is_afni(dset):
+    if nl.is_afni(dset):
         dset_strip = re.sub(r'\.(HEAD|BRIK)?(\.(gz|bz))?','',dset)
         for dset_file in [dset_strip + '.HEAD'] + glob.glob(dset_strip + '.BRIK*'):
             if os.path.exists(dset_file):
