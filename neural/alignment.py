@@ -223,7 +223,7 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
     anatomy_use = anatomy
     
     if skull_strip_anat:
-        nl.default.skull_strip(anatomy,'_ns')
+        nl.skull_strip(anatomy,'_ns')
         anatomy_use = nl.suffix(anatomy,'_ns')
     
     inputs = [anatomy_use] + epi_dsets
