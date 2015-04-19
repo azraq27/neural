@@ -245,6 +245,6 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
         
         for dset in epi_dsets:
             if nl.is_nifti(dset):
-                dset_nifti = nifti_copy(nl.prefix(dset)+'_al+orig')
+                dset_nifti = nl.nifti_copy(nl.prefix(dset)+'_al+orig')
                 if dset_nifti and os.path.exists(dset_nifti) and dset_nifti.endswith('.nii') and dset.endswith('.gz'):
                     nl.run(['gzip',dset_nifti])
