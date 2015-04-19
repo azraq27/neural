@@ -12,6 +12,9 @@ and simple functions to replace common scripts.
 
 For a more comprehensive analysis library, see the NIPy project: http://nipy.org
 
+This library is written to try to be generic, wrapping multiple neuroimaging packages, although (because of author bias) it's
+currently dominated by AFNI functions.
+
 
 Usage Example:
 ===============
