@@ -73,7 +73,7 @@ def skull_strip(dset,suffix='_ns'):
     neural.run([
         '3dSkullStrip',
         '-input', dset,
-        '-prefix', suffix(dset,suffix),
+        '-prefix', nl.suffix(dset,suffix),
         '-niter', '400',
         '-ld', '40'
-    ],products=suffix(dset,suffix))
+    ],products=nl.suffix(dset,suffix))

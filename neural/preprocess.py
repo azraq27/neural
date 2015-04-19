@@ -27,6 +27,6 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
             binary_outcount[best_outlier[1]] = False
             perc_outliers = sum(binary_outcount)/float(info.reps)
     if not out_prefix:
-        out_prefix = prefix(input_dset) + '.1D'
+        out_prefix = nl.prefix(input_dset) + '.1D'
     with open(out_prefix,'w') as f:
         f.write('\n'.join([str(int(x)) for x in binary_outcount]))

@@ -58,10 +58,10 @@ def temporal_snr(signal_dset,noise_dset,mask=None,prefix='temporal_snr.nii.gz'):
     known signal fluctuations (e.g., task-related effects) removed from it (the residual dataset from a 
     deconvolve works well)'''
     for d in [('mean',signal_dset), ('stdev',noise_dset)]:
-        new_d = suffix(d[1],'_%s' % d[0])
+        new_d = nl.suffix(d[1],'_%s' % d[0])
         cmd = ['3dTstat','-%s' % d[0],'-prefix',new_d]
         if mask:
             cmd += ['-mask',mask]
         cmd += [d[1]]
         nl.run(cmd,products=new_d)
-    nl.calc([suffix(signal_dset,'_mean'),suffix(noise_dset,'_stdev')],'a/b',prefix=prefix)
+    nl.calc([nl.suffix(signal_dset,'_mean'),nl.suffix(noise_dset,'_stdev')],'a/b',prefix=prefix)

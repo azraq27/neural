@@ -1,4 +1,5 @@
 import neural as nl
+import os
 
 def volreg(dset,suffix='_volreg',base_subbrick=3,tshift=True):
     ''' simple interface to 3dvolreg (recommend looking at align_epi_anat instead of using this) '''
@@ -11,15 +12,15 @@ def volreg(dset,suffix='_volreg',base_subbrick=3,tshift=True):
 def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff'):
     ''' interface to 3dAllineate to align anatomies and EPIs '''
     
-    dset_ss = lambda dset: os.path.split(suffix(dset,'_ns'))[1]
+    dset_ss = lambda dset: os.path.split(nl.suffix(dset,'_ns'))[1]
     def dset_source(dset):      
         if skull_strip==True or skull_strip==dset:
             return dset_ss(dset)
         else:
             return dset
     
-    dset_affine = os.path.split(suffix(dset_from,affine_suffix))[1]
-    dset_affine_1D = prefix(dset_affine) + '.1D'
+    dset_affine = os.path.split(nl.suffix(dset_from,affine_suffix))[1]
+    dset_affine_1D = nl.prefix(dset_affine) + '.1D'
         
     if os.path.exists(dset_affine):
         # final product already exists
@@ -64,8 +65,8 @@ def affine_apply(dset_from,affine_1D,master,affine_suffix='_aff',interp='NN',inv
             temp.write(subprocess.check_output(['cat_matvec',affine_1D,'-I']))
             affine_1D_use = temp.name
     if prefix==None:
-        prefix = suffix(dset_from,affine_suffix)
-    nl.run(['3dAllineate','-1Dmatrix_apply',affine_1D_use,'-input',dset_from,'-prefix',prefix,'-master',master,'-final',interp],products=suffix(dset_from,affine_suffix))
+        prefix = nl.suffix(dset_from,affine_suffix)
+    nl.run(['3dAllineate','-1Dmatrix_apply',affine_1D_use,'-input',dset_from,'-prefix',prefix,'-master',master,'-final',interp],products=nl.suffix(dset_from,affine_suffix))
 
 
 def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',qwarp_suffix='_qwarp'):
@@ -101,17 +102,17 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
     # TODO: currently does not work with +tlrc datasets because the filenames get mangled
     '''
     
-    dset_ss = lambda dset: os.path.split(suffix(dset,'_ns'))[1]
-    dset_u = lambda dset: os.path.split(suffix(dset,'_u'))[1]
+    dset_ss = lambda dset: os.path.split(nl.suffix(dset,'_ns'))[1]
+    dset_u = lambda dset: os.path.split(nl.suffix(dset,'_u'))[1]
     def dset_source(dset):      
         if skull_strip==True or skull_strip==dset:
             return dset_ss(dset)
         else:
             return dset
     
-    dset_affine = os.path.split(suffix(dset_from,affine_suffix))[1]
-    dset_affine_1D = prefix(dset_affine) + '.1D'
-    dset_qwarp = os.path.split(suffix(dset_from,qwarp_suffix))[1]
+    dset_affine = os.path.split(nl.suffix(dset_from,affine_suffix))[1]
+    dset_affine_1D = nl.prefix(dset_affine) + '.1D'
+    dset_qwarp = os.path.split(nl.suffix(dset_from,qwarp_suffix))[1]
     
     if os.path.exists(dset_qwarp):
         # final product already exists
@@ -163,13 +164,13 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP
     
     Output dataset with have the ``warp_suffix`` suffix added to its name
     '''
-    out_dset = os.path.split(suffix(dset_from,warp_suffix))[1]
+    out_dset = os.path.split(nl.suffix(dset_from,warp_suffix))[1]
     dset_from_info = dset_info(dset_from)
     dset_warp_info = dset_info(dset_warp)
     if(dset_from_info.orient!=dset_warp_info.orient):
         # If the datasets are different orientations, the transform won't be applied correctly
-        nl.run(['3dresample','-orient',dset_warp_info.orient,'-prefix',suffix(dset_from,'_reorient'),'-inset',dset_from],products=suffix(dset_from,'_reorient'))
-        dset_from = suffix(dset_from,'_reorient')
+        nl.run(['3dresample','-orient',dset_warp_info.orient,'-prefix',nl.suffix(dset_from,'_reorient'),'-inset',dset_from],products=nl.suffix(dset_from,'_reorient'))
+        dset_from = nl.suffix(dset_from,'_reorient')
     warp_opt = str(dset_warp)
     if affine:
         warp_opt += ' ' + affine
@@ -216,14 +217,14 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
         nl.notify('Warning: no epi alignment datasets given for anatomy %s!' % anatomy,level=nl.level.warning)
         return
     
-    if all(os.path.exists(suffix(x,'_al')) for x in epi_dsets):
+    if all(os.path.exists(nl.suffix(x,'_al')) for x in epi_dsets):
         return
     
     anatomy_use = anatomy
     
     if skull_strip_anat:
         nl.default.skull_strip(anatomy,'_ns')
-        anatomy_use = suffix(anatomy,'_ns')
+        anatomy_use = nl.suffix(anatomy,'_ns')
     
     inputs = [anatomy_use] + epi_dsets
     dset_products = lambda dset: [nl.suffix(dset,'_al'), nl.prefix(dset)+'_al_mat.aff12.1D', nl.prefix(dset)+'_tsh_vr_motion.1D']
@@ -244,6 +245,6 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
         
         for dset in epi_dsets:
             if is_nifti(dset):
-                dset_nifti = nifti_copy(prefix(dset)+'_al+orig')
+                dset_nifti = nifti_copy(nl.prefix(dset)+'_al+orig')
                 if dset_nifti and os.path.exists(dset_nifti) and dset_nifti.endswith('.nii') and dset.endswith('.gz'):
                     nl.run(['gzip',dset_nifti])
