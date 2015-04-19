@@ -209,7 +209,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
             nl.notify('Error: could not find %s' % directory,level=nl.level.error)
             return False
         
-        out_file = '%s.nii.gz' % nl.afni.prefix(os.path.basename(directory))
+        out_file = '%s.nii.gz' % nl.prefix(os.path.basename(directory))
         if os.path.exists(out_file):
             nl.notify('Error: file "%s" already exists!' % out_file,level=nl.level.error)
             return False
