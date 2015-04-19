@@ -1,4 +1,4 @@
-neural.stats - Methods to extract dataset statistics
+stats - Methods to extract dataset statistics
 =======================================================
 
 .. automodule:: neural.stats

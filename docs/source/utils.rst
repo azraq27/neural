@@ -1,4 +1,4 @@
-neural.utils - Generic helper utilities
+utils - Generic helper utilities
 ========================================
 
 .. automodule:: neural.utils

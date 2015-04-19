@@ -1,4 +1,4 @@
-neural.dicom - Functions to interact with DICOM images
+dicom - Functions to interact with DICOM images
 =======================================================
 
 .. automodule:: neural.dicom

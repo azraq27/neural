@@ -1,4 +1,4 @@
-neural.dsets - Simple manipulation of datasets
+dsets - Simple manipulation of datasets
 =======================================================
 
 .. automodule:: neural.dsets

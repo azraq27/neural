@@ -1,4 +1,4 @@
-neural.eprime - E-Prime logfile parsing
+eprime - E-Prime logfile parsing
 ========================================
 
 .. automodule:: neural.eprime
