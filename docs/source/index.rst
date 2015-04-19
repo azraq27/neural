@@ -13,21 +13,31 @@ and simple functions to replace common scripts.
 For a more comprehensive analysis library, see the NIPy project: http://nipy.org
 
 
+Usage Example:
+===============
+
+Just a quick example of how you might use it::
+
+	import neural as nl
+	
+	with nl.run_in('data_dir/subject1'):
+		nl.calc(['dataset.nii.gz','mask.nii.gz'],'a*step(b)',prefix='dataset_masked.nii.gz')
+		nl.thresh('dataset_masked.nii.gz',p=0.005,prefix='dataset_masked_p0.005.nii.gz')
+		
+		nl.affine_align('anatomy.nii.gz','TT_N27.nii.gz',skull_strip='anatomy.nii.gz')
+		nl.affine_apply('dataset_masked_p0.005.nii.gz','anatomy_aff.1D')
+
+
 General Structure
 ====================
 
-The library contains several groups of functions, organized into several modules. The modules are primarily there for
+The library contains several groups of functions, organized into several modules. When using the functions, you can pretty much ignore the
+module hierchy (just call :meth:`neural.func` rather than :meth:`neural.module.func`. The modules are primarily there for
 conceptual organization and keeping the documentation simple. All of the following modules are imported into the main level,
 and don't need to be referred to in code:
 
-	* :mod:`neural.wrappers`
-	* :mod:`neural.utils`
-	* :mod:`neural.dsets`
-	* :mod:`neural.decon`
-	* :mod:`neural.alignment`
-	* :mod:`neural.dicom`
-	* :mod:`neural.preprocess`
-	* :mod:`neural.stats`
+:mod:`neural.wrappers`, :mod:`neural.utils`, :mod:`neural.dsets`, :mod:`neural.decon`, :mod:`neural.alignment`,
+:mod:`neural.dicom`, :mod:`neural.preprocess`, :mod:`neural.stats`
 
 For example, to call the method :meth:`neural.wrappers.calc`, you just need to call :meth:`neural.calc`
 
