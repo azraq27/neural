@@ -20,7 +20,7 @@ The library contains several groups of functions, organized into several modules
 conceptual organization and keeping the documentation simple. All of the following modules are imported into the main level,
 and don't need to be referred to in code:
 
-	* :mod:`neural.wrappers.common`
+	* :mod:`neural.wrappers`
 	* :mod:`neural.utils`
 	* :mod:`neural.dsets`
 	* :mod:`neural.decon`
@@ -29,7 +29,7 @@ and don't need to be referred to in code:
 	* :mod:`neural.preprocess`
 	* :mod:`neural.stats`
 
-For example, to call the method :meth:`neural.wrappers.common.calc`, you just need to call :meth:`neural.calc`
+For example, to call the method :meth:`neural.wrappers.calc`, you just need to call :meth:`neural.calc`
 
 Modules:
 ======================
