@@ -31,6 +31,9 @@ and don't need to be referred to in code:
 
 For example, to call the method :meth:`neural.wrappers.calc`, you just need to call :meth:`neural.calc`
 
+Modules:
+======================
+
 Wrapper Functions
 --------------------
 
