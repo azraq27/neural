@@ -233,7 +233,7 @@ class run_in_tmp:
         self.cwd = os.getcwd()
         for file in self.inputs:
             try:
-                dset_copy(file,self.tmp_dir)
+                nl.dset_copy(file,self.tmp_dir)
             except (OSError,IOError):
                 pass
         os.chdir(self.tmp_dir)
@@ -244,7 +244,7 @@ class run_in_tmp:
             self.products = [self.products]
         for file in self.products:
             try:
-                dset_copy(file,self.cwd)
+                nl.dset_copy(file,self.cwd)
             except (OSError,IOError):
                 pass
         os.chdir(self.cwd)
