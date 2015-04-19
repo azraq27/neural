@@ -43,7 +43,7 @@ def is_afni(filename):
     
 def is_dset(filename):
     '''just checks if the filename has the format of an fMRI dataset'''
-    return is_nifti(filename) or is_afni(filename)
+    return nl.is_nifti(filename) or is_afni(filename)
 
 class temp_afni_copy:
     ''' used within a ``with`` block, will create a temporary ``+orig`` copy of dataset

@@ -230,11 +230,11 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
     dset_products = lambda dset: [nl.suffix(dset,'_al'), nl.prefix(dset)+'_al_mat.aff12.1D', nl.prefix(dset)+'_tsh_vr_motion.1D']
     products = nl.flatten([dset_products(dset) for dset in epi_dsets])
     with nl.run_in_tmp(inputs,products): 
-        if is_nifti(anatomy_use):
+        if nl.is_nifti(anatomy_use):
             anatomy_use = afni_copy(anatomy_use)
         epi_dsets_use = []
         for dset in epi_dsets:
-            if is_nifti(dset):
+            if nl.is_nifti(dset):
                 epi_dsets_use.append(afni_copy(dset))
             else:
                 epi_dsets_use.append(dset)
@@ -244,7 +244,7 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
             out = nl.run(cmd)
         
         for dset in epi_dsets:
-            if is_nifti(dset):
+            if nl.is_nifti(dset):
                 dset_nifti = nifti_copy(nl.prefix(dset)+'_al+orig')
                 if dset_nifti and os.path.exists(dset_nifti) and dset_nifti.endswith('.nii') and dset.endswith('.gz'):
                     nl.run(['gzip',dset_nifti])
