@@ -1,6 +1,7 @@
 '''methods to do simple manipulations of datasets'''
 import neural as nl
 import shutil,os,glob,re,subprocess
+from operator import mul
 
 _afni_suffix_regex = r"((\+(orig|tlrc|acpc))?\.?(nii|HEAD|BRIK)?(.gz|.bz2)?)(\[\d+\])?$"
 
@@ -193,7 +194,7 @@ def dset_info(dset):
 
 def auto_polort(dset):
     '''a copy of 3dDeconvolve's ``-polort A`` option'''
-    info = dset_info(dset)
+    info = nl.dset_info(dset)
     return 1 + round(info.reps/150.0)
 
 def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False,number_only=False):
@@ -223,7 +224,7 @@ def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False,number_on
     elif rstat:
         label += "_R^2"
     
-    info = dset_info(dset)
+    info = nl.dset_info(dset)
     i = info.subbrick_labeled(label)
     if number_only:
         return i

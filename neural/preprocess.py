@@ -1,4 +1,5 @@
 import neural as nl
+import subprocess
 
 def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_exclude=0.3):
     '''create a binary censor file using 3dToutcount
