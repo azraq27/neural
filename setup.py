@@ -1,10 +1,10 @@
 from distutils.core import setup
 
-version = '1.0.1'
+version = '1.0.2'
 
 setup(
   name = 'neural-fmri',
-  packages = ['neural'], # this must be the same as the name above
+  packages = ['neural','neural.wrappers'], # this must be the same as the name above
   version = version,
   description = 'Neuroimaging Analysis Library',
   long_description = '''NeurAL - a neuroimaging analysis library
