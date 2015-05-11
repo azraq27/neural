@@ -260,3 +260,43 @@ def universal_read(fname):
         data = f.read()
     enc_guess = chardet.detect(data)
     return data.decode(enc_guess['encoding'])
+
+def thread_safe(app_name=None,instance_name=None):
+    '''Returns ``bool`` of whether a duplicate of this ``app_name`` and ``instance_name`` is running.
+    If ``instance_name`` is omitted, any other running ``app_name`` is considered a duplicate. If ``app_name`` is omitted, will 
+    assume the script name'''
+    if app_name==None:
+        app_name = os.path.basename(__file__)
+    if instance_name:
+        app_name += '_' + instance_name
+    pid_file = os.path.join(tempfile.gettempdir(),app_name + '.pid')
+    
+    def write_mypid():
+        try:
+            with open(pid_file,'w') as f:
+                f.write(str(os.getpid()))
+        except:
+            pass
+        
+    if os.path.exists(pid_file):
+        # Maybe we're running... unless it died and left this file hanging
+        try:
+            with open(pid_file) as f:
+                pid = int(f.read())
+            try:
+                # Send "are you alive" message to PID
+                os.kill(pid,0)
+            except: OSError:
+                # It isn't actually running
+                write_mypid()
+                return True
+            else:
+                # Still running... we're a duplicate
+                return False
+        except:
+            # Something messed up there... let's just assume something else is running
+            return False
+    else:
+        # No PID file, we're clear
+        write_mypid()
+        return True
