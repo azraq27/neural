@@ -286,7 +286,7 @@ def thread_safe(app_name=None,instance_name=None):
             try:
                 # Send "are you alive" message to PID
                 os.kill(pid,0)
-            except: OSError:
+            except OSError:
                 # It isn't actually running
                 write_mypid()
                 return True
