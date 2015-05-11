@@ -261,6 +261,13 @@ def universal_read(fname):
     enc_guess = chardet.detect(data)
     return data.decode(enc_guess['encoding'])
 
+_pid_file = None
+def _del_pid_file():
+    try:
+        os.unlink(_pid_file)
+    except:
+        pass
+
 def thread_safe(app_name=None,instance_name=None):
     '''Returns ``bool`` of whether a duplicate of this ``app_name`` and ``instance_name`` is running.
     If ``instance_name`` is omitted, any other running ``app_name`` is considered a duplicate. If ``app_name`` is omitted, will 
@@ -275,6 +282,9 @@ def thread_safe(app_name=None,instance_name=None):
         try:
             with open(pid_file,'w') as f:
                 f.write(str(os.getpid()))
+            _pid_file = pid_file
+            print _pid_file
+            sys.atexit(_del_pid_file)
         except:
             pass
         
