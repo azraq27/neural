@@ -32,6 +32,18 @@ import eprime
 import general
 import notification
 
+# Check for update
+import xmlrpclib
+try:
+    pypi = xmlrpclib.ServerProxy('http://pypi.python.org/pypi')
+    latest = pypi.package_releases('neural-fmri')
+    if latest:
+        if latest[0]!=version:
+            notify('## Update to neural available on PyPI (current version: %s; latest version: %s)' % (version,latest[0]),level=level.debug)
+except:
+    pass
+    
+
 # user customization
 import personality
 personality.display('greeting')
