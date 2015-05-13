@@ -227,6 +227,9 @@ def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False,number_on
         label += "_R^2"
     
     info = nl.dset_info(dset)
+    if info==None:
+        nl.notify('Error: Couldn\'t get info from dset "%s"'%dset,level=nl.level.error)
+        return None
     i = info.subbrick_labeled(label)
     if number_only:
         return i
