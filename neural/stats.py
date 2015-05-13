@@ -65,3 +65,9 @@ def temporal_snr(signal_dset,noise_dset,mask=None,prefix='temporal_snr.nii.gz'):
         cmd += [d[1]]
         nl.run(cmd,products=new_d)
     nl.calc([nl.suffix(signal_dset,'_mean'),nl.suffix(noise_dset,'_stdev')],'a/b',prefix=prefix)
+
+def mask_average(dset,mask):
+    '''Returns average of voxels in ``dset`` within non-zero voxels of ``mask``'''
+    o = nl.run(['3dmaskave','-q','-mask',mask,dset])
+    if o:
+        return float(o.output.split()[-1])
