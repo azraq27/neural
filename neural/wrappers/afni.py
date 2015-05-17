@@ -26,7 +26,7 @@ def calc(dsets,expr,prefix=None,datum=None):
         return ' '.join(cmd)
 
 def cdf(dset,p):
-    info = dset_info(dset)
+    info = nl.dset_info(dset)
     command = ['cdf','-p2t',info.subbricks[subbrick]['stat'],str(p)] + info.subbricks[subbrick]['params']
     return float(subprocess.check_output(command).split()[2])
 
