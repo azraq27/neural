@@ -27,7 +27,7 @@ def calc(dsets,expr,prefix=None,datum=None):
 
 def cdf(dset,p):
     info = nl.dset_info(dset)
-    command = ['cdf','-p2t',info.subbricks[subbrick]['stat'],str(p)] + info.subbricks[subbrick]['params']
+    command = ['cdf','-p2t',info.subbricks[0]['stat'],str(p)] + info.subbricks[0]['params']
     return float(subprocess.check_output(command).split()[2])
 
 def thresh(dset,p,positive_only=False,prefix=None):
