@@ -1,4 +1,5 @@
 import neural as nl
+import subprocess
 
 def binary_available():
     if nl.which('afni'):
