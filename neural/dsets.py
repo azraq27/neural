@@ -30,7 +30,11 @@ def nifti_copy(filename,prefix=None,gzip=True):
     if gzip:
         nifti_filename += '.gz'
     if not os.path.exists(nifti_filename):
-        subprocess.check_call(['3dAFNItoNIFTI','-prefix',nifti_filename,str(filename)])
+        try:
+            subprocess.check_call(['3dAFNItoNIFTI','-prefix',nifti_filename,str(filename)])
+        except subprocess.CalledProcessError:
+            nl.notify('Error: could not convert "%s" to NIFTI dset!' % filename,level=nl.level.error)
+            return None
     return nifti_filename
 
 afni_dset_regex = r'^.*\+(orig|acpc|tlrc)\.?(HEAD|BRIK)?(.gz|.bz)?$'
