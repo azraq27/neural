@@ -23,4 +23,4 @@ def skull_strip(dset,suffix='_ns'):
     cmd = os.path.join(fsl_dir,cmd) if fsl_dir else cmd
     cutoff_value = info.subbricks[0]['max'] * 0.05
     nl.run(['3dUnifize','-prefix',unifize_dset,nl.calc(dset,'step(a-%f)*a' % cutoff_value)],products=unifize_dset)
-    nl.run([cmd,unifize_dset,out_dset,'-w',0.25],products=out_dset)
+    nl.run([cmd,unifize_dset,out_dset,'-w',0.5],products=out_dset)
