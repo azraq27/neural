@@ -283,7 +283,6 @@ def thread_safe(app_name=None,instance_name=None):
             with open(pid_file,'w') as f:
                 f.write(str(os.getpid()))
             _pid_file = pid_file
-            print _pid_file
             sys.atexit(_del_pid_file)
         except:
             pass
