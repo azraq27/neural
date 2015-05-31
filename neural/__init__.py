@@ -31,6 +31,7 @@ from stats import *
 import eprime
 import general
 import notification
+import freesurfer
 
 # Check for update
 import xmlrpclib
