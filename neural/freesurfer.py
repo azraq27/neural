@@ -9,7 +9,8 @@ parpar_dir = lambda d: os.path.abspath(os.path.join(os.path.dirname(d),os.pardir
 
 guess_locations = [
     '/Applications/freesurfer',
-    '/usr/local/freesurfer'
+    '/usr/local/freesurfer',
+    '/opt/freesurfer'
 ]
 
 if_exists = lambda f: f if os.path.exists(f) else None
@@ -38,7 +39,7 @@ def guess_home():
     # if we already have it in the path, use that
     fv = nl.which('freeview')
     if fv:
-        freesurfer_home = parpar_dir(fv)
+        freesurfer_home = parpar_dir(os.path.realpath(fv))
         return True
     for guess_dir in guess_locations:
         if os.path.exists(guess_dir):
