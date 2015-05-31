@@ -29,7 +29,7 @@ def mgz_to_nifti(filename,prefix=None,gzip=True):
         prefix = nl.prefix(filename) + '.nii'
     if gzip and not prefix.endswith('.gz'):
         prefix += '.gz'
-    nl.run([os.path.join(freesurfer_home,'bin','mri-convert'),filename,prefix],products=prefix)
+    nl.run([os.path.join(freesurfer_home,'bin','mri_convert'),filename,prefix],products=prefix)
 
 def guess_home():
     global freesurfer_home
