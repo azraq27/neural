@@ -21,9 +21,10 @@ class FreesurferDir(object):
         self.subj_id = subj_id
         self.dir_name = os.path.join(subj_dir,subj_id)
         
-        self.skull_strip = if_exist(os.path.join(self.dir_name,'mri','brainmask.auto.mgz'))
+        self.skull_strip = if_exists(os.path.join(self.dir_name,'mri','brainmask.auto.mgz'))
 
 def mgz_to_nifti(filename,prefix=None,gzip=True):
+    setup_freesurfer()
     if prefix==None:
         prefix = nl.prefix(filename) + '.nii'
     if gzip and not prefix.endswith('.gz'):
