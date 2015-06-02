@@ -1,7 +1,7 @@
 import neural as nl
 import os
 
-def volreg(dset,suffix='_volreg',base_subbrick=3,tshift=True):
+def volreg(dset,suffix='_volreg',base_subbrick=3,tshift=True,cost=None):
     ''' simple interface to 3dvolreg (recommend looking at align_epi_anat instead of using this) '''
     cmd = ['3dvolreg','-prefix',nl.suffix(dset,suffix),'-base',base_subbrick]
     if tshift:
@@ -44,12 +44,12 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
         '-prefix', dset_affine,
         '-base', dset_source(dset_to),
         '-source', dset_source(dset_from),
-        '-cost', 'lpa',
         '-1Dmatrix_save', dset_affine_1D,
         '-autoweight',
         '-cmass'
     ]
-    
+    if cost:
+        all_cmd += ['-cost',cost]    
     if mask:
         all_cmd += ['-emask', mask_use]
     
