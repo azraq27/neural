@@ -18,13 +18,18 @@ if_exists = lambda f: f if os.path.exists(f) else None
 class FreesurferDir(object):
     '''Class to interact with a freesurfer-organized directory'''
     def __init__(self,subj_dir,subj_id):
+        #: The parent subjects directory (the ``SUBJECTS_DIR`` environment variable)
         self.subj_dir = subj_dir
+        #: The individual subject id
         self.subj_id = subj_id
+        #: The individual subject's directory (i.e., "[subj_dir]/[subj_id]")
         self.dir_name = os.path.join(subj_dir,subj_id)
         
+        #: Path to the skull-stripped anatomy
         self.skull_strip = if_exists(os.path.join(self.dir_name,'mri','brainmask.auto.mgz'))
 
 def mgz_to_nifti(filename,prefix=None,gzip=True):
+    '''Convert ``filename`` to a NIFTI file using ``mri_convert``'''
     setup_freesurfer()
     if prefix==None:
         prefix = nl.prefix(filename) + '.nii'
@@ -33,6 +38,7 @@ def mgz_to_nifti(filename,prefix=None,gzip=True):
     nl.run([os.path.join(freesurfer_home,'bin','mri_convert'),filename,prefix],products=prefix)
 
 def guess_home():
+    '''If ``freesurfer_home`` is not set, try to make an intelligent guess at it'''
     global freesurfer_home
     if freesurfer_home != None:
         return True
@@ -49,6 +55,7 @@ def guess_home():
 
 environ_setup = False
 def setup_freesurfer():
+    '''Setup the freesurfer environment variables'''
     guess_home()
     os.environ['FREESURFER_HOME'] = freesurfer_home
     os.environ['SUBJECTS_DIR'] = subjects_dir
@@ -60,6 +67,7 @@ def setup_freesurfer():
     environ_setup = True
 
 def recon_all(subj_id,anatomies):
+    '''Run the ``recon_all`` script'''
     if not environ_setup:
         setup_freesurfer()
     if isinstance(anatomies,basestring):

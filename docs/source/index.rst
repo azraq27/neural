@@ -68,6 +68,8 @@ Other Related Modules
 
 The :mod:`neural.eprime` module can be used to parse E-Prime data files, a program commonly used to present stimuli in fMRI experiments
 
+The :mod:`neural.freesurfer` module has methods to interact with Freesurfer
+
 Contents
 =========
 
@@ -83,6 +85,7 @@ Contents
    preprocess
    stats
    eprime
+   freesurfer
    
 
 Indices and tables
