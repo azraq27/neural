@@ -9,7 +9,7 @@ def volreg(dset,suffix='_volreg',base_subbrick=3,tshift=True,cost=None):
     cmd += [dset]
     nl.run(cmd,products=nl.suffix(dset,suffix))
 
-def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',opts=[]):
+def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',cost=None,opts=[]):
     ''' interface to 3dAllineate to align anatomies and EPIs '''
     
     dset_ss = lambda dset: os.path.split(nl.suffix(dset,'_ns'))[1]
