@@ -182,8 +182,7 @@ def smooth_decon_to_fwhm(decon,fwhm):
         return
     with nl.notify('Running smooth_decon_to_fwhm analysis (with %.2fmm blur)' % fwhm):
         tmpdir = tempfile.mkdtemp()
-#        try:
-        for i in xrange(1):
+        try:
             cwd = os.getcwd()
             random_files = [re.sub(r'\[\d+\]$','',x) for x in nl.flatten([x for x in decon.__dict__.values() if isinstance(x,basestring) or isinstance(x,list)]+[x.values() for x in decon.__dict__.values() if isinstance(x,dict)])]
             files_to_copy = [x for x in random_files if os.path.exists(x) and x[0]!='/']
@@ -231,7 +230,7 @@ def smooth_decon_to_fwhm(decon,fwhm):
                         shutil.copy(copyfile,cwd)
                     else:
                         nl.notify('Warning: deconvolve did not produce expected file %s' % decon.prefix,level=nl.level.warning)
-#        except Exception as e:
-#            raise e
-#        finally:
-#            shutil.rmtree(tmpdir,True)
+        except Exception as e:
+            raise e
+        finally:
+            shutil.rmtree(tmpdir,True)
