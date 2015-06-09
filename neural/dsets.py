@@ -41,9 +41,11 @@ afni_dset_regex = r'^.*\+(orig|acpc|tlrc)\.?(HEAD|BRIK)?(.gz|.bz)?$'
 nifti_dset_regex = r'^.*\.nii(.gz|.bz)?$'
 
 def is_nifti(filename):
+    '''return True/False if this looks like a NIFTI dset'''
     return re.match(nifti_dset_regex,filename)!=None
 
 def is_afni(filename):
+    '''return True/False if this looks like an AFNI dset'''
     return re.match(afni_dset_regex,filename)!=None
     
 def is_dset(filename):

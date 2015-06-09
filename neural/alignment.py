@@ -1,11 +1,24 @@
 import neural as nl
 import os
 
-def volreg(dset,suffix='_volreg',base_subbrick=3,tshift=True,cost=None):
-    ''' simple interface to 3dvolreg (recommend looking at align_epi_anat instead of using this) '''
-    cmd = ['3dvolreg','-prefix',nl.suffix(dset,suffix),'-base',base_subbrick]
+def align_epi(anatomy,epis,suffix='_al',base=3):
+    '''[[currently in progress]]: a simple replacement for the ``align_epi_anat.py`` script, because I've found it to be unreliable, in my usage'''
+    raise Warning('align_epi: this function is not finished yet')
+    for epi in epis:
+        volreg(epi,base='%s[%d]'%(epis[0],base),tshift=base)
+
+def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
+    '''simple interface to 3dvolreg
+    
+        :suffix:        suffix to add to ``dset`` for volreg'ed file
+        :base:          either a number or ``dset[#]`` of the base image to register to
+        :tshift:        if a number, then tshift ignoring that many images, if ``None``
+                        then don't tshift
+        :dfile_suffix:  suffix to add to ``dset`` to save the motion parameters to
+    '''
+    cmd = ['3dvolreg','-prefix',nl.suffix(dset,suffix),'-base',base,'-dfile',nl.suffix(dset,dfile_suffix)]
     if tshift:
-        cmd += ['-tshift',base_subbrick]
+        cmd += ['-tshift',tshift]
     cmd += [dset]
     nl.run(cmd,products=nl.suffix(dset,suffix))
 
