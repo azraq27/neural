@@ -16,7 +16,7 @@ def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
                         then don't tshift
         :dfile_suffix:  suffix to add to ``dset`` to save the motion parameters to
     '''
-    cmd = ['3dvolreg','-prefix',nl.suffix(dset,suffix),'-base',base,'-dfile',nl.suffix(dset,dfile_suffix)]
+    cmd = ['3dvolreg','-prefix',nl.suffix(dset,suffix),'-base',base,'-dfile',nl.prefix(dset)+dfile_suffix]
     if tshift:
         cmd += ['-tshift',tshift]
     cmd += [dset]
