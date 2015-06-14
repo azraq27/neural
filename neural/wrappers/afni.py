@@ -68,10 +68,10 @@ def roi_stats(mask,dset):
     return out_dict
 
 def tshift(dset,suffix='_tshift',initial_ignore=3):
-    nl.run(['3dTshift','-prefix',neural.suffix(dset,suffix),'-ignore',initial_ignore,dset],products=neural.suffix(dset,suffix))
+    nl.run(['3dTshift','-prefix',nl.suffix(dset,suffix),'-ignore',initial_ignore,dset],products=nl.suffix(dset,suffix))
 
 def skull_strip(dset,suffix='_ns'):
-    neural.run([
+    nl.run([
         '3dSkullStrip',
         '-input', dset,
         '-prefix', nl.suffix(dset,suffix),
