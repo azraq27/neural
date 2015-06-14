@@ -5,7 +5,7 @@ def align_epi(anatomy,epis,suffix='_al',base=3):
     '''[[currently in progress]]: a simple replacement for the ``align_epi_anat.py`` script, because I've found it to be unreliable, in my usage'''
     for epi in epis:
         nl.tshift(epi)
-        nl.affine_align(nl.suffix(epi,'_tshift'),'%s[%d]'%(epis[0],base),skull_strip=False,epi=True,cost='crM',resample='NN',grid_size=dset.info.voxel_size[0],affine_suffix='_al')
+        nl.affine_align(nl.suffix(epi,'_tshift'),'%s[%d]'%(epis[0],base),skull_strip=False,epi=True,cost='crM',resample='NN',grid_size=nl.dset_info(epi).voxel_size[0],affine_suffix='_al')
         
 def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     '''simple interface to 3dvolreg
