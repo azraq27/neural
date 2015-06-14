@@ -1,12 +1,12 @@
 import neural as nl
-import os
+import os,tempfile,subprocess
 
 def align_epi(anatomy,epis,suffix='_al',base=3):
     '''[[currently in progress]]: a simple replacement for the ``align_epi_anat.py`` script, because I've found it to be unreliable, in my usage'''
-    raise Warning('align_epi: this function is not finished yet')
     for epi in epis:
-        volreg(epi,base='%s[%d]'%(epis[0],base),tshift=base)
-
+        nl.tshift(epi)
+        nl.affine_align(nl.suffix(epi,'_tshift'),'%s[%d]'%(epis[0],base),skull_strip=False,epi=True,cost='crM',resample='NN',grid_size=dset.info.voxel_size[0],affine_suffix='_al')
+        
 def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     '''simple interface to 3dvolreg
     
@@ -22,7 +22,7 @@ def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     cmd += [dset]
     nl.run(cmd,products=nl.suffix(dset,suffix))
 
-def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',cost=None,opts=[]):
+def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',cost=None,epi=False,resample='wsinc5',grid_size=None,opts=[]):
     ''' interface to 3dAllineate to align anatomies and EPIs '''
     
     dset_ss = lambda dset: os.path.split(nl.suffix(dset,'_ns'))[1]
@@ -59,10 +59,15 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
         '-source', dset_source(dset_from),
         '-1Dmatrix_save', dset_affine_1D,
         '-autoweight',
+        '-final',resample,
         '-cmass'
     ] + opts
+    if grid_size:
+        all_cmd += ['-newgrid',grid_size]
     if cost:
         all_cmd += ['-cost',cost]    
+    if epi:
+        all_cmd += ['-EPI']
     if mask:
         all_cmd += ['-emask', mask_use]
     
