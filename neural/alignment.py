@@ -33,7 +33,8 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
             return dset
     
     dset_affine = os.path.split(nl.suffix(dset_from,affine_suffix))[1]
-    dset_affine_1D = nl.prefix(dset_affine) + '.1D'
+    dset_affine_mat_1D = nl.prefix(dset_affine) + '_matrix.1D'
+    dset_affine_par_1D = nl.prefix(dset_affine) + '_params.1D'
         
     if os.path.exists(dset_affine):
         # final product already exists
@@ -57,7 +58,8 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
         '-prefix', dset_affine,
         '-base', dset_source(dset_to),
         '-source', dset_source(dset_from),
-        '-1Dmatrix_save', dset_affine_1D,
+        '-1Dmatrix_save', dset_affine_mat_1D,
+        '-1Dparam_save',dset_affine_par_1D,
         '-autoweight',
         '-final',resample,
         '-cmass'
