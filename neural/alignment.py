@@ -1,5 +1,6 @@
 import neural as nl
 import os,tempfile,subprocess
+from math import sqrt
 
 def align_epi(anatomy,epis,suffix='_al',base=3,skull_strip=True):
     '''[[currently in progress]]: a simple replacement for the ``align_epi_anat.py`` script, because I've found it to be unreliable, in my usage'''
