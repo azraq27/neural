@@ -1,12 +1,25 @@
 import neural as nl
 import os,tempfile,subprocess
 
-def align_epi(anatomy,epis,suffix='_al',base=3):
+def align_epi(anatomy,epis,suffix='_al',base=3,skull_strip=True):
     '''[[currently in progress]]: a simple replacement for the ``align_epi_anat.py`` script, because I've found it to be unreliable, in my usage'''
     for epi in epis:
         nl.tshift(epi,suffix='_tshift')
         nl.affine_align(nl.suffix(epi,'_tshift'),'%s[%d]'%(epis[0],base),skull_strip=False,epi=True,cost='crM',resample='NN',grid_size=nl.dset_info(epi).voxel_size[0],affine_suffix='_al')
-        
+    ss = [anatomy] if skull_strip else False
+    nl.affine_align(anatomy,'%s[%d]'%(epis[0],base),skull_strip=ss,cost='hel',grid_size=1,opts=['-interp','cubic'],suffix='_al-to-EPI')
+
+def motion_from_params(param_file,motion_file):
+    '''calculate a motion regressor from the params file given by 3dAllineate
+    
+    Basically just calculates the rms change in the translation and rotation components. Returns a single vector.'''
+    with open(param_file) as inf:
+        translate_rotate = [[float(y) for y in x.strip().split()[:6]] for x in inf.readlines() if x[0]!='#']
+        translate = [sqrt(sum([x**2 for x in y[:3]])) for y in translate_rotate]
+        rotate = [sqrt(sum([x**2 for x in y[3:]])) for y in translate_rotate]            
+        with open(motion_file,'w') as outf:
+            outf.write('\n'.join([str(x) for x in map(add,translate,rotate)]))
+    
 def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     '''simple interface to 3dvolreg
     
@@ -22,7 +35,7 @@ def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     cmd += [dset]
     nl.run(cmd,products=nl.suffix(dset,suffix))
 
-def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',cost=None,epi=False,resample='wsinc5',grid_size=None,opts=[]):
+def affine_align(dset_from,dset_to,skull_strip=True,mask=None,suffix='_aff',cost=None,epi=False,resample='wsinc5',grid_size=None,opts=[]):
     ''' interface to 3dAllineate to align anatomies and EPIs '''
     
     dset_ss = lambda dset: os.path.split(nl.suffix(dset,'_ns'))[1]
@@ -32,7 +45,7 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_af
         else:
             return dset
     
-    dset_affine = os.path.split(nl.suffix(dset_from,affine_suffix))[1]
+    dset_affine = os.path.split(nl.suffix(dset_from,suffix))[1]
     dset_affine_mat_1D = nl.prefix(dset_affine) + '_matrix.1D'
     dset_affine_par_1D = nl.prefix(dset_affine) + '_params.1D'
         
