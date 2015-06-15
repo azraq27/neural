@@ -184,7 +184,8 @@ def _dset_info_afni(dset):
     # Other info..
     details_regex = {
         'identifier': r'Identifier Code:\s+(.*)',
-        'filetype': r'Storage Mode:\s+(.*)'
+        'filetype': r'Storage Mode:\s+(.*)',
+        'space': r'Template Space:\s+(.*)'
     }
     for d in details_regex:
         m = re.search(details_regex[d],raw_info)
