@@ -11,16 +11,21 @@ def align_epi(anatomy,epis,suffix='_al',base=3,skull_strip=True):
     ss = [anatomy] if skull_strip else False
     nl.affine_align(anatomy,'%s[%d]'%(epis[0],base),skull_strip=ss,cost='hel',grid_size=1,opts=['-interp','cubic'],suffix='_al-to-EPI')
 
-def motion_from_params(param_file,motion_file):
+def motion_from_params(param_file,motion_file,rms=True):
     '''calculate a motion regressor from the params file given by 3dAllineate
     
-    Basically just calculates the rms change in the translation and rotation components. Returns a single vector.'''
+    Basically just calculates the rms change in the translation and rotation components. Returns a single vector (unless ``rms``==``False``, then returns 6 vectors).'''
     with open(param_file) as inf:
         translate_rotate = [[float(y) for y in x.strip().split()[:6]] for x in inf.readlines() if x[0]!='#']
-        translate = [sqrt(sum([x**2 for x in y[:3]])) for y in translate_rotate]
-        rotate = [sqrt(sum([x**2 for x in y[3:]])) for y in translate_rotate]            
-        with open(motion_file,'w') as outf:
-            outf.write('\n'.join([str(x) for x in map(add,translate,rotate)]))
+        if rms:
+            translate = [sqrt(sum([x**2 for x in y[:3]])) for y in translate_rotate]
+            rotate = [sqrt(sum([x**2 for x in y[3:]])) for y in translate_rotate]            
+            translate_rotate = map(add,translate,rotate)
+            with open(motion_file,'w') as outf:
+                outf.write('\n'.join([str(x) for x in translate_rotate]))
+        else:
+            with open(motion_file,'w') as outf:
+                outf.write('\n'.join([' '.join([str(y) for y in x]) for x in translate_rotate]))
     
 def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     '''simple interface to 3dvolreg
