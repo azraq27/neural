@@ -24,12 +24,12 @@ def motion_from_params(param_file,motion_file,rms=True):
             translate_rotate = map(add,translate,rotate)
             motion = [0] + list(np.diff(translate_rotate))
             with open(motion_file,'w') as outf:
-                outf.write('\n'.join([str(x) for x in translate_rotate]))
+                outf.write('\n'.join([str(x) for x in motion]))
         else:
             translate_rotate = np.array(translate_rotate)
             motion = np.vstack((np.zeros(translate_rotate.shape[1]),np.diff(translate_rotate,axis=0)))
             with open(motion_file,'w') as outf:
-                outf.write('\n'.join([' '.join([str(y) for y in x]) for x in translate_rotate]))
+                outf.write('\n'.join([' '.join([str(y) for y in x]) for x in motion]))
     
 def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     '''simple interface to 3dvolreg
