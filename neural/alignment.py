@@ -2,6 +2,7 @@ import neural as nl
 import os,tempfile,subprocess
 from math import sqrt
 from operator import add
+import numpy as np
 
 def align_epi(anatomy,epis,suffix='_al',base=3,skull_strip=True):
     '''[[currently in progress]]: a simple replacement for the ``align_epi_anat.py`` script, because I've found it to be unreliable, in my usage'''
@@ -21,9 +22,12 @@ def motion_from_params(param_file,motion_file,rms=True):
             translate = [sqrt(sum([x**2 for x in y[:3]])) for y in translate_rotate]
             rotate = [sqrt(sum([x**2 for x in y[3:]])) for y in translate_rotate]            
             translate_rotate = map(add,translate,rotate)
+            motion = [0] + list(np.diff(translate_rotate))
             with open(motion_file,'w') as outf:
                 outf.write('\n'.join([str(x) for x in translate_rotate]))
         else:
+            translate_rotate = np.array(translate_rotate)
+            motion = np.vstack((np.zeros(translate_rotate.shape[1]),np.diff(translate_rotate,axis=0)))
             with open(motion_file,'w') as outf:
                 outf.write('\n'.join([' '.join([str(y) for y in x]) for x in translate_rotate]))
     
