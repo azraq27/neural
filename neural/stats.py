@@ -71,3 +71,7 @@ def mask_average(dset,mask):
     o = nl.run(['3dmaskave','-q','-mask',mask,dset])
     if o:
         return float(o.output.split()[-1])
+
+def sphere_average(dset,x,y,z,radius=1):
+    '''returns a list of average values (one for each subbrick/time point) within the coordinate ``(x,y,z)`` using a sphere of radius ``radius`` in ``dset``'''
+    return [float(a) for a in subprocess.check_output(['3dmaskave','-q','-xball',str(x),str(y),str(z),str(radius),dset]).split()]
