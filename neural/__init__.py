@@ -27,11 +27,14 @@ import preprocess
 from preprocess import *
 import stats
 from stats import *
+import connectivity
+from connectivity import *
 
 import eprime
 import general
 import notification
 import freesurfer
+
 
 # Check for update
 import xmlrpclib

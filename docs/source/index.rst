@@ -61,7 +61,7 @@ Generic, non-imaging specific methods for useful functions are located in :mod:`
 Simple Analysis
 ------------------
 
-Methods to implement simple analyses are organized by topic. Linear and non-linear alignment methods can be found in :mod:`neural.alignment`. DICOM image manipulation and dataset creation methods are in :mod:`neural.dicom`. Simple preprocessing and dataset statistic methods are in :mod:`neural.preprocess` and :mod:`neural.stats`
+Methods to implement simple analyses are organized by topic. Linear and non-linear alignment methods can be found in :mod:`neural.alignment`. DICOM image manipulation and dataset creation methods are in :mod:`neural.dicom`. Simple preprocessing and dataset statistic methods are in :mod:`neural.preprocess` and :mod:`neural.stats`. Functional connectivity analyses can be found in :mod:`neural.connectivity`.
 
 Other Related Modules
 -----------------------
@@ -86,6 +86,7 @@ Contents
    stats
    eprime
    freesurfer
+   connectivity
    
 
 Indices and tables
