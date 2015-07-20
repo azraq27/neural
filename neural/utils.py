@@ -285,6 +285,13 @@ class Beacon(Thread):
     '''Class to easily handle running multiple threads simultaneously. Communicates through a lockfile in an
     arbitrary file path, so communicating across different computers that have shared file systems is relatively
     easy (just choose a file path on the shared drive).
+
+    Options::
+    
+        :app_name:      Arbitrary name of the script. Will use script filename if ``None``
+        :instance_name: Arbitrary name of this instance (e.g., subject #)
+        :packet_path:   Path to put the lock file in (defaults to the system temp directory)
+        :poll_time:     How often (in seconds) to ping the lock file
     
     Example of usage::
     
@@ -296,12 +303,6 @@ class Beacon(Thread):
                 # do the analysis here...
         '''
     def __init__(self,app_name=None,instance_name=None,packet_path=None,poll_time=0.5):
-        '''Create a new instance. Options::
-        
-            :app_name:      Arbitrary name of the script. Will use script filename if ``None``
-            :instance_name: Arbitrary name of this instance (e.g., subject #)
-            :packet_path:   Path to put the lock file in (defaults to the system temp directory)
-            :poll_time:     How often (in seconds) to ping the lock file'''
         Thread.__init__(self)
         self.stop_event = Event()
         self.app_name = app_name
