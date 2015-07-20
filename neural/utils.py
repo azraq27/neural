@@ -286,7 +286,7 @@ class Beacon(Thread):
     arbitrary file path, so communicating across different computers that have shared file systems is relatively
     easy (just choose a file path on the shared drive).
 
-    Options::
+    Options:
     
         :app_name:      Arbitrary name of the script. Will use script filename if ``None``
         :instance_name: Arbitrary name of this instance (e.g., subject #)
