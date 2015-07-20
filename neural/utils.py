@@ -6,6 +6,9 @@ import hashlib
 import zlib, base64
 import tempfile,shutil,re,glob
 import chardet
+from threading import Thread,Event
+import json,time
+
 
 #! A list of archives this library understands
 archive_formats = {
@@ -123,8 +126,13 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
             returncode = 0
             try:
                 if stderr:
+                    # include STDERR in STDOUT output
                     out = subprocess.check_output(command,stderr=subprocess.STDOUT)
+                elif stderr==None:
+                    # dump STDERR into nothing
+                    out = subprocess.check_output(command,stderr=subprocess.PIPE) 
                 else:
+                    # let STDERR show through to the console
                     out = subprocess.check_output(command)                    
             except subprocess.CalledProcessError, e:
                 nl.notify('''ERROR: %s returned a non-zero status
@@ -261,51 +269,103 @@ def universal_read(fname):
     enc_guess = chardet.detect(data)
     return data.decode(enc_guess['encoding'])
 
-_pid_file = None
-def _del_pid_file():
-    try:
-        os.unlink(_pid_file)
-    except:
-        pass
-
-def thread_safe(app_name=None,instance_name=None):
-    '''Returns ``bool`` of whether a duplicate of this ``app_name`` and ``instance_name`` is running.
-    If ``instance_name`` is omitted, any other running ``app_name`` is considered a duplicate. If ``app_name`` is omitted, will 
-    assume the script name'''
-    if app_name==None:
-        app_name = os.path.basename(__file__)
-    if instance_name:
-        app_name += '_' + instance_name
-    pid_file = os.path.join(tempfile.gettempdir(),app_name + '.pid')
+class ThreadSafe(object):
+    '''wrapper class to handle starting and stopping for the :meth:`thread_safe` method of :class:`Beacon`'''
+    def __init__(self,beacon):
+        self.beacon = beacon
     
-    def write_mypid():
-        try:
-            with open(pid_file,'w') as f:
-                f.write(str(os.getpid()))
-            _pid_file = pid_file
-            sys.atexit(_del_pid_file)
-        except:
-            pass
+    def __enter__(self):
+        self.beacon.write_packet()
+        self.beacon.start()
+    
+    def __exit__(self, type, value, traceback):
+        self.beacon.stop()
+
+class Beacon(Thread):
+    '''Class to easily handle running multiple threads simultaneously. Communicates through a lockfile in an
+    arbitrary file path, so communicating across different computers that have shared file systems is relatively
+    easy (just choose a file path on the shared drive).
+    
+    Example of usage::
+    
+        b = Beacon('my_analysis','subject_4')
+        if not b.exists():
+            # there are no "my_analysis" scripts running "subject_4" right now
+            with b.thread_safe():
+                # lock this, so other scripts will fail when they run b.exists() on this subject
+                # do the analysis here...
+        '''
+    def __init__(self,app_name=None,instance_name=None,packet_path=None,poll_time=0.5):
+        '''Create a new instance. Options::
         
-    if os.path.exists(pid_file):
-        # Maybe we're running... unless it died and left this file hanging
-        try:
-            with open(pid_file) as f:
-                pid = int(f.read())
-            try:
-                # Send "are you alive" message to PID
-                os.kill(pid,0)
-            except OSError:
-                # It isn't actually running
-                write_mypid()
+            :app_name:      Arbitrary name of the script. Will use script filename if ``None``
+            :instance_name: Arbitrary name of this instance (e.g., subject #)
+            :packet_path:   Path to put the lock file in (defaults to the system temp directory)
+            :poll_time:     How often (in seconds) to ping the lock file'''
+        Thread.__init__(self)
+        self.stop_event = Event()
+        self.app_name = app_name
+        if app_name==None:
+            self.app_name = os.path.basename(__file__)
+        self.instance_name = instance_name
+        self.filename = self.app_name
+        if instance_name:
+            self.filename += '_' + instance_name
+        self.filename += '.lock'
+        self.packet_path = packet_path
+        if packet_path==None:
+            self.packet_path = tempfile.gettempdir()
+        self.poll_time = poll_time
+    
+    def exists(self):
+        '''Returns a ``bool`` of whether this analysis is already running somewhere else'''
+        return not self.check_packet()
+    
+    def thread_safe(self):
+        '''Use in a ``with`` statement to run code within a thread-safe context. When the ``with`` statement
+        enters, this will create the lock file, and it will automatically stop and delete it when the ``with``
+        block finishes'''
+        return ThreadSafe(self)
+        
+    def packet(self):
+        return {
+            'app_name':self.app_name,
+            'instance_name':self.instance_name,
+            'poll_time':self.poll_time,
+            'last_time':time.time()
+        }
+    
+    def packet_file(self):
+        return os.path.join(self.packet_path,self.filename)
+        
+    def write_packet(self):
+        with open(self.packet_file(),'w') as f:
+            f.write(json.dumps(self.packet()))
+    
+    def check_packet(self):
+        '''is there a valid packet (from another thread) for this app/instance?'''
+        if not os.path.exists(self.packet_file()):
+            # No packet file, we're good
+            return True
+        else:
+            # There's already a file, but is it still running?
+            with open(self.packet_file()) as f:
+                packet = json.loads(f.read())
+            if time.time() - packet['last_time'] > 3.0*packet['poll_time']:
+                # We haven't heard a ping in too long. It's probably dead
                 return True
             else:
-                # Still running... we're a duplicate
+                # Still getting pings.. probably still a live process
                 return False
-        except:
-            # Something messed up there... let's just assume something else is running
-            return False
-    else:
-        # No PID file, we're clear
-        write_mypid()
-        return True
+    
+    def run(self):
+        while not self.stop_event.wait(self.poll_time):
+            self.write_packet()
+        if os.path.exists(self.packet_file()):
+            try:
+                os.remove(self.packet_file())
+            except:
+                pass
+    
+    def stop(self):
+        self.stop_event.set()

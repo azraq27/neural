@@ -71,7 +71,7 @@ def blur(dset,fwhm,prefix=None):
     default ``prefix`` is to suffix ``dset`` with ``_blur%.1fmm``'''
     if prefix==None:
         prefix = nl.suffix(dset,'_blur%.1fmm'%fwhm)
-    return available_method('cluster')(dset,fwhm,prefix)
+    return available_method('blur')(dset,fwhm,prefix)
 
 def roi_stats(mask,dset):
     '''returns ROI stats on ``dset`` using ``mask`` as the ROI mask

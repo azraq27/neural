@@ -194,7 +194,7 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
     
     nl.run(warp_cmd,products=dset_qwarp)
 
-def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP',interp=None):
+def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP',interp=None,prefix=None):
     '''applies the transform from a previous qwarp
     
     Uses the warp parameters from the dataset listed in 
@@ -208,7 +208,9 @@ def qwarp_apply(dset_from,dset_warp,affine=None,warp_suffix='_warp',master='WARP
     
     Output dataset with have the ``warp_suffix`` suffix added to its name
     '''
-    out_dset = os.path.split(nl.suffix(dset_from,warp_suffix))[1]
+    out_dset = prefix
+    if out_dset==None:
+        out_dset = os.path.split(nl.suffix(dset_from,warp_suffix))[1]
     dset_from_info = nl.dset_info(dset_from)
     dset_warp_info = nl.dset_info(dset_warp)
     if(dset_from_info.orient!=dset_warp_info.orient):
