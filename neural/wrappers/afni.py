@@ -33,9 +33,9 @@ def cdf(dset,p):
 
 def thresh(dset,p,positive_only=False,prefix=None):
     t = cdf(dset,p)
-    expr = 'step(abs(a)-%f)' % t
+    expr = 'step(abs(a)-%f)*a' % t
     if positive_only:
-        expr = 'step(a-%f)' % t
+        expr = 'step(a-%f)*a' % t
     return calc(dset,expr,prefix)
 
 def cluster(dset,min_distance,min_cluster_size,prefix):
