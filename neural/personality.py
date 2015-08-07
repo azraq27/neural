@@ -50,6 +50,14 @@ faces = {
     'eNpLSi/KLy4GAAjDApE=\n': {
         'greeting': 'eNrzSM3JyVcoyUgtStVRKM4s0gMANzUF9Q==\n',
         'goodbye': 'eNpzz89PSapM1QMADcIC+A==\n'
+    },
+    'eNpLLE7Myc3PAwALiALs\n:' {
+        'greeting': 'eNrzSM3JyVdwzEmt0FNwz89PUSjJVyhOTVWozC9VSExPzMzTAwDKaguh\n',
+        'goodbye': 'eNoLTk1VqMwvVUgsyi/NS9FTCMlIzMsuVkjLL1IoLskvKMjMS1dIqtQDABlZDh8=\n'
+    }
+    'eNorTszJqUwBAAjnAoo=\n': {
+        'greeting': 'eNrzyFQITszJqVQEAA6XAvg=\n',
+        'goodbye': 'eNpzzMlRSMnPS9VT8MgvSFUoyUgsUchIzSkoVgQAdo0I6A==\n'
     }
 }
 _unic_z = 'eNpVT8ENwzAI/DPFpR+SSIZnpczQDULqRRi+gGNVsSx8HBycCfMITaQ8oWoimcBN9U3ZgBeMsoAdO8GxZruViKUnk2+EwSBGarVw495aE2zYSPA4hzD5k4o1XnsqyO2UB/K6hQj2TcO98TGs50IfdQ5jMVqhNwGz1BhsDR/jp6mwqRgpPguWf4azX8Gd3ekHgEMzrA=='
