@@ -1,5 +1,5 @@
 import neural as nl
-import os,tempfile,subprocess
+import os,tempfile,subprocess,shutil
 from math import sqrt
 from operator import add
 import numpy as np
@@ -294,3 +294,20 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
                 dset_nifti = nl.nifti_copy(nl.prefix(dset)+'_al+orig')
                 if dset_nifti and os.path.exists(dset_nifti) and dset_nifti.endswith('.nii') and dset.endswith('.gz'):
                     nl.run(['gzip',dset_nifti])
+
+def skullstrip_template(dset,template,dilate=0):
+    '''Takes the raw anatomy ``dset``, aligns it to a template brain, and applies a templated skullstrip. Should produce fairly reliable skullstrips as long
+    as there is a decent amount of normal brain and the overall shape of the brain is normal-ish'''
+    with nl.notify('Running template-based skull-strip on %s' % dset):
+        dset = os.path.abspath(dset)
+        template = os.path.abspath(template)
+        tmp_dir = tempfile.mkdtemp()
+        cwd = os.getcwd()
+        with nl.run_in(tmp_dir):
+            nl.affine_align(template,dset,skull_strip=None,cost='mi',opts=['-nmatch','100%'])
+            nl.run(['3dQwarp','-minpatch','20','-penfac','10','-noweight','-source',nl.suffix(template,'_aff'),'-base',dset,'-prefix',nl.suffix(template,'_qwarp')],products=nl.suffix(template,'_qwarp'))
+            info = nl.dset_info(nl.suffix(template,'_qwarp'))
+            max_value = info.subbricks[0]['max']    
+            nl.calc([dset,nl.suffix(template,'_qwarp')],'a*step(b-%f*0.05)'%max_value,nl.suffix(dset,'_sstemplate'))
+            shutil.move(nl.suffix(dset,'_sstemplate'),cwd)
+        shutil.rmtree(tmp_dir)
