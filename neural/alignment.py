@@ -12,24 +12,26 @@ def align_epi(anatomy,epis,suffix='_al',base=3,skull_strip=True):
     ss = [anatomy] if skull_strip else False
     nl.affine_align(anatomy,'%s[%d]'%(epis[0],base),skull_strip=ss,cost='hel',grid_size=1,opts=['-interp','cubic'],suffix='_al-to-EPI')
 
-def motion_from_params(param_file,motion_file,rms=True):
+def motion_from_params(param_file,motion_file,individual=True,rms=True):
     '''calculate a motion regressor from the params file given by 3dAllineate
     
-    Basically just calculates the rms change in the translation and rotation components. Returns a single vector (unless ``rms``==``False``, then returns 6 vectors).'''
+    Basically just calculates the rms change in the translation and rotation components. Returns the 6 motion vector (if ``individual`` is ``True``) and the RMS difference (if ``rms`` is ``True``).'''
     with open(param_file) as inf:
-        translate_rotate = [[float(y) for y in x.strip().split()[:6]] for x in inf.readlines() if x[0]!='#']
+        translate_rotate = np.array([[float(y) for y in x.strip().split()[:6]] for x in inf.readlines() if x[0]!='#'])
+        motion = None
+        if individual:
+            motion = np.vstack((np.zeros(translate_rotate.shape[1]),np.diff(translate_rotate,axis=0)))
         if rms:
             translate = [sqrt(sum([x**2 for x in y[:3]])) for y in translate_rotate]
             rotate = [sqrt(sum([x**2 for x in y[3:]])) for y in translate_rotate]            
             translate_rotate = map(add,translate,rotate)
-            motion = [0] + list(np.diff(translate_rotate))
-            with open(motion_file,'w') as outf:
-                outf.write('\n'.join([str(x) for x in motion]))
-        else:
-            translate_rotate = np.array(translate_rotate)
-            motion = np.vstack((np.zeros(translate_rotate.shape[1]),np.diff(translate_rotate,axis=0)))
-            with open(motion_file,'w') as outf:
-                outf.write('\n'.join([' '.join([str(y) for y in x]) for x in motion]))
+            rms_motion = [0] + list(np.diff(translate_rotate))
+            if motion==None:
+                motion = rms_motion
+            else:
+                motion = np.hstack((motion,rms_motion))
+        with open(motion_file,'w') as outf:
+            outf.write('\n'.join(['\t'.join([str(y) for y in x]) for x in motion]))
     
 def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     '''simple interface to 3dvolreg
