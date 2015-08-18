@@ -8,6 +8,7 @@ import tempfile,shutil,re,glob
 import chardet
 from threading import Thread,Event
 import json,time
+import numpy as np
 
 
 #! A list of archives this library understands
@@ -370,3 +371,9 @@ class Beacon(Thread):
     
     def stop(self):
         self.stop_event.set()
+
+def strip_rows(array,invalid=None):
+    '''takes a 2D arrays removes rows containing the invalid value (default ``None``)'''
+    array = np.array(array)
+    none_indices = np.where(np.any(np.equal(a,invalid),axis=1))
+    return np.delete(a,none_indices,axis=0)
