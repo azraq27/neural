@@ -373,7 +373,8 @@ class Beacon(Thread):
         self.stop_event.set()
 
 def strip_rows(array,invalid=None):
-    '''takes a 2D arrays removes rows containing the invalid value (default ``None``)'''
+    '''takes a ``list`` of ``list``s and removes corresponding indices containing the 
+    invalid value (default ``None``). '''
     array = np.array(array)
-    none_indices = np.where(np.any(np.equal(array,invalid),axis=1))
-    return np.delete(array,none_indices,axis=0)
+    none_indices = np.where(np.any(np.equal(array,invalid),axis=0))
+    return tuple(np.delete(array,none_indices,axis=1))
