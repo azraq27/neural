@@ -51,10 +51,10 @@ faces = {
         'greeting': 'eNrzSM3JyVcoyUgtStVRKM4s0gMANzUF9Q==\n',
         'goodbye': 'eNpzz89PSapM1QMADcIC+A==\n'
     },
-    'eNpLLE7Myc3PAwALiALs\n:' {
+    'eNpLLE7Myc3PAwALiALs\n': {
         'greeting': 'eNrzSM3JyVdwzEmt0FNwz89PUSjJVyhOTVWozC9VSExPzMzTAwDKaguh\n',
         'goodbye': 'eNoLTk1VqMwvVUgsyi/NS9FTCMlIzMsuVkjLL1IoLskvKMjMS1dIqtQDABlZDh8=\n'
-    }
+    },
     'eNorTszJqUwBAAjnAoo=\n': {
         'greeting': 'eNrzyFQITszJqVQEAA6XAvg=\n',
         'goodbye': 'eNpzzMlRSMnPS9VT8MgvSFUoyUgsUchIzSkoVgQAdo0I6A==\n'

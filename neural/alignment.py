@@ -1,5 +1,5 @@
 import neural as nl
-import os,tempfile,subprocess
+import os,tempfile,subprocess,shutil
 from math import sqrt
 from operator import add
 import numpy as np
@@ -12,24 +12,26 @@ def align_epi(anatomy,epis,suffix='_al',base=3,skull_strip=True):
     ss = [anatomy] if skull_strip else False
     nl.affine_align(anatomy,'%s[%d]'%(epis[0],base),skull_strip=ss,cost='hel',grid_size=1,opts=['-interp','cubic'],suffix='_al-to-EPI')
 
-def motion_from_params(param_file,motion_file,rms=True):
+def motion_from_params(param_file,motion_file,individual=True,rms=True):
     '''calculate a motion regressor from the params file given by 3dAllineate
     
-    Basically just calculates the rms change in the translation and rotation components. Returns a single vector (unless ``rms``==``False``, then returns 6 vectors).'''
+    Basically just calculates the rms change in the translation and rotation components. Returns the 6 motion vector (if ``individual`` is ``True``) and the RMS difference (if ``rms`` is ``True``).'''
     with open(param_file) as inf:
-        translate_rotate = [[float(y) for y in x.strip().split()[:6]] for x in inf.readlines() if x[0]!='#']
+        translate_rotate = np.array([[float(y) for y in x.strip().split()[:6]] for x in inf.readlines() if x[0]!='#'])
+        motion = np.array([])
+        if individual:
+            motion = np.vstack((np.zeros(translate_rotate.shape[1]),np.diff(translate_rotate,axis=0)))
         if rms:
             translate = [sqrt(sum([x**2 for x in y[:3]])) for y in translate_rotate]
             rotate = [sqrt(sum([x**2 for x in y[3:]])) for y in translate_rotate]            
-            translate_rotate = map(add,translate,rotate)
-            motion = [0] + list(np.diff(translate_rotate))
-            with open(motion_file,'w') as outf:
-                outf.write('\n'.join([str(x) for x in motion]))
-        else:
-            translate_rotate = np.array(translate_rotate)
-            motion = np.vstack((np.zeros(translate_rotate.shape[1]),np.diff(translate_rotate,axis=0)))
-            with open(motion_file,'w') as outf:
-                outf.write('\n'.join([' '.join([str(y) for y in x]) for x in motion]))
+            translate_rotate = np.array(map(add,translate,rotate))
+            translate_rotate_diff = np.array([0] + np.diff(translate_rotate,axis=0))
+            if motion.shape==(0,):
+                motion = rms_motion
+            else:
+                motion = np.column_stack((motion,translate_rotate_diff))
+        with open(motion_file,'w') as outf:
+            outf.write('\n'.join(['\t'.join([str(y) for y in x]) for x in motion]))
     
 def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     '''simple interface to 3dvolreg
@@ -294,3 +296,21 @@ def align_epi_anat(anatomy,epi_dsets,skull_strip_anat=True):
                 dset_nifti = nl.nifti_copy(nl.prefix(dset)+'_al+orig')
                 if dset_nifti and os.path.exists(dset_nifti) and dset_nifti.endswith('.nii') and dset.endswith('.gz'):
                     nl.run(['gzip',dset_nifti])
+
+def skullstrip_template(dset,template,dilate=0):
+    '''Takes the raw anatomy ``dset``, aligns it to a template brain, and applies a templated skullstrip. Should produce fairly reliable skullstrips as long
+    as there is a decent amount of normal brain and the overall shape of the brain is normal-ish'''
+    if not os.path.exists(nl.suffix(dset,'_sstemplate')):
+        with nl.notify('Running template-based skull-strip on %s' % dset):
+            dset = os.path.abspath(dset)
+            template = os.path.abspath(template)
+            tmp_dir = tempfile.mkdtemp()
+            cwd = os.getcwd()
+            with nl.run_in(tmp_dir):
+                nl.affine_align(template,dset,skull_strip=None,cost='mi',opts=['-nmatch','100%'])
+                nl.run(['3dQwarp','-minpatch','20','-penfac','10','-noweight','-source',nl.suffix(template,'_aff'),'-base',dset,'-prefix',nl.suffix(template,'_qwarp')],products=nl.suffix(template,'_qwarp'))
+                info = nl.dset_info(nl.suffix(template,'_qwarp'))
+                max_value = info.subbricks[0]['max']    
+                nl.calc([dset,nl.suffix(template,'_qwarp')],'a*step(b-%f*0.05)'%max_value,nl.suffix(dset,'_sstemplate'))
+                shutil.move(nl.suffix(dset,'_sstemplate'),cwd)
+            shutil.rmtree(tmp_dir)

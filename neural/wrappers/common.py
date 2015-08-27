@@ -112,3 +112,7 @@ def tshift(dset,suffix='_tshft',initial_ignore=3):
 def skull_strip(dset,suffix='_ns'):
     '''attempts to cleanly remove skull from ``dset``'''
     return available_method('skull_strip')(dset,suffix)
+
+def segment(dset):
+    '''segment ``dset`` into WM/GM/CSF'''
+    return available_method('segment')(dset)

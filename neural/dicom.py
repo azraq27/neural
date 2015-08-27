@@ -243,6 +243,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                     '-dicom_org', 
                     '-save_details','details',
                     '-max_images','100000',
+                    '-fast','-no_wait',
                     '-quit'],stderr=subprocess.STDOUT)
                 except subprocess.CalledProcessError, e:
                     nl.notify('Warning: Dimon returned an error while sorting images',level=nl.level.warning)

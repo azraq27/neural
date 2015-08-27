@@ -7,7 +7,8 @@ import zlib, base64
 import tempfile,shutil,re,glob
 import chardet
 from threading import Thread,Event
-import json,time
+import json,time,re
+import numpy as np
 
 
 #! A list of archives this library understands
@@ -370,3 +371,21 @@ class Beacon(Thread):
     
     def stop(self):
         self.stop_event.set()
+
+def strip_rows(array,invalid=None):
+    '''takes a ``list`` of ``list``s and removes corresponding indices containing the 
+    invalid value (default ``None``). '''
+    array = np.array(array)
+    none_indices = np.where(np.any(np.equal(array,invalid),axis=0))
+    return tuple(np.delete(array,none_indices,axis=1))
+
+def numberize(string):
+    '''Turns a string into a number (``int`` or ``float``) if it's only a number (ignoring spaces), otherwise returns the string.
+    For example, ``"5 "`` becomes ``5`` and ``"2 ton"`` remains ``"2 ton"``'''
+    just_int = r'^\s*[-+]?\d+\s*$'
+    just_float = r'^\s*[-+]?\d+\.(\d+)?\s*$'
+    if re.match(just_int,string):
+        return int(string)
+    if re.match(just_float,string):
+        return float(string)
+    return string

@@ -3,10 +3,17 @@ import os
 
 fsl_dir = None
 
+def find_app(name):
+    app = nl.which(name)
+    if app==None:
+        app = nl.which('fsl5.0-' + name)
+
 # Try to find bet
-bet2 = nl.which('bet2')
-if bet2==None:
-    bet2 = nl.which('fsl5.0-bet2')
+bet2 = find_app('bet2')
+fast = find_app('fast')
+
+def segment(dset):
+    nl.run([fast,dset])
 
 def binary_available():
     if nl.which(bet2):
