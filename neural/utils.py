@@ -109,7 +109,10 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
     :working_directory: will chdir to this directory
     :force_local:       when used with `neural.scheduler`, setting to ``True`` will disable
                         all job distribution functions
-    :stderr:            forward stderr into the output
+    :stderr:            forward ``stderr`` into the output
+                        ``True`` will combine ``stderr`` and ``stdout``
+                        ``False`` will return ``stdout`` and let ``stderr`` print to the console
+                        ``None`` will return ``stdout`` and suppress ``stderr``
     
     Returns result in form of :class:`RunResult`
     '''
@@ -122,7 +125,7 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
         
         command = flatten(command)
         command = [str(x) for x in command]
-        with nl.notify('Running %s...' % command[0]):
+        with nl.notify('Running %s...' % command[0],level=nl.level.debug):
             out = None
             returncode = 0
             try:
