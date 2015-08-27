@@ -115,7 +115,7 @@ def affine_apply(dset_from,affine_1D,master,affine_suffix='_aff',interp='NN',inv
     nl.run(['3dAllineate','-1Dmatrix_apply',affine_1D_use,'-input',dset_from,'-prefix',prefix,'-master',master,'-final',interp],products=nl.suffix(dset_from,affine_suffix))
 
 
-def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',qwarp_suffix='_qwarp'):
+def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff',suffix='_qwarp',prefix=None):
     '''aligns ``dset_from`` to ``dset_to`` using 3dQwarp
     
     Will run ``3dSkullStrip`` (unless ``skull_strip`` is ``False``), ``3dUnifize``,
@@ -134,10 +134,11 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
                         the mask will also be resampled to match the ``dset_to`` grid.
     :affine_suffix:     Suffix applied to ``dset_from`` to name the new dataset, as well as
                         the ``.1D`` file.
-    :qwarp_suffix:      Suffix applied to the final ``dset_from`` dataset. An additional file
+    :suffix:            Suffix applied to the final ``dset_from`` dataset. An additional file
                         with the additional suffix ``_WARP`` will be created containing the parameters
                         (e.g., with the default ``_qwarp`` suffix, the parameters will be in a file with
                         the suffix ``_qwarp_WARP``)
+    :prefix:            Alternatively to ``suffix``, explicitly give the full output filename
     
     The output affine dataset and 1D, as well as the output of qwarp are named by adding
     the given suffixes (``affine_suffix`` and ``qwarp_suffix``) to the ``dset_from`` file
@@ -158,7 +159,9 @@ def qwarp_align(dset_from,dset_to,skull_strip=True,mask=None,affine_suffix='_aff
     
     dset_affine = os.path.split(nl.suffix(dset_from,affine_suffix))[1]
     dset_affine_1D = nl.prefix(dset_affine) + '.1D'
-    dset_qwarp = os.path.split(nl.suffix(dset_from,qwarp_suffix))[1]
+    dset_qwarp = prefix
+    if dset_qwarp==None:
+        dset_qwarp = os.path.split(nl.suffix(dset_from,suffix))[1]
     
     if os.path.exists(dset_qwarp):
         # final product already exists
