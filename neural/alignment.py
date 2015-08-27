@@ -48,7 +48,7 @@ def volreg(dset,suffix='_volreg',base=3,tshift=3,dfile_suffix='_volreg.1D'):
     cmd += [dset]
     nl.run(cmd,products=nl.suffix(dset,suffix))
 
-def affine_align(dset_from,dset_to,skull_strip=True,mask=None,suffix='_aff',cost=None,epi=False,resample='wsinc5',grid_size=None,opts=[]):
+def affine_align(dset_from,dset_to,skull_strip=True,mask=None,suffix='_aff',prefix=None,cost=None,epi=False,resample='wsinc5',grid_size=None,opts=[]):
     ''' interface to 3dAllineate to align anatomies and EPIs '''
     
     dset_ss = lambda dset: os.path.split(nl.suffix(dset,'_ns'))[1]
@@ -58,7 +58,9 @@ def affine_align(dset_from,dset_to,skull_strip=True,mask=None,suffix='_aff',cost
         else:
             return dset
     
-    dset_affine = os.path.split(nl.suffix(dset_from,suffix))[1]
+    dset_affine = prefix
+    if dset_affine==None:
+        dset_affine = os.path.split(nl.suffix(dset_from,suffix))[1]
     dset_affine_mat_1D = nl.prefix(dset_affine) + '_matrix.1D'
     dset_affine_par_1D = nl.prefix(dset_affine) + '_params.1D'
         
