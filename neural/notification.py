@@ -53,6 +53,8 @@ class level:
 interactive_enabled = False
 email_digest = None
 
+notify_level = None
+
 #! variable to hold list of nested notifications
 _notify_tree = []
 _digest_list = []
@@ -64,7 +66,9 @@ class notify:
         :text:      the content of the message
         :log:       if ``True``, will save the message
         :email:     add to email digests
-        :level:     priority of message, should be '''
+        :level:     priority of message, should be 
+        
+        if ``neural.notify_level`` is set, will only print notifications that have a ``level`` >= ``notify_level`` '''
         self.text = text
         self.log = log
         self.email = email
@@ -73,10 +77,11 @@ class notify:
         for d in _digest_list:
             if d.level==None or level>=d.level:
                 d._notifications.append((copy.copy(_notify_tree),self))
-        if interactive_enabled:
-            notify_interactive(self)
-        else:
-            notify_normal(self)
+        if notify_level==None or level>=notify_level:
+            if interactive_enabled:
+                notify_interactive(self)
+            else:
+                notify_normal(self)
         return
     
     def __enter__(self):
