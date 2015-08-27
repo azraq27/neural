@@ -241,3 +241,25 @@ def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False,number_on
     if number_only:
         return i
     return '%s[%d]' % (dset,i)
+
+def dset_grids_equal(dsets):
+    '''Tests if each dataset in the ``list`` ``dsets`` has the same number of voxels and voxel-widths'''
+    infos = [dset_info(dset) for dset in dsets]
+    for i in xrange(3):
+        if len(set([x.voxel_size[i] for x in infos]))>1 or len(set([x.voxel_dims[i] for x in infos]))>1:
+            return False
+    return True
+
+def resample_dset(dset,template,prefix=None,resam='NN'):
+    '''Resamples ``dset`` to the grid of ``template`` using resampling mode ``resam``.
+    Default prefix is to suffix ``_resam`` at the end of ``dset``
+    
+    Available resampling modes:
+        :NN:    Nearest Neighbor
+        :Li:    Linear
+        :Cu:    Cubic
+        :Bk:    Blocky
+    '''
+    if prefix==None:
+        prefix = nl.suffix(dset,'_resam')
+    nl.run(['3dresample','-master',template,'-rmode',resam,'-prefix',prefix,'-inset',dset])
