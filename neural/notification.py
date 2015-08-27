@@ -68,7 +68,7 @@ class notify:
         :email:     add to email digests
         :level:     priority of message, should be 
         
-        if ``neural.notify_level`` is set, will only print notifications that have a ``level`` >= ``notify_level`` '''
+        if ``neural.notification.notify_level`` is set, will only print notifications that have a ``level`` >= ``notify_level`` '''
         self.text = text
         self.log = log
         self.email = email
@@ -77,6 +77,7 @@ class notify:
         for d in _digest_list:
             if d.level==None or level>=d.level:
                 d._notifications.append((copy.copy(_notify_tree),self))
+        print notify_level
         if notify_level==None or level>=notify_level:
             if interactive_enabled:
                 notify_interactive(self)

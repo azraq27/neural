@@ -8,7 +8,7 @@ version = '1.1.1'
 #! flag to indicate whether most functions should be verbose or not
 verbose = True
 
-from notification import level,notify,notify_level
+from notification import level,notify
 
 from utils import *
 
