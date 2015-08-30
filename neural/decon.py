@@ -5,22 +5,25 @@ class Decon:
     '''wrapper for AFNI 3dDeconvolve command
     
     Properties:
-        :input_dset:        list of input datasets
-        :stim_files:        dictionary where keys are used as stimulus labels
+        :input_dset:        ``list`` of input datasets
+        :decon_stims:       ``list`` of :class:`DeconStim` objects that define the different stimuli. Allows
+                            for flexible coding of complex stimuli. Alternatively, for simpler stimuli, you 
+                            can simply use one of the traditional options below (e.g., ``stim_files`` or ``stim_times``)
+        :stim_files:        ``dict`` where keys are used as stimulus labels
                             and the values are taken as 1D files
         :stim_times:        same as stim_files, but used as a stim_times file
-        :models:            dictionary of model names to use for each of the
+        :models:            ``dict`` of model names to use for each of the
                             listed stimuli (optional)
         :model_default:     default model to use for each ``stim_times`` stimulus if nothing
                             is listed in ``models``
-        :stim_base:         list of names of stimuli (defined either in stim_files or 
+        :stim_base:         ``list`` of names of stimuli (defined either in stim_files or 
                             stim_times) that should be considered in the baseline instead
                             of full model
-        :stim_am1:          list of names of stimuli defined in stim_times that should
+        :stim_am1:          ``list`` of names of stimuli defined in stim_times that should
                             use the ``-stim_times_AM1`` model
-        :stim_am2:          list of names of stimuli defined in stim_times that should
+        :stim_am2:          ``list`` of names of stimuli defined in stim_times that should
                             use the ``-stim_times_AM2`` model
-        :glts:              dictionary where keys are GLT labels, and the value
+        :glts:              ``dict`` where keys are GLT labels, and the value
                             is a symbolic statement
         :mask:              either a mask file, or "auto", which will use "-automask"
         :errts:             name of file to save residual time series to
@@ -60,6 +63,7 @@ class Decon:
         self.input_dsets=[]
         self.stim_files={}
         self.stim_times={}
+        self.decon_stims = []
         self.model_default = 'GAM'
         self.models = {}
         self.stim_base = []
@@ -80,6 +84,8 @@ class Decon:
         self.TR = None
         self.stim_sds = None
         self.errts = None
+        
+        self._del_files = []
     
     def command_list(self):
         '''returns the 3dDeconvolve command as a list
@@ -109,30 +115,54 @@ class Decon:
                 cmd += ['-mask',self.mask]
         cmd += ['-polort',str(self.polort)]
         
-        cmd += ['-num_stimts',len(self.stim_files)+len(self.stim_times)]
+        cmd += ['-num_stimts',len(self.stim_files)+len(self.stim_times)+len(self.decon_stims)]
         
         stim_num = 1
-        for stim in self.stim_files:
-            cmd += ['-stim_file',stim_num,self.stim_files[stim],'-stim_label',stim_num,stim]
-            if stim in self.stim_base:
-                cmd += ['-stim_base',stim_num]
-            stim_num += 1
         
+        all_stims = list(self.decon_stims)
+        all_stims += [DeconStim(stim,column_file=self.stim_files[stim],base=(stim in self.stim_base)) for stim in self.stim_files]
         for stim in self.stim_times:
-            opt = '-stim_times'
-            if stim in self.stim_am1:
-                opt = '-stim_times_AM1'
-            if stim in self.stim_am2:
-                opt = '-stim_times_AM2'
-            cmd += [opt,stim_num,self.stim_times[stim]]
-            if stim in self.models:
-                cmd += [self.models[stim]]
-            else:
-                cmd += [self.model_default]
-            cmd += ['-stim_label',stim_num,stim]
-            if stim in self.stim_base:
-                cmd += ['-stim_base',stim_num]
-            stim_num += 1
+            decon_stim = DeconStim(stim,times_file=self.stim_times[stim])
+            decon_stim.times_model = self.models[stim] if stim in self.models else self.model_default
+            decon_stim.AM1 = (stim in self.stim_am1)
+            decon_stim.AM2 = (stim in self.stim_am2)
+            decon_stim.base = (stim in self.stim_base)
+            all_stims.append(decon_stim)
+            
+        for stim in all_stims:        
+            column_file = stim.column_file
+            if stim.column:
+                with tempfile.NamedTemporaryFile(delete=False) as f:
+                    f.write('\n'.join([str(x) for x in stim.column]))
+                    column_file = f.name
+                    self._del_files.append(f.name)
+            if column_file:
+                cmd += ['-stim_file',stim_num,column_file,'-stim_label',stim_num,stim.name]
+                if stim.base:
+                    cmd += ['-stim_base',stim_num]
+                stim_num += 1
+                continue
+            times_file = stim.times_file
+            if stim.times:
+                times = list(stim.times)
+                if '__iter__' not in dir(times[0]):
+                    # a single list
+                    times = [times]
+                with tempfile.NamedTemporaryFile(delete=False) as f:
+                    f.write('\n'.join([' '.join([str(x) for x in y]) for y in times]))
+                    times_file = f.name
+                    self._del_files.append(f.name)
+            if times_file:
+                opt = '-stim_times'
+                if stim.AM1:
+                    opt = '-stim_times_AM1'
+                if stim.AM2:
+                    opt = '-stim_times_AM2'
+                cmd += [opt,stim_num,times_file,stim.times_model]
+                cmd += ['-stim_label',stim_num,stim.name]
+                if stim.base:
+                    cmd += ['-stim_base',stim_num]
+                stim_num += 1
         
         cmd += ['-num_glt',len(self.glts)]
         
@@ -158,6 +188,13 @@ class Decon:
         
         return [str(x) for x in cmd]
     
+    def __del__(self):
+        for f in self._del_files:
+            try:
+                os.unlink(f)
+            except:
+                pass
+    
     def command_string(self):
         '''returns the 3dDeconvolve command as as string
         
@@ -174,6 +211,41 @@ class Decon:
             self.stim_sds = {}
             for stim in stim_sds_list:
                 self.stim_sds[stim[1]] = float(stim[-1])'''
+
+class DeconStim(object):
+    '''encapsulates the definition of any arbitrary stimulus, along with all of its 3dDeconvolve options
+    
+    Attributes:
+        :name:          Label used for the stimulus
+        
+        You only need to define one of the following to define the stimulus:
+        :column:        A ``list`` of numbers (usually the length of the runs) that is placed directly in the 3dDeconvolve
+                        matrix. This can be a series of 1's and 0's, a 1D-file that has already been convolved with an HRF,
+                        or a covariate like motion parameters
+        :column_file:   The filename of a file that contains a matrix column 
+        :times:         Definition of stimuli using ``stim_times`` approach.  Either a ``list`` or a ``list`` of ``list``s
+                        (one for each run) containing either ``float``s or strings of the stimulus times. For details on
+                        how to define the stimulus time, see the documentation of ``3dDeconvolve``.
+        :times_file:    A file containing a ``stim_times`` stimulus
+        
+        :times_model:   If using ``stim_times``, which HRF model to use
+        :base:          Is this stimulus part of the baseline? (``True``/``False``)
+        :AM1:           Does this stimulus use an "AM1" model? (``True``/``False``)
+        :AM2:           Does this stimulus use an "AM2" model? (``True``/``False``)
+    
+    '''
+    def __init__(self,name,column_file=None,times_file=None,model='GAM',base=False,AM1=False,AM2=False):
+        self.name = name
+        self.column = None
+        self.column_file = column_file
+        self.times = None
+        self.times_file = times_file
+        self.times_model = model
+        
+        self.base = base
+        self.AM1 = AM1
+        self.AM2 = AM2
+
 
 def smooth_decon_to_fwhm(decon,fwhm):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
