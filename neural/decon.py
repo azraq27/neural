@@ -1,4 +1,4 @@
-import os,shutil,tempfile,re,multiprocessing
+import os,shutil,tempfile,re,multiprocessing,copy
 import neural as nl
 
 class Decon:
@@ -232,6 +232,8 @@ class DeconStim(object):
         :base:          Is this stimulus part of the baseline? (``True``/``False``)
         :AM1:           Does this stimulus use an "AM1" model? (``True``/``False``)
         :AM2:           Does this stimulus use an "AM2" model? (``True``/``False``)
+
+        :reps:          Number of reps in associated fMRI run (helpful when manipulating the stims)
     
     '''
     def __init__(self,name,column_file=None,times_file=None,model='GAM',base=False,AM1=False,AM2=False):
@@ -246,6 +248,58 @@ class DeconStim(object):
         self.AM1 = AM1
         self.AM2 = AM2
 
+        self.reps = None
+
+    def type(self):
+        '''returns kind of stim ("column" or "times"), based on what parameters are set'''
+        if self.column or self.column_file:
+            return "column"
+        if self.times or self.times_file:
+            return "times"
+        return None
+
+    def read_file(self):
+        '''if this is stored in a file, read it into self.column'''
+        if self.column_file:
+            with open(self.column_file) as f:
+                self.column = [nl.numberize(x) for x in f.read().split('\n')]
+        if self.times_file:
+            with open(self.times_file) as f:
+                self.times = [[nl.numberize(x) for x in y.split()] for y in f.read().split('\n')]
+
+    def blank_stim(self,type=None,fill=0):
+        '''Makes a blank version of stim. If a type is not given, returned as same type as current stim.
+        If a column stim, will fill in blanks with ``fill``'''
+        blank = DeconStim('blank')
+        if type==None:
+            type = self.type()
+        if type=="column":
+            num_reps = self.reps
+            if num_reps==None:
+                if self.type()=="column":
+                    self.read_file()
+                    num_reps = len(self.column)
+                else:
+                    nl.notify('Error: requested to return a blank column, but I can\'t figure out how many reps to make it!',level=nl.level.error)
+            blank.column = [fill]*num_reps
+            return blank
+        if type=="times"
+            blank.times = []
+            return blank
+
+    def concat_stim(self,decon_stim):
+        '''concatenate this to another :class:`DeconStim` of the same "type"'''
+        if self.type()!=decon_stim.type():
+            nl.notify('Error: Trying to concatenate stimuli of different types! (%s with %s)' % (self.name,decon_stim.name),level=nl.level.error)
+            return None
+        concat_stim = copy.copy(self)
+
+        self.read_file()
+        if self.type()=="column":
+            # if an explicit # of reps is given, concat to that
+            reps = [x.reps if x.reps else len(x.column) for x in [self,decon_stim]]
+            
+            
 
 def smooth_decon_to_fwhm(decon,fwhm):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
