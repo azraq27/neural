@@ -270,7 +270,8 @@ class DeconStim(object):
     def blank_stim(self,type=None,fill=0):
         '''Makes a blank version of stim. If a type is not given, returned as same type as current stim.
         If a column stim, will fill in blanks with ``fill``'''
-        blank = DeconStim('blank')
+        blank = copy.copy(self)
+        blank.name = 'Blank'
         if type==None:
             type = self.type()
         if type=="column":
@@ -283,7 +284,7 @@ class DeconStim(object):
                     nl.notify('Error: requested to return a blank column, but I can\'t figure out how many reps to make it!',level=nl.level.error)
             blank.column = [fill]*num_reps
             return blank
-        if type=="times"
+        if type=="times":
             blank.times = []
             return blank
 
@@ -298,7 +299,16 @@ class DeconStim(object):
         if self.type()=="column":
             # if an explicit # of reps is given, concat to that
             reps = [x.reps if x.reps else len(x.column) for x in [self,decon_stim]]
-            
+            concat_stim.column = self.column[:reps[0]] + decon_stim.column[:reps[1]]
+            return concat_stim
+        if self.type()=="times":
+            if '__iter__' not in dir(self.times[0]):
+                self.times = [self.times]
+            if '__iter__' not in dir(decon_stim.times[0]):
+                decon_stim.times = [decon_stim.times]
+            concat_stim.times = self.times + decon_stim.times
+            return concat_stim
+        return None
             
 
 def smooth_decon_to_fwhm(decon,fwhm):
