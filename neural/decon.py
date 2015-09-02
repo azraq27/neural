@@ -247,9 +247,9 @@ class DeconStim(object):
         self.AM2 = AM2
 
 
-def smooth_decon_to_fwhm(decon,fwhm):
+def smooth_decon_to_fwhm(decon,fwhm,cache=False):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
-    returns the final measured fwhm'''
+    returns the final measured fwhm. If ``cache`` is ``True``, will save the blurred input file (and use it again in the future)'''
     if os.path.exists(decon.prefix):
         return
     with nl.notify('Running smooth_decon_to_fwhm analysis (with %.2fmm blur)' % fwhm):
@@ -274,7 +274,7 @@ def smooth_decon_to_fwhm(decon,fwhm):
                 # Run once in place to get the residual dataset
                 decon.run()
                 running_reps = 0
-                blur_input = lambda i: 'input_blur-part%d.nii.gz'%(i+1)
+                blur_input = lambda dset: 'input_blur-part%d.nii.gz'%(i+1)
                 for i in xrange(len(decon.input_dsets)):
                     dset = decon.input_dsets[i]
                     info = nl.dset_info(dset)
