@@ -25,7 +25,7 @@ def motion_from_params(param_file,motion_file,individual=True,rms=True):
             translate = [sqrt(sum([x**2 for x in y[:3]])) for y in translate_rotate]
             rotate = [sqrt(sum([x**2 for x in y[3:]])) for y in translate_rotate]            
             translate_rotate = np.array(map(add,translate,rotate))
-            translate_rotate_diff = np.array([0] + np.diff(translate_rotate,axis=0))
+            translate_rotate_diff = np.hstack(([0],np.diff(translate_rotate,axis=0)))
             if motion.shape==(0,):
                 motion = rms_motion
             else:
