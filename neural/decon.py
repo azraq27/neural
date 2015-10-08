@@ -131,7 +131,7 @@ class Decon:
             
         for stim in all_stims:        
             column_file = stim.column_file
-            if stim.column:
+            if stim.column!=None:
                 with tempfile.NamedTemporaryFile(delete=False) as f:
                     f.write('\n'.join([str(x) for x in stim.column]))
                     column_file = f.name
@@ -143,7 +143,7 @@ class Decon:
                 stim_num += 1
                 continue
             times_file = stim.times_file
-            if stim.times:
+            if stim.times!=None:
                 times = list(stim.times)
                 if '__iter__' not in dir(times[0]):
                     # a single list
@@ -294,6 +294,8 @@ class DeconStim(object):
             nl.notify('Error: Trying to concatenate stimuli of different types! %s (%s) with %s (%s)' % (self.name,self.type(),decon_stim.name,decon_stim.type()),level=nl.level.error)
             return None
         concat_stim = copy.copy(self)
+        if self.name=='Blank':
+            concat_stim = copy.copy(decon_stim)
 
         self.read_file()
         if self.type()=="column":
