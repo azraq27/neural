@@ -291,7 +291,7 @@ class DeconStim(object):
     def concat_stim(self,decon_stim):
         '''concatenate this to another :class:`DeconStim` of the same "type"'''
         if self.type()!=decon_stim.type():
-            nl.notify('Error: Trying to concatenate stimuli of different types! (%s with %s)' % (self.name,decon_stim.name),level=nl.level.error)
+            nl.notify('Error: Trying to concatenate stimuli of different types! %s (%s) with %s (%s)' % (self.name,self.type(),decon_stim.name,decon_stim.type()),level=nl.level.error)
             return None
         concat_stim = copy.copy(self)
 
