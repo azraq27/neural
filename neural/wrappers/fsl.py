@@ -7,6 +7,7 @@ def find_app(name):
     app = nl.which(name)
     if app==None:
         app = nl.which('fsl5.0-' + name)
+    return app
 
 # Try to find bet
 bet2 = find_app('bet2')
