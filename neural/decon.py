@@ -302,9 +302,9 @@ class DeconStim(object):
             concat_stim.column = self.column[:reps[0]] + decon_stim.column[:reps[1]]
             return concat_stim
         if self.type()=="times":
-            if '__iter__' not in dir(self.times[0]):
+            if len(self.times)==0 or '__iter__' not in dir(self.times[0]):
                 self.times = [self.times]
-            if '__iter__' not in dir(decon_stim.times[0]):
+            if len(decon_stim.times)==0 or '__iter__' not in dir(decon_stim.times[0]):
                 decon_stim.times = [decon_stim.times]
             concat_stim.times = self.times + decon_stim.times
             return concat_stim
