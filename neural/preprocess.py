@@ -16,7 +16,7 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
     '''
     polort = nl.auto_polort(input_dset)
     info = nl.dset_info(input_dset)
-    outcount = [float(x) for x in subprocess.check_output(['3dToutcount','-fraction','-automask','-polort',str(polort),str(input_dset)]).split('\n') if len(x.strip())>0]
+    outcount = [float(x) for x in subprocess.check_output(['3dToutcount','-fraction','-automask','-polort',str(polort),str(input_dset)],stderr=subprocess.PIPE).split('\n') if len(x.strip())>0]
     binary_outcount = [x<fraction for x in outcount]
     perc_outliers = 1 - (sum(binary_outcount)/float(info.reps))
     if max_exclude and perc_outliers > max_exclude:
