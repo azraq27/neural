@@ -368,7 +368,7 @@ def smooth_decon_to_fwhm(decon,fwhm,cache=False):
                         shutil.copy(copyfile,cwd)
                     else:
                         nl.notify('Warning: deconvolve did not produce expected file %s' % decon.prefix,level=nl.level.warning)
-        except Exception as e:
-            raise e
+        except:
+            raise
         finally:
             shutil.rmtree(tmpdir,True)
