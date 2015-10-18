@@ -30,8 +30,13 @@ class Decon:
         
         Options that are obvious:
             nfirst (default: 3), censor_file, polort (default: 'A'), tout, vout, rout, prefix
-            
-        opts        = list of extra things to put in the command
+                    
+        Other options:
+        
+        :opts:              list of extra things to put directly in the command (in case none of the above options cover you)
+        :partial:           ``dict`` with keys of datasets (given in ``input_dsets``) and values of a ``tuple``
+        
+        
         
         **Example:**::
         
