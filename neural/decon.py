@@ -316,7 +316,22 @@ class DeconStim(object):
             concat_stim.times = self.times + decon_stim.times
             return concat_stim
         return None
-            
+        
+        def partial(self,start=0,end=None):
+            '''chops the stimulus by only including time points ``start`` through ``end`` (in seconds, inclusive; ``None``=until the end)'''
+            decon_stim = copy.copy(self)
+            self.read_file()
+            if self.type()=="column": 
+                # Need to change times from seconds to TRs...
+                if end==None:
+                    pass
+                decon_stim.column_file = None
+                decon_stim.column = decon_stim.column[start]
+                # ...
+            if self.type()=="times":
+                pass
+                # ...
+            return decon_stim
 
 def smooth_decon_to_fwhm(decon,fwhm,cache=False):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
