@@ -114,7 +114,11 @@ class Decon:
                 if self.TR:
                     cmd += [str(self.TR)]
         if self.censor_file:
-            cmd += ['-censor', self.censor_file]
+            censor_file = self.censor_file
+            if self.partial:
+                # This is just a hack. needs to be fixed somehow
+                censor_file = '%s[%d..%d]' % (censor_file,self.partial.values[0][0],self.partial.values[0][1])
+            cmd += ['-censor', censor_file]
         nfirst = self.nfirst
         if self.input_dsets[0] in self.partial:
             nfirst -= self.partial[self.input_dsets[0]][0]
