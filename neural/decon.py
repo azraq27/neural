@@ -34,7 +34,9 @@ class Decon:
         Other options:
         
         :opts:              list of extra things to put directly in the command (in case none of the above options cover you)
-        :partial:           ``dict`` with keys of datasets (given in ``input_dsets``) and values of a ``tuple``
+        :partial:           ``dict`` with keys of datasets (given in ``input_dsets``) and values of a ``tuple`` of (start,end) for each given
+                            dataset. Will automatically adjust all stimfiles and such to match. **Column-style stimuli only work if there's only
+                            one dataset**
         
         
         
@@ -89,6 +91,7 @@ class Decon:
         self.TR = None
         self.stim_sds = None
         self.errts = None
+        self.partial = {}
         
         self._del_files = []
     
@@ -103,7 +106,7 @@ class Decon:
         cmd += ['-jobs',multiprocessing.cpu_count()]
         cmd += self.opts
         if(len(self.input_dsets)):
-            cmd += ['-input'] + self.input_dsets
+            cmd += ['-input'] + ['%s[%d..%d]' % (dset,self.partial[dset][0],self.partial[dset][1]) if dset in self.partial else dset for dset in self.input_dsets]
         else:
             cmd += ['-nodata']
             if self.reps:
@@ -112,7 +115,12 @@ class Decon:
                     cmd += [str(self.TR)]
         if self.censor_file:
             cmd += ['-censor', self.censor_file]
-        cmd += ['-nfirst',str(self.nfirst)]
+        nfirst = self.nfirst
+        if self.input_dsets[0] in self.partial:
+            nfirst -= self.partial[self.input_dsets[0]][0]
+        if nfirst<0:
+            nfirst = 0
+        cmd += ['-nfirst',str(nfirst)]
         if self.mask:
             if self.mask=='auto':
                 cmd += ['-automask']
@@ -134,7 +142,10 @@ class Decon:
             decon_stim.base = (stim in self.stim_base)
             all_stims.append(decon_stim)
             
-        for stim in all_stims:        
+        for stim in all_stims:
+            for i in xrange(len(self.input_dsets)):
+                if self.input_dsets[i] in self.partial:
+                    stim = stim.partial(self.partial[self.input_dsets[i]][0],self.partial[self.input_dsets[i]][1],i)
             column_file = stim.column_file
             if stim.column!=None:
                 with tempfile.NamedTemporaryFile(delete=False) as f:
@@ -239,6 +250,7 @@ class DeconStim(object):
         :AM2:           Does this stimulus use an "AM2" model? (``True``/``False``)
 
         :reps:          Number of reps in associated fMRI run (helpful when manipulating the stims)
+        :TR:            TR of the associated fMRI run
     
     '''
     def __init__(self,name,column_file=None,times_file=None,model='GAM',base=False,AM1=False,AM2=False):
@@ -254,6 +266,7 @@ class DeconStim(object):
         self.AM2 = AM2
 
         self.reps = None
+        self.TR = None
 
     def type(self):
         '''returns kind of stim ("column" or "times"), based on what parameters are set'''
@@ -317,21 +330,44 @@ class DeconStim(object):
             return concat_stim
         return None
         
-        def partial(self,start=0,end=None):
-            '''chops the stimulus by only including time points ``start`` through ``end`` (in seconds, inclusive; ``None``=until the end)'''
-            decon_stim = copy.copy(self)
-            self.read_file()
-            if self.type()=="column": 
-                # Need to change times from seconds to TRs...
-                if end==None:
-                    pass
-                decon_stim.column_file = None
-                decon_stim.column = decon_stim.column[start]
-                # ...
-            if self.type()=="times":
-                pass
-                # ...
-            return decon_stim
+    def partial(self,start=0,end=None,run=0):
+        '''chops the stimulus by only including time points ``start`` through ``end`` (in reps, inclusive; ``None``=until the end)
+        if using stim_times-style simulus, will change the ``run``'th run. If a column, will just chop the column'''
+        decon_stim = copy.copy(self)
+        self.read_file()
+        if start<0:
+            start = 0
+        if self.type()=="column": 
+            decon_stim.column_file = None
+            if end>=len(decon_stim.column):
+                end = None
+            if end==None:                
+                decon_stim.column = decon_stim.column[start:]
+            else:
+                decon_stim.column = decon_stim.column[start:end+1]
+        if self.type()=="times":
+            if self.TR==None:
+                nl.notify('Error: cannot get partial segment of a stim_times stimulus without a TR',level=nl.level.error)
+                return None
+            def time_in(a):
+                first_number = r'^(\d+(\.\d+)?)'
+                if isinstance(a,basestring):
+                    m = re.match(first_number,a)
+                    if m:
+                        a = m.group(1)
+                    else:
+                        nl.notify('Warning: cannot intepret a number from the stim_time: "%s"' % a,level=nl.level.warning)
+                        return False
+                a = float(a)/self.TR
+                if a>=start and (end==None or a<=end):
+                    return True
+                return False
+            
+            decon_stim.times_file = None
+            if len(decon_stim.times)==0 or '__iter__' not in dir(decon_stim.times[0]):
+                decon_stim.times = [decon_stim.times]
+            decon_stim.times[run] = [x for x in decon_stim.times[run] if time_in(x)]
+        return decon_stim
 
 def smooth_decon_to_fwhm(decon,fwhm,cache=False):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
