@@ -118,7 +118,7 @@ class Decon:
             if self.partial:
                 # This assumes only one dataset!
                 with open(censor_file) as inf:
-                    censor = inf.read().split()[self.partial.values()[0][0],self.partial.values()[0][1]+1]
+                    censor = inf.read().split()[self.partial.values()[0][0]:self.partial.values()[0][1]+1]
                     with tempfile.NamedTemporaryFile(delete=False) as f:
                         f.write('\n'.join(censor))
                         censor_file = f.name
