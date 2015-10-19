@@ -116,8 +116,13 @@ class Decon:
         if self.censor_file:
             censor_file = self.censor_file
             if self.partial:
-                # This is just a hack. needs to be fixed somehow
-                censor_file = '%s[%d..%d]' % (censor_file,self.partial.values()[0][0],self.partial.values()[0][1])
+                # This assumes only one dataset!
+                with open(censor_file) as inf:
+                    censor = inf.read().split()[self.partial.values()[0][0],self.partial.values()[0][1]+1]
+                    with tempfile.NamedTemporaryFile(delete=False) as f:
+                        f.write('\n'.join(censor))
+                        censor_file = f.name
+                        self._del_files.append(f.name)
             cmd += ['-censor', censor_file]
         nfirst = self.nfirst
         if self.input_dsets[0] in self.partial:
