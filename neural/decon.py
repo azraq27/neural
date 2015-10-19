@@ -150,6 +150,8 @@ class Decon:
             for i in xrange(len(self.input_dsets)):
                 if self.input_dsets[i] in self.partial:
                     stim = stim.partial(self.partial[self.input_dsets[i]][0],self.partial[self.input_dsets[i]][1],i)
+            if stim==None:
+                continue
             column_file = stim.column_file
             if stim.column!=None:
                 with tempfile.NamedTemporaryFile(delete=False) as f:
@@ -361,6 +363,8 @@ class DeconStim(object):
                 decon_stim.column = decon_stim.column[start:]
             else:
                 decon_stim.column = decon_stim.column[start:end+1]
+            if len(decon_stim.column)==0:
+                return None
         if self.type()=="times":
             if self.TR==None:
                 nl.notify('Error: cannot get partial segment of a stim_times stimulus without a TR',level=nl.level.error)
@@ -383,6 +387,8 @@ class DeconStim(object):
             if len(decon_stim.times)==0 or '__iter__' not in dir(decon_stim.times[0]):
                 decon_stim.times = [decon_stim.times]
             decon_stim.times[run] = [x for x in decon_stim.times[run] if time_in(x)]
+            if len(nl.flatten(decon_stim.times))==0:
+                return None
         return decon_stim
 
 def smooth_decon_to_fwhm(decon,fwhm,cache=False):
