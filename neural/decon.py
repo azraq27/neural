@@ -347,8 +347,8 @@ class DeconStim(object):
     def partial(self,start=0,end=None,run=0):
         '''chops the stimulus by only including time points ``start`` through ``end`` (in reps, inclusive; ``None``=until the end)
         if using stim_times-style simulus, will change the ``run``'th run. If a column, will just chop the column'''
-        decon_stim = copy.copy(self)
         self.read_file()
+        decon_stim = copy.copy(self)
         if start<0:
             start = 0
         if self.type()=="column": 
