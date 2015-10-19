@@ -295,9 +295,11 @@ class DeconStim(object):
                 if column!=None:
                     lines = [x.split()[column] for x in lines]
                 self.column = [nl.numberize(x) for x in lines]
+            self.column_file = None
         if self.times_file:
             with open(self.times_file) as f:
                 self.times = [[nl.numberize(x) for x in y.split()] for y in f.read().split('\n')]
+            self.times_file = None
 
     def blank_stim(self,type=None,fill=0):
         '''Makes a blank version of stim. If a type is not given, returned as same type as current stim.
