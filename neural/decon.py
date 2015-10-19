@@ -131,9 +131,7 @@ class Decon:
             else:
                 cmd += ['-mask',self.mask]
         cmd += ['-polort',str(self.polort)]
-        
-        cmd += ['-num_stimts',len(self.stim_files)+len(self.stim_times)+len(self.decon_stims)]
-        
+                
         stim_num = 1
         
         all_stims = list(self.decon_stims)
@@ -145,13 +143,20 @@ class Decon:
             decon_stim.AM2 = (stim in self.stim_am2)
             decon_stim.base = (stim in self.stim_base)
             all_stims.append(decon_stim)
-            
-        for stim in all_stims:
+        
+        if self.partial:
             for i in xrange(len(self.input_dsets)):
                 if self.input_dsets[i] in self.partial:
-                    stim = stim.partial(self.partial[self.input_dsets[i]][0],self.partial[self.input_dsets[i]][1],i)
-            if stim==None:
-                continue
+                    new_stims = []
+                    for stim in all_stims:
+                        stim = stim.partial(self.partial[self.input_dsets[i]][0],self.partial[self.input_dsets[i]][1],i)
+                        if stim:
+                            new_stims.append(stim)
+                    all_stims = new_stims
+        
+        cmd += ['-num_stimts',len(all_stims)]
+            
+        for stim in all_stims:
             column_file = stim.column_file
             if stim.column!=None:
                 with tempfile.NamedTemporaryFile(delete=False) as f:
