@@ -196,11 +196,25 @@ class Decon:
                     cmd += ['-stim_base',stim_num]
                 stim_num += 1
         
-        cmd += ['-num_glt',len(self.glts)]
+        strip_number = r'-?\d+?\*?(.*)'
+        all_glts = {}
+        stim_names = [stim.name for stim in all_stims]
+        for glt in self.glts:
+            ok = True
+            for stim in self.glts[glt]:
+                m = re.match(strip_number,stim)
+                if m:
+                    stim = m.group(1)
+                if stim not in stim_names:
+                    ok = False
+            if ok:
+                all_glts[glt] = self.glts[glt]
+
+        cmd += ['-num_glt',len(all_glts)]
         
         glt_num = 1
-        for glt in self.glts:
-            cmd += ['-gltsym','SYM: %s' % self.glts[glt],'-glt_label',glt_num,glt]
+        for glt in all_glts:
+            cmd += ['-gltsym','SYM: %s' % all_glts[glt],'-glt_label',glt_num,glt]
             glt_num += 1
         
         if self.bout:
