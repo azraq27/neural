@@ -282,15 +282,17 @@ class DeconStim(object):
 
     def read_file(self):
         '''if this is stored in a file, read it into self.column'''
-        column_selector = r'.*\[(\d+)\]$'
+        column_selector = r'(.*)\[(\d+)\]$'
         if self.column_file:
             column = None
             m = re.match(column_selector,self.column_file)
+            file = self.column_file
             if m:
-                column = int(m.group(1))
-            with open(self.column_file) as f:
+                file = m.group(1)
+                column = int(m.group(2))
+            with open(file) as f:
                 lines = f.read().split('\n')
-                if m!=None:
+                if column!=None:
                     lines = [x.split()[column] for x in lines]
                 self.column = [nl.numberize(x) for x in lines]
         if self.times_file:
