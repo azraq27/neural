@@ -258,7 +258,15 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                 cmd = ['to3d','-skip_outliers','-quit_on_err','-prefix',out_file]
                 
                 num_reps = None
-                i = info(file_list[0])
+                ii = 0
+                i = info(file_list[ii])
+                while i==None:
+                    nl.notify('Warning: failed to read DICOM info from %s' % file_list[ii],level=nl.level.warning)
+                    ii += 1
+                    if ii>=len(file_list):
+                        nl.notify('Error: could not find any valid DICOM info, unable to auto-create datasets',level=nl.level.error)
+                        break
+                    i = info(file_list[ii])
                 if i.addr(tags['num_reps']) and int(i.addr(tags['num_reps'])['value'])>1:
                     # multiple reps per file
                     num_reps = int(i.addr(tags['num_reps'])['value'])
