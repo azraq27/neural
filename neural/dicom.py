@@ -258,31 +258,23 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                 cmd = ['to3d','-skip_outliers','-quit_on_err','-prefix',out_file]
                 
                 num_reps = None
-                ii = 0
-                i = info(file_list[ii])
-                while i==None:
-                    nl.notify('Warning: failed to read DICOM info from %s' % file_list[ii],level=nl.level.warning)
-                    ii += 1
-                    if ii>=len(file_list):
-                        nl.notify('Error: could not find any valid DICOM info, unable to auto-create datasets',level=nl.level.error)
-                        break
-                    i = info(file_list[ii])
-                if i.addr(tags['num_reps']) and int(i.addr(tags['num_reps'])['value'])>1:
+                i = info_for_tags(file_list[0],[tags['num_reps'],tags['acq_time']])
+                if tags['num_reps'] in i and i[tags['num_reps']]>1:
                     # multiple reps per file
-                    num_reps = int(i.addr(tags['num_reps'])['value'])
+                    num_reps = i[tags['num_reps']]
                     # probably makes sense to default to "tz"
                     if sort_order==None:
                         sort_order='tz'
                 else:
-                    if i.addr(tags['acq_time']) and len(file_list)>1:
-                        i2 = info(file_list[1])
-                        if i.addr(tags['acq_time'])['value'] != i2.addr(tags['acq_time'])['value']:
+                    if tags['acq_time'] in i and len(file_list)>1:
+                        i2 = info_for_tags(file_list[1],[tags['acq_time']])
+                        if i[tags['acq_time']] != i2[tags['acq_time']]:
                             # each file is a different rep
                             num_reps = len(file_list)
                             # "zt" sounds like a good default
                             if sort_order==None:
                                 sort_order='zt'
-                    
+                
                 if num_reps:
                     # This is a time-dependent dataset
                     cmd += ['-time:' + sort_order]
