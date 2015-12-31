@@ -258,7 +258,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                 cmd = ['to3d','-skip_outliers','-quit_on_err','-prefix',out_file]
                 
                 num_reps = None
-                i = info_for_tags(file_list[0],[tags['num_reps'],tags['acq_time']])
+                i = info_for_tags(file_list[0],[tags['num_reps'],tags['acq_time'],tags['TR']])
                 if tags['num_reps'] in i and i[tags['num_reps']]>1:
                     # multiple reps per file
                     num_reps = i[tags['num_reps']]
@@ -290,7 +290,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                         cmd += [str(num_files/num_reps),str(num_reps)]
                     else:
                         cmd += [str(num_reps),str(num_files/num_reps)]
-                    cmd += [i.addr(tags['TR'])['value'],slice_order]
+                    cmd += [i[tags['TR']],slice_order]
                 
                 cmd += ['-@']
                 p = subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
