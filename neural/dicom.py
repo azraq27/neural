@@ -290,7 +290,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                         cmd += [str(num_files/num_reps),str(num_reps)]
                     else:
                         cmd += [str(num_reps),str(num_files/num_reps)]
-                    cmd += [i[tags['TR']],slice_order]
+                    cmd += [str(i[tags['TR']]),slice_order]
                 
                 cmd += ['-@']
                 p = subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
