@@ -227,7 +227,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                         if len(info_for_tags(f,tags['num_rows']))>0:
                             # Only include DICOMs that actually have image information
                             new_file_list.append(f)
-                    except pydicom.errors.InvalidDicomError:
+                    except:
                         pass
                 file_list = new_file_list
                 if len(file_list)==0:
