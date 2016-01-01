@@ -282,10 +282,10 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                     for f in file_list:
                         # Take into account multi-frame DICOMs
                         num_frames_info = info_for_tags(f,[tags['num_frames'],tags['siemens_slices']])
-                        if tags['num_frames'] in num_frames_info:
-                            num_files += float(num_frames_info[tags['num_frames']]) - 1
-                        if tags['siemens_slices'] in num_frames_info:
-                            num_files += float(num_frames_info[tags['siemens_slices']]) - 1                            
+                        if tags['num_frames'] in num_frames_info and not isinstance(nl.numberize(num_frames_info[tags['num_frames']]),basestring):
+                            num_files += nl.numberize(num_frames_info[tags['num_frames']]) - 1
+                        if tags['siemens_slices'] in num_frames_info and not isinstance(nl.numberize(num_frames_info[tags['siemens_slices']]),basestring):
+                            num_files += nl.numberize(num_frames_info[tags['siemens_slices']]) - 1                            
                     if sort_order=='zt':
                         cmd += [str(num_files/num_reps),str(num_reps)]
                     else:
