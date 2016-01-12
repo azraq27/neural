@@ -297,11 +297,12 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                 
                 cmd += ['-@']
                 p = subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-                p.communicate('\n'.join(file_list))
+                out = p.communicate('\n'.join(file_list))
                 
                 if os.path.exists(out_file):
                     shutil.copy(out_file,cwd)
                     return out_file
+                nl.notify('Error: Failed to create dataset\nStdout:\n%s\nStderr:\n%s' % out,level=nl.level.error)
                 
                 return False
         finally:
