@@ -347,7 +347,7 @@ def create_dset_to3d(prefix,file_list,file_order='zt',num_slices=None,num_reps=N
             num_slices = len(file_list)/num_reps
         if num_reps==None:
             if len(file_list)%num_slices!=0:
-                nl.notify('Error: trying to guess # of reps, but %d (number for files) doesn\'t divide evenly into %d (number of slices)' % (len(file_list),num_reps),level=nl.level.error)
+                nl.notify('Error: trying to guess # of reps, but %d (number for files) doesn\'t divide evenly into %d (number of slices)' % (len(file_list),num_slices),level=nl.level.error)
                 return False
             num_reps = len(file_list)/num_slices
         
