@@ -196,7 +196,7 @@ def max_diff(dset1,dset2):
     except ValueError:
         return float('inf')
 
-def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
+def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None,force_slices=None):
     tags = {
         'num_rows': (0x0028,0x0010),
         'num_reps': (0x0020,0x0105),
@@ -282,17 +282,22 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None):
                     # This is a time-dependent dataset
                     cmd += ['-time:' + sort_order]
                     num_files = len(file_list)
-                    for f in file_list:
-                        # Take into account multi-frame DICOMs
-                        num_frames_info = info_for_tags(f,[tags['num_frames'],tags['siemens_slices']])
-                        if tags['num_frames'] in num_frames_info and not isinstance(num_frames_info[tags['num_frames']],basestring):
-                            num_files += num_frames_info[tags['num_frames']] - 1
-                        if tags['siemens_slices'] in num_frames_info and not isinstance(num_frames_info[tags['siemens_slices']],basestring):
-                            num_files += num_frames_info[tags['siemens_slices']] - 1                            
-                    if sort_order=='zt':
-                        cmd += [str(num_files/num_reps),str(num_reps)]
+                    num_slices = None
+                    if force_slices:
+                        num_slices = force_slices
                     else:
-                        cmd += [str(num_reps),str(num_files/num_reps)]
+                        for f in file_list:
+                            # Take into account multi-frame DICOMs
+                            num_frames_info = info_for_tags(f,[tags['num_frames'],tags['siemens_slices']])
+                            if tags['num_frames'] in num_frames_info and not isinstance(num_frames_info[tags['num_frames']],basestring):
+                                num_files += num_frames_info[tags['num_frames']] - 1
+                            if tags['siemens_slices'] in num_frames_info and not isinstance(num_frames_info[tags['siemens_slices']],basestring):
+                                num_files += num_frames_info[tags['siemens_slices']] - 1                            
+                        num_slices = num_files/num_reps
+                    if sort_order=='zt':
+                        cmd += [str(num_slices),str(num_reps)]
+                    else:
+                        cmd += [str(num_reps),str(num_slices)]
                     cmd += [str(i[tags['TR']]),slice_order]
                 
                 cmd += ['-@']
@@ -377,9 +382,9 @@ def create_dset_to3d(prefix,file_list,file_order='zt',num_slices=None,num_reps=N
                     nl.notify('stdout:\n' + out[0] + '\nstderr:\n' + out[1],level=nl.level.error)
             return False
 
-def create_dset(directory,slice_order='alt+z',sort_order='zt'):
+def create_dset(directory,slice_order='alt+z',sort_order='zt',force_slices=None):
     '''tries to autocreate a dataset from images in the given directory'''
-    return _create_dset_dicom(directory,slice_order,sort_order)
+    return _create_dset_dicom(directory,slice_order,sort_order,force_slices=force_slices)
     # Add more options for GE I-files, and other non-DICOM data formats
 
 def date_for_str(date_str):
