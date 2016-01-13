@@ -49,6 +49,8 @@ except:
     
 
 # user customization
-import personality
-personality.display('greeting')
-personality.set_goodbye()
+import sys
+if sys.stdout.isatty():
+    import personality
+    personality.display('greeting')
+    personality.set_goodbye()
