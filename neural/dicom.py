@@ -92,7 +92,19 @@ def info_for_tags(filename,tags):
     if isinstance(tags,tuple):
         tags = [tags]
     d = pydicom.read_file(filename)
-    return {k:d[k].value for k in tags if k in d}
+    return_dict = {}
+    dicom_info = None
+    for k in tags:
+        if k in d:
+            return_dict[k] = d[k].value
+        else:
+            # Backup to the old method
+            if dicom_info==None:
+                dicom_info = info(filename)
+            i = dicom_info.addr(k)
+            if i:
+                return_dict[k] = nl.numberize(i['value'])
+    return return_dict
 
 def scan_dir(dirname,tags=None,md5_hash=False):
     '''scans a directory tree and returns a dictionary with files and key DICOM tags
