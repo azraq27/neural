@@ -415,7 +415,7 @@ class DeconStim(object):
                 return None
         return decon_stim
 
-def smooth_decon_to_fwhm(decon,fwhm,cache=False):
+def smooth_decon_to_fwhm(decon,fwhm,cache=True):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
     returns the final measured fwhm. If ``cache`` is ``True``, will save the blurred input file (and use it again in the future)'''
     if os.path.exists(decon.prefix):
@@ -444,27 +444,26 @@ def smooth_decon_to_fwhm(decon,fwhm,cache=False):
                     nl.notify('Using cache\'d blurred datasets')
                 else:
                     # Need to make them from scratch
-                    old_errts = decon.errts
-                    decon.errts = 'residual.nii.gz'
-                    decon.prefix = os.path.basename(decon.prefix)
-                    # Run once in place to get the residual dataset
-                    decon.run()
-                    running_reps = 0
-                    blur_input = lambda dset: 'input_blur-part%d.nii.gz'%(i+1)
-                    for i in xrange(len(decon.input_dsets)):
-                        dset = decon.input_dsets[i]
-                        info = nl.dset_info(dset)
-                        residual_dset = 'residual-part%d.nii.gz'%(i+1)
-                        nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)],products=residual_dset)
-                        cmd = ['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_input(i),'-FWHM',fwhm]
-                        if decon.mask:
-                            if decon.mask=='auto':
-                                cmd += ['-automask']
-                            else:
-                                cmd += ['-mask',decon.mask]
-                        nl.run(cmd,products=blur_input(i))
-                        running_reps += info.reps
-                decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
+                    with nl.notify('Creating blurred datasets'):
+                        old_errts = decon.errts
+                        decon.errts = 'residual.nii.gz'
+                        decon.prefix = os.path.basename(decon.prefix)
+                        # Run once in place to get the residual dataset
+                        decon.run()
+                        running_reps = 0
+                        for dset in decon.input_dsets:
+                            info = nl.dset_info(dset)
+                            residual_dset = nl.suffix(dset,'_residual')
+                            nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)],products=residual_dset)
+                            cmd = ['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_dset(dset),'-FWHM',fwhm]
+                            if decon.mask:
+                                if decon.mask=='auto':
+                                    cmd += ['-automask']
+                                else:
+                                    cmd += ['-mask',decon.mask]
+                            nl.run(cmd,products=blur_dset(dset))
+                            running_reps += info.reps
+                decon.input_dsets = [blur_dset(dset) for dset in decon.input_dsets]
                 for d in [decon.prefix,decon.errts]:
                     if os.path.exists(d):
                         try:
