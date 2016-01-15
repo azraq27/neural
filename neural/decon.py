@@ -439,7 +439,7 @@ def smooth_decon_to_fwhm(decon,fwhm,cache=True):
                 
                 # Create the blurred inputs (or load from cache)
                 blur_dset = lambda dset: nl.suffix(dset,'_smooth_to_%.2f' % fwhm)
-                if cache and all([os.path.exists(os.path.join(cwd,blur_dset(dset))) for dset in decon.input_dsets):
+                if cache and all([os.path.exists(os.path.join(cwd,blur_dset(dset))) for dset in decon.input_dsets]):
                     # Everything is already cached...
                     nl.notify('Using cache\'d blurred datasets')
                 else:
