@@ -196,15 +196,15 @@ class Decon:
                     cmd += ['-stim_base',stim_num]
                 stim_num += 1
         
-        strip_number = r'-?\d+?\*?(.*)'
+        strip_number = r'[-+]?(\d+)?\*?(.*)'
         all_glts = {}
         stim_names = [stim.name for stim in all_stims]
         for glt in self.glts:
             ok = True
-            for stim in self.glts[glt]:
+            for stim in self.glts[glt].split():
                 m = re.match(strip_number,stim)
                 if m:
-                    stim = m.group(1)
+                    stim = m.group(2)
                 if stim not in stim_names:
                     ok = False
             if ok:
@@ -436,26 +436,34 @@ def smooth_decon_to_fwhm(decon,fwhm,cache=False):
             with nl.run_in(tmpdir):
                 if os.path.exists(decon.prefix):
                     os.remove(decon.prefix)
-                old_errts = decon.errts
-                decon.errts = 'residual.nii.gz'
-                decon.prefix = os.path.basename(decon.prefix)
-                # Run once in place to get the residual dataset
-                decon.run()
-                running_reps = 0
-                blur_input = lambda dset: 'input_blur-part%d.nii.gz'%(i+1)
-                for i in xrange(len(decon.input_dsets)):
-                    dset = decon.input_dsets[i]
-                    info = nl.dset_info(dset)
-                    residual_dset = 'residual-part%d.nii.gz'%(i+1)
-                    nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)],products=residual_dset)
-                    cmd = ['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_input(i),'-FWHM',fwhm]
-                    if decon.mask:
-                        if decon.mask=='auto':
-                            cmd += ['-automask']
-                        else:
-                            cmd += ['-mask',decon.mask]
-                    nl.run(cmd,products=blur_input(i))
-                    running_reps += info.reps
+                
+                # Create the blurred inputs (or load from cache)
+                blur_dset = lambda dset: nl.suffix(dset,'_smooth_to_%.2f' % fwhm)
+                if cache and all([os.path.exists(os.path.join(cwd,blur_dset(dset))) for dset in decon.input_dsets):
+                    # Everything is already cached...
+                    nl.notify('Using cache\'d blurred datasets')
+                else:
+                    # Need to make them from scratch
+                    old_errts = decon.errts
+                    decon.errts = 'residual.nii.gz'
+                    decon.prefix = os.path.basename(decon.prefix)
+                    # Run once in place to get the residual dataset
+                    decon.run()
+                    running_reps = 0
+                    blur_input = lambda dset: 'input_blur-part%d.nii.gz'%(i+1)
+                    for i in xrange(len(decon.input_dsets)):
+                        dset = decon.input_dsets[i]
+                        info = nl.dset_info(dset)
+                        residual_dset = 'residual-part%d.nii.gz'%(i+1)
+                        nl.run(['3dbucket','-prefix',residual_dset,'%s[%d..%d]'%(decon.errts,running_reps,running_reps+info.reps-1)],products=residual_dset)
+                        cmd = ['3dBlurToFWHM','-quiet','-input',dset,'-blurmaster',residual_dset,'-prefix',blur_input(i),'-FWHM',fwhm]
+                        if decon.mask:
+                            if decon.mask=='auto':
+                                cmd += ['-automask']
+                            else:
+                                cmd += ['-mask',decon.mask]
+                        nl.run(cmd,products=blur_input(i))
+                        running_reps += info.reps
                 decon.input_dsets = [blur_input(i) for i in xrange(len(decon.input_dsets))]
                 for d in [decon.prefix,decon.errts]:
                     if os.path.exists(d):
