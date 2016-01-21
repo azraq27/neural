@@ -60,13 +60,14 @@ _notify_tree = []
 _digest_list = []
 
 class notify:
-    def __init__(self,text,log=False,email=False,level=level.informational):
+    def __init__(self,text,log=False,email=False,level=level.informational,quiet=False):
         '''notify user or log information
     
         :text:      the content of the message
         :log:       if ``True``, will save the message
         :email:     add to email digests
         :level:     priority of message, should be 
+        :quiet:     if ``True``, will not print message to screen
         
         if ``neural.notification.notify_level`` is set, will only print notifications that have a ``level`` >= ``notify_level`` '''
         self.text = text
@@ -77,7 +78,7 @@ class notify:
         for d in _digest_list:
             if d.level==None or level>=d.level:
                 d._notifications.append((copy.copy(_notify_tree),self))
-        if notify_level==None or level>=notify_level:
+        if (notify_level==None or level>=notify_level) and quiet==False:
             if interactive_enabled:
                 notify_interactive(self)
             else:

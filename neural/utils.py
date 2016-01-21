@@ -99,7 +99,7 @@ class RunResult:
     def __str__(self):
         return self.output_filename
 
-def run(command,products=None,working_directory='.',force_local=False,stderr=True):
+def run(command,products=None,working_directory='.',force_local=False,stderr=True,quiet=False):
     '''wrapper to run external programs
     
     :command:           list containing command and parameters 
@@ -113,6 +113,9 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
                         ``True`` will combine ``stderr`` and ``stdout``
                         ``False`` will return ``stdout`` and let ``stderr`` print to the console
                         ``None`` will return ``stdout`` and suppress ``stderr``
+    :quiet:             ``False`` (default) will print friendly messages
+                        ``True`` will suppress everything but errors
+                        ``None`` will suppress all output
     
     Returns result in form of :class:`RunResult`
     '''
@@ -125,7 +128,8 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
         
         command = flatten(command)
         command = [str(x) for x in command]
-        with nl.notify('Running %s...' % command[0],level=nl.level.debug):
+        quiet_option = False if quiet==False else True
+        with nl.notify('Running %s...' % command[0],level=nl.level.debug,quiet=quiet_option):
             out = None
             returncode = 0
             try:
@@ -139,19 +143,20 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
                     # let STDERR show through to the console
                     out = subprocess.check_output(command)                    
             except subprocess.CalledProcessError, e:
-                nl.notify('''ERROR: %s returned a non-zero status
+                if quiet!=None:
+                    nl.notify('''ERROR: %s returned a non-zero status
 
-----COMMAND------------
-%s
------------------------
+    ----COMMAND------------
+    %s
+    -----------------------
 
                     
-----OUTPUT-------------
-%s
------------------------
-Return code: %d
-''' % (command[0],' '.join(command),e.output,e.returncode),level=nl.level.error)
-                returncode = e.returncode
+    ----OUTPUT-------------
+    %s
+    -----------------------
+    Return code: %d
+    ''' % (command[0],' '.join(command),e.output,e.returncode),level=nl.level.error)
+                    returncode = e.returncode
             result = RunResult(out,returncode)
             if products and returncode==0:
                 result.output_filename = products[0]
