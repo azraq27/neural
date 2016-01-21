@@ -51,7 +51,7 @@ def calc(dsets,expr,prefix=None,datum=None):
 
 def cdf(dset,p):
     ''' converts *p*-values to the appropriate statistic for the specified subbrick '''
-    return available_method('cdf')(dset,p,subbrick)
+    return available_method('cdf')(dset,p)
 
 def thresh(dset,p,positive_only=False,prefix=None):
     ''' returns a string containing an inline ``3dcalc`` command that thresholds the 
