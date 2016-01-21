@@ -13,6 +13,10 @@ def suffix(filename,suffix):
     ''' returns a filenames with ``suffix`` inserted before the dataset suffix '''
     return os.path.split(re.sub(_afni_suffix_regex,"%s\g<1>" % suffix,str(filename)))[1]
 
+def strip_subbrick(filename):
+    ''' returns the filename without any ``[]`` subbrick modifiers '''
+    return re.sub(r'\[\d+\]$','',filename)
+
 def afni_copy(filename):
     ''' creates a ``+orig`` copy of the given dataset and returns the filename as a string '''
     if nl.pkg_available('afni',True):
