@@ -148,16 +148,25 @@ def _dset_info_afni(dset):
     if raw_info==None:
         return None
     # Subbrick info:
-    sub_info = re.findall(r'At sub-brick #(\d+) \'([^\']+)\' datum type is (\w+):\s+(.*)\s+to\s+(.*)\n(.*statcode = (\w+);  statpar = (.*)|)',raw_info)
+    sub_pattern = r'At sub-brick #(\d+) \'([^\']+)\' datum type is (\w+)(:\s+(.*)\s+to\s+(.*))?\n(.*statcode = (\w+);  statpar = (.*)|)'
+    sub_info = re.findall(sub_pattern,raw_info)
     for brick in sub_info:
-        info.subbricks.append({
+        brick_info = {
+            'index': int(brick[0]),
             'label': brick[1],
-            'datum': brick[2],
-            'min': float(brick[3]),
-            'max': float(brick[4]),
-            'stat': brick[6],
-            'params': brick[7].split()
-        })
+            'datum': brick[2]
+        }
+        if brick[3]!='':
+            brick_info.update({
+                'min': float(brick[4]),
+                'max': float(brick[5])
+            })
+        if brick[6]!='':
+            brick_info.update({            
+                'stat': brick[7],
+                'params': brick[8].split()
+            })
+        info.subbricks.append(brick_info)
     info.reps = len(info.subbricks)
     # Dimensions:
     
