@@ -28,6 +28,9 @@ def calc(dsets,expr,prefix=None,datum=None):
 
 def cdf(dset,p):
     info = nl.dset_info(dset)
+    if info==None:
+        nl.notify('Error: Could not get info for dset %s'%dset, level=nl.level.error)
+        return None
     command = ['cdf','-p2t',info.subbricks[0]['stat'],str(p)] + info.subbricks[0]['params']
     return float(subprocess.check_output(command).split()[2])
 
