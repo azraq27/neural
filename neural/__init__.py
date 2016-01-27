@@ -29,6 +29,8 @@ import stats
 from stats import *
 import connectivity
 from connectivity import *
+import qc
+from qc import *
 
 import eprime
 import general
