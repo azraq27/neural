@@ -28,6 +28,9 @@ def skull_strip(dset,suffix='_ns'):
     unifize_dset = nl.suffix(dset,'_u')
     cmd = bet2 if bet2 else 'bet2'
     info = nl.dset_info(dset)
+    if info==None:
+        nl.notify('Error: could not read info for dset %s' % dset,level=nl.level.error)
+        return False
     cmd = os.path.join(fsl_dir,cmd) if fsl_dir else cmd
     cutoff_value = info.subbricks[0]['max'] * 0.05
     nl.run(['3dUnifize','-prefix',unifize_dset,nl.calc(dset,'step(a-%f)*a' % cutoff_value)],products=unifize_dset)
