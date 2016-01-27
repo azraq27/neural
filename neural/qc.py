@@ -13,7 +13,7 @@ def inside_brain(stat_dset,atlas=None,p=0.001):
         nl.error('Error: No atlas specified, and I can\'t find "TT_N27"',level=nl.level.error)
         return None
     mask_dset = nl.suffix(stat_dset,'_atlasfrac')
-    nl.run(['3dFractionize','-template',nl.strip_subbrick(stat_dset),'-input',nl.calc([atlas],'1+step(a-100)',datum='short'),'-preserve','-clip','0.2','-prefix',mask_dset],products=mask_dset,quiet=True)
+    nl.run(['3dFractionize','-template',nl.strip_subbrick(stat_dset),'-input',nl.calc([atlas],'1+step(a-100)',datum='short'),'-preserve','-clip','0.2','-prefix',mask_dset],products=mask_dset,quiet=True,stderr=None)
     stat_thresh = nl.cdf(stat_dset,p)
     s = nl.roi_stats(mask_dset,nl.calc([stat_dset],'step(a-%f)*a'%stat_thresh))
     return s[2]['nzvoxels'] / (s[1]['nzvoxels'] + s[2]['nzvoxels'])
