@@ -236,6 +236,38 @@ def which(program):
 
     return None
 
+def find(file):
+    '''tries to find ``file`` using OS-specific searches and some guessing'''
+    # Try MacOS Spotlight:
+    mdfind = which('mdfind')
+    if mdfind:
+        out = run([mdfind,'-name',file])
+        if out.return_code==0:
+            for fname in out.output.split():
+                if os.path.basename(fname)==file:
+                    return fname
+    
+    # Try UNIX locate:
+    locate = which('locate')
+    if locate:
+        out = run([locate,file])
+        if out.return_code==0:
+            for fname in out.output.split():
+                if os.path.basename(fname)==file:
+                    return fname
+    
+    # Try to look through the PATH, and some guesses:
+    path_search = os.environ["PATH"].split(os.pathsep)
+    afni_path = which('afni')
+    if afni_path:
+        path_search.append(os.path.dirname(afni_path))
+    if nl.wrappers.fsl.bet2:
+        path_search.append(os.path.dirname(nl.wrappers.fsl.bet2))
+    for path in path_search:
+        path = path.strip('"')
+        if file in os.listdir(path):
+            return os.path.join(path,file)
+
 class run_in_tmp:
     '''creates a temporary directory to run the code block in'''
     def __init__(self,inputs=[],products=[]):
