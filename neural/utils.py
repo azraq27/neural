@@ -258,6 +258,7 @@ def find(file):
     
     # Try to look through the PATH, and some guesses:
     path_search = os.environ["PATH"].split(os.pathsep)
+    path_search += ['/usr/local/afni','/usr/local/afni/atlases','/usr/local/share','/usr/local/share/afni','/usr/local/share/afni/atlases']
     afni_path = which('afni')
     if afni_path:
         path_search.append(os.path.dirname(afni_path))
@@ -265,8 +266,11 @@ def find(file):
         path_search.append(os.path.dirname(nl.wrappers.fsl.bet2))
     for path in path_search:
         path = path.strip('"')
-        if file in os.listdir(path):
-            return os.path.join(path,file)
+        try:
+            if file in os.listdir(path):
+                return os.path.join(path,file)
+        except:
+            pass
 
 class run_in_tmp:
     '''creates a temporary directory to run the code block in'''
