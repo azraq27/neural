@@ -242,16 +242,16 @@ def find(file):
     mdfind = which('mdfind')
     if mdfind:
         out = run([mdfind,'-name',file],stderr=None,quiet=None)
-        if out.return_code==0:
-            for fname in out.output.split():
-                if os.path.basename(fname)==file:
-                    return fname
+        if out.return_code==0 and out.output:
+                for fname in out.output.split():
+                    if os.path.basename(fname)==file:
+                        return fname
     
     # Try UNIX locate:
     locate = which('locate')
     if locate:
         out = run([locate,file],stderr=None,quiet=None)
-        if out.return_code==0:
+        if out.return_code==0 and out.output:
             for fname in out.output.split():
                 if os.path.basename(fname)==file:
                     return fname
