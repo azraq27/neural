@@ -243,7 +243,7 @@ def find(file):
     if mdfind:
         out = run([mdfind,'-name',file],stderr=None,quiet=None)
         if out.return_code==0 and out.output:
-                for fname in out.output.split():
+                for fname in out.output.split('\n'):
                     if os.path.basename(fname)==file:
                         return fname
     
@@ -252,7 +252,7 @@ def find(file):
     if locate:
         out = run([locate,file],stderr=None,quiet=None)
         if out.return_code==0 and out.output:
-            for fname in out.output.split():
+            for fname in out.output.split('\n'):
                 if os.path.basename(fname)==file:
                     return fname
     
