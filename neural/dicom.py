@@ -355,31 +355,31 @@ def create_dset_to3d(prefix,file_list,file_order='zt',num_slices=None,num_reps=N
             nl.notify('Error: Couldn\'t find any valid DICOM images',level=nl.level.error)
             return False
         
-        if num_slices==None and num_reps==None:
-            nl.notify('Error: create_dset_to3d will not try to guess both slices and reps! (use create_dset if you want that)',level=nl.level.error)
-            return False
-        if num_slices==None:
-            if len(file_list)%num_reps!=0:
-                nl.notify('Error: trying to guess # of slices, but %d (number for files) doesn\'t divide evenly into %d (number of reps)' % (len(file_list),num_reps),level=nl.level.error)
-                return False
-            num_slices = len(file_list)/num_reps
-        if num_reps==None:
-            if len(file_list)%num_slices!=0:
-                nl.notify('Error: trying to guess # of reps, but %d (number for files) doesn\'t divide evenly into %d (number of slices)' % (len(file_list),num_slices),level=nl.level.error)
-                return False
-            num_reps = len(file_list)/num_slices
-        
-        if TR==None:
-            i = info_for_tags(file_list[0],[tags['TR']])
-            TR = i[tags['TR']]
 
         cmd = ['to3d','-skip_outliers','-quit_on_err','-prefix',prefix]
-        cmd += ['-time:%s'%file_order]
-        if file_order=='zt':
-            cmd += [num_slices,num_reps]
-        else:
-            cmd += [num_reps,num_slices]
-        cmd += [TR,slice_order]
+
+        if num_slices!=None or num_reps!=None:
+            # Time-based dataset
+            if num_slices==None:
+                if len(file_list)%num_reps!=0:
+                    nl.notify('Error: trying to guess # of slices, but %d (number for files) doesn\'t divide evenly into %d (number of reps)' % (len(file_list),num_reps),level=nl.level.error)
+                    return False
+                num_slices = len(file_list)/num_reps
+            if num_reps==None:
+                if len(file_list)%num_slices!=0:
+                    nl.notify('Error: trying to guess # of reps, but %d (number for files) doesn\'t divide evenly into %d (number of slices)' % (len(file_list),num_slices),level=nl.level.error)
+                    return False
+                num_reps = len(file_list)/num_slices
+        
+            if TR==None:
+                i = info_for_tags(file_list[0],[tags['TR']])
+                TR = i[tags['TR']]
+            cmd += ['-time:%s'%file_order]
+            if file_order=='zt':
+                cmd += [num_slices,num_reps]
+            else:
+                cmd += [num_reps,num_slices]
+            cmd += [TR,slice_order]
         cmd += ['-@']
         cmd = [str(x) for x in cmd]
         out = None
