@@ -325,12 +325,15 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None,force_slice
         finally:
             shutil.rmtree(sorted_dir)
             
-def create_dset_to3d(prefix,file_list,file_order='zt',num_slices=None,num_reps=None,TR=None,slice_order='alt+z',only_dicoms=True):
+def create_dset_to3d(prefix,file_list,file_order='zt',num_slices=None,num_reps=None,TR=None,slice_order='alt+z',only_dicoms=True,sort_filenames=False):
     '''manually create dataset by specifying everything (not recommended, but necessary when autocreation fails)
     
-    if `num_slices` or `num_reps` is omitted, it will be inferred by the number of images
+    If `num_slices` or `num_reps` is omitted, it will be inferred by the number of images. If both are omitted,
+    it assumes that this it not a time-dependent dataset
     
-    `only_dicoms` will filter the given list by readable DICOM images'''
+    :only_dicoms:       filter the given list by readable DICOM images
+    :sort_filenames:    sort the given files by filename using the right-most number in the filename'''
+    
     tags = {
         'num_rows': (0x0028,0x0010),
         'TR': (0x0018,0x0080)
@@ -350,6 +353,15 @@ def create_dset_to3d(prefix,file_list,file_order='zt',num_slices=None,num_reps=N
                 except:
                     pass
             file_list = new_file_list
+        
+        if sort_filenames:
+            def file_num(fname):
+                try:
+                    nums = [x.strip('.') for x in re.findall(r'[\d.]+',fname) if x.strip('.')!='']
+                    return float(nums[-1])
+                except:
+                    return fname
+            file_list = sorted(file_list,key=file_num)
         
         if len(file_list)==0:
             nl.notify('Error: Couldn\'t find any valid DICOM images',level=nl.level.error)
