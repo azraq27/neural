@@ -241,7 +241,7 @@ def find(file):
     # Try MacOS Spotlight:
     mdfind = which('mdfind')
     if mdfind:
-        out = run([mdfind,'-name',file],stderr=None)
+        out = run([mdfind,'-name',file],stderr=None,quiet=None)
         if out.return_code==0:
             for fname in out.output.split():
                 if os.path.basename(fname)==file:
@@ -250,7 +250,7 @@ def find(file):
     # Try UNIX locate:
     locate = which('locate')
     if locate:
-        out = run([locate,file],stderr=None)
+        out = run([locate,file],stderr=None,quiet=None)
         if out.return_code==0:
             for fname in out.output.split():
                 if os.path.basename(fname)==file:
