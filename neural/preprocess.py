@@ -14,15 +14,13 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
     :max_exclude:       if more time points than the given proportion of reps are excluded for the 
                         entire run, throw an exception -- something is probably wrong
     '''
-    polort = nl.auto_polort(input_dset)
-    info = nl.dset_info(input_dset)
-    outcount = [float(x) for x in subprocess.check_output(['3dToutcount','-fraction','-automask','-polort',str(polort),str(input_dset)],stderr=subprocess.PIPE).split('\n') if len(x.strip())>0]
-    binary_outcount = [x<fraction for x in outcount]
-    perc_outliers = 1 - (sum(binary_outcount)/float(info.reps))
+    (outcount,perc_outliers) = nl.qc.outcount(input_dset,fraction)
     if max_exclude and perc_outliers > max_exclude:
         nl.notify('Error: Found %f outliers in dset %s' % (perc_outliers,input_dset),level=nl.level.error)
         return False
     if clip_to:
+        info = nl.dset_info(input_dset)
+        binary_outcount = [x<fraction for x in outcount]
         while perc_outliers > clip_to:
             best_outlier = min([(outcount[i],i) for i in range(len(outcount)) if binary_outcount[i]])
             binary_outcount[best_outlier[1]] = False
