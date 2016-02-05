@@ -77,7 +77,7 @@ def temporal_snr(signal_dset,noise_dset,mask=None,prefix='temporal_snr.nii.gz'):
         nl.run(cmd,products=new_d)
     nl.calc([nl.suffix(signal_dset,'_mean'),nl.suffix(noise_dset,'_stdev')],'a/b',prefix=prefix)
 
-def auto_qc(dset,inside_perc=60,atlas=None):
+def auto_qc(dset,inside_perc=60,atlas=None,p=0.001):
     '''returns ``False`` if ``dset`` fails minimum checks, or returns a float from ``0.0`` to ``100.0`` describing data quality'''
     with nl.notify('Running quality check on %s:' % dset):
         if not os.path.exists(dset):
@@ -90,7 +90,7 @@ def auto_qc(dset,inside_perc=60,atlas=None):
         
         if any(['stat' in x for x in info.subbricks]):
             with nl.notify('Statistical results detected...'):
-                inside = inside_brain(dset,atlas=atlas)
+                inside = inside_brain(dset,atlas=atlas,p)
                 nl.notify('%.1f significant voxels inside brain')
                 if inside<inside_perc:
                     nl.notify('Warning: below quality threshold!',level=nl.level.warning)
