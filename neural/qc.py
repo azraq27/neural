@@ -90,7 +90,7 @@ def auto_qc(dset,inside_perc=60,atlas=None,p=0.001):
         
         if any(['stat' in x for x in info.subbricks]):
             with nl.notify('Statistical results detected...'):
-                inside = inside_brain(dset,atlas=atlas,p)
+                inside = inside_brain(dset,atlas=atlas,p=p)
                 nl.notify('%.1f significant voxels inside brain')
                 if inside<inside_perc:
                     nl.notify('Warning: below quality threshold!',level=nl.level.warning)
