@@ -94,7 +94,7 @@ def auto_qc(dset,inside_perc=60,atlas=None,p=0.001):
                 nl.notify('%.1f significant voxels inside brain')
                 if inside<inside_perc:
                     nl.notify('Warning: below quality threshold!',level=nl.level.warning)
-                    return False
+#                    return False
                 nl.notify('Looks ok')
                 return inside
         

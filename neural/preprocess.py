@@ -1,7 +1,7 @@
 import neural as nl
 import subprocess
 
-def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_exclude=0.3):
+def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_exclude=0.3,motion_file=None,motion_exclude=0.5):
     '''create a binary censor file using 3dToutcount
     
     :input_dset:        the input dataset
@@ -13,18 +13,31 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
                         it will only pick the top ``clip_to*reps`` points
     :max_exclude:       if more time points than the given proportion of reps are excluded for the 
                         entire run, throw an exception -- something is probably wrong
+    :motion_file:       optional filename of a "motion" file with multiple columns and rows corresponding to reps.
+                        It doesn't really matter what the values are, as long as they are appropriate relative to ``motion_exclude``
+    :motion_exclude:    Will exclude any reps that have a value greater than this in any column of ``motion_file``
     '''
     (outcount,perc_outliers) = nl.qc.outcount(input_dset,fraction)
-    if max_exclude and perc_outliers > max_exclude:
-        nl.notify('Error: Found %f outliers in dset %s' % (perc_outliers,input_dset),level=nl.level.error)
+    info = nl.dset_info(input_dset)    
+    binarize = lambda o,f: [oo<f for oo in o]
+    perc_outliers = lambda o: sum(o)/float(info.reps)
+
+    if motion_file:
+        with open(motion_file,'Ur') as f:
+            motion = [max([float(y) for y in x.strip().split()]) for x in f.read().split('\n') if len(x.strip())>0 and x.strip()[0]!='#']
+            motion_1D = [not(x) for x in binarize(motion,motion_exclude)]
+            if perc_outliers(motion_1D) > max_exclude or perc_outliers(motion_1D)>clip_to:
+                nl.notify('Error: Too many points excluded because of motion (%.2f) in dset %s' % (perc_outliers(motion_1D),input_dset),level=nl.level.error)
+                return False
+            outcount = [outcount[i] for i in range(len(outcount)) if motion_1D[i]]
+    if max_exclude and perc_outliers(outcount) > max_exclude:
+        nl.notify('Error: Found %f outliers in dset %s' % (perc_outliers(outcount),input_dset),level=nl.level.error)
         return False
     if clip_to:
-        info = nl.dset_info(input_dset)
-        binary_outcount = [x<fraction for x in outcount]
-        while perc_outliers > clip_to:
+        binary_outcount = binarize(outcount,fraction)
+        while perc_outliers(outcount) > clip_to:
             best_outlier = min([(outcount[i],i) for i in range(len(outcount)) if binary_outcount[i]])
             binary_outcount[best_outlier[1]] = False
-            perc_outliers = sum(binary_outcount)/float(info.reps)
     if not out_prefix:
         out_prefix = nl.prefix(input_dset) + '.1D'
     with open(out_prefix,'w') as f:
