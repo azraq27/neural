@@ -70,6 +70,8 @@ The :mod:`neural.eprime` module can be used to parse E-Prime data files, a progr
 
 The :mod:`neural.freesurfer` module has methods to interact with Freesurfer
 
+:mod:`neural.driver` contains methods to control the AFNI GUI. Particularly useful if you want to automate doing things like taking screenshots
+
 Contents
 =========
 
@@ -87,6 +89,7 @@ Contents
    eprime
    freesurfer
    connectivity
+   driver
    
 
 Indices and tables

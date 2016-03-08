@@ -15,6 +15,7 @@ from utils import *
 import wrappers
 import wrappers.common
 from wrappers.common import *
+import wrappers.afni as afni
 import decon
 from decon import *
 import alignment
@@ -36,7 +37,7 @@ import eprime
 import general
 import notification
 import freesurfer
-
+import driver
 
 # Check for update
 import xmlrpclib
