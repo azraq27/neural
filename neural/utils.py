@@ -54,13 +54,13 @@ def flatten(nested_list):
 
 class run_in:
     '''temporarily changes into another directory
-    
+
     If the directory name you pass doesn't exist, but matches the current directory
     you are in, it will silently ignore your silliness. Otherwise, it will raise an
     ``OSError``. If the argument ``create`` is True, it will create the directory instead
     of raising an error.
-    
-    Example::   
+
+    Example::
         with run_in('another_directory'):
             do_some_stuff_there()
     '''
@@ -70,7 +70,7 @@ class run_in:
 
     def __enter__(self):
         self.old_cwd = os.getcwd()
-        if self.working_directory:
+        if self.working_directory and self.working_directory!='.':
             if os.path.exists(self.working_directory):
                 os.chdir(self.working_directory)
             elif self.old_cwd.endswith(self.working_directory.rstrip('/')):
@@ -82,27 +82,27 @@ class run_in:
                     os.chdir(self.working_directory)
                 else:
                     raise IOError('Attempting to run_in the non-existent directory "%s"' % self.working_directory)
-    
+
     def __exit__(self, type, value, traceback):
         os.chdir(self.old_cwd)
 
 class RunResult:
     '''result of calling :meth:`run`
-    
+
     when used as a string, will try to reasonably return the filename of the primary output
-    of the command (if known)'''    
+    of the command (if known)'''
     def __init__(self,output=None,return_code=None,output_filename=None):
         self.output_filename = output_filename
         self.output = output
         self.return_code = return_code
-    
+
     def __str__(self):
         return self.output_filename
 
 def run(command,products=None,working_directory='.',force_local=False,stderr=True,quiet=False):
     '''wrapper to run external programs
-    
-    :command:           list containing command and parameters 
+
+    :command:           list containing command and parameters
                         (formatted the same as subprocess; must contain only strings)
     :products:          string or list of files that are the products of this command
                         if all products exist, the command will not be run, and False returned
@@ -116,7 +116,7 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
     :quiet:             ``False`` (default) will print friendly messages
                         ``True`` will suppress everything but errors
                         ``None`` will suppress all output
-    
+
     Returns result in form of :class:`RunResult`
     '''
     with run_in(working_directory):
@@ -125,7 +125,7 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
                 products = [products]
             if all([os.path.exists(x) for x in products]):
                 return False
-        
+
         command = flatten(command)
         command = [str(x) for x in command]
         quiet_option = False if quiet==False else True
@@ -138,10 +138,10 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
                     out = subprocess.check_output(command,stderr=subprocess.STDOUT)
                 elif stderr==None:
                     # dump STDERR into nothing
-                    out = subprocess.check_output(command,stderr=subprocess.PIPE) 
+                    out = subprocess.check_output(command,stderr=subprocess.PIPE)
                 else:
                     # let STDERR show through to the console
-                    out = subprocess.check_output(command)                    
+                    out = subprocess.check_output(command)
             except subprocess.CalledProcessError, e:
                 if quiet!=None:
                     nl.notify('''ERROR: %s returned a non-zero status
@@ -150,7 +150,7 @@ def run(command,products=None,working_directory='.',force_local=False,stderr=Tru
     %s
     -----------------------
 
-                    
+
     ----OUTPUT-------------
     %s
     -----------------------
@@ -175,7 +175,7 @@ def hash(filename):
         buff = f.read(buffer_size)
         while len(buff)>0:
             m.update(buff)
-            buff = f.read(buffer_size)          
+            buff = f.read(buffer_size)
     dig = m.digest()
     return ''.join(['%x' % ord(x) for x in dig])
 
@@ -188,18 +188,18 @@ def hash_str(string):
 
 class simple_timer:
     '''a simple way to time a single run of a function
-    
+
     Example::
         with simple_timer():
             do_stuff()
     '''
     def __init__(self):
         self.start_time = None
-    
+
     def __enter__(self):
         self.start_time = datetime.datetime.now()
         print 'timer start time: %s' % self.start_time.strftime('%Y-%m-%d %H:%M:%S')
-    
+
     def __exit__(self, type, value, traceback):
         self.end_time = datetime.datetime.now()
         print 'timer end time: %s' % self.end_time.strftime('%Y-%m-%d %H:%M:%S')
@@ -246,7 +246,7 @@ def find(file):
                 for fname in out.output.split('\n'):
                     if os.path.basename(fname)==file:
                         return fname
-    
+
     # Try UNIX locate:
     locate = which('locate')
     if locate:
@@ -255,7 +255,7 @@ def find(file):
             for fname in out.output.split('\n'):
                 if os.path.basename(fname)==file:
                     return fname
-    
+
     # Try to look through the PATH, and some guesses:
     path_search = os.environ["PATH"].split(os.pathsep)
     path_search += ['/usr/local/afni','/usr/local/afni/atlases','/usr/local/share','/usr/local/share/afni','/usr/local/share/afni/atlases']
@@ -279,7 +279,7 @@ class run_in_tmp:
         self.cwd = None
         self.inputs = inputs
         self.products = products
-    
+
     def __enter__(self):
         if not isinstance(self.inputs,list):
             self.inputs = [self.inputs]
@@ -291,7 +291,7 @@ class run_in_tmp:
                 pass
         os.chdir(self.tmp_dir)
         return self
-    
+
     def __exit__(self, type, value, traceback):
         if not isinstance(self.products,list):
             self.products = [self.products]
@@ -318,11 +318,11 @@ class ThreadSafe(object):
     '''wrapper class to handle starting and stopping for the :meth:`thread_safe` method of :class:`Beacon`'''
     def __init__(self,beacon):
         self.beacon = beacon
-    
+
     def __enter__(self):
         self.beacon.write_packet()
         self.beacon.start()
-    
+
     def __exit__(self, type, value, traceback):
         self.beacon.stop()
 
@@ -332,14 +332,14 @@ class Beacon(Thread):
     easy (just choose a file path on the shared drive).
 
     Options:
-    
+
         :app_name:      Arbitrary name of the script. Will use script filename if ``None``
         :instance_name: Arbitrary name of this instance (e.g., subject #)
         :packet_path:   Path to put the lock file in (defaults to the system temp directory)
         :poll_time:     How often (in seconds) to ping the lock file
-    
+
     Example of usage::
-    
+
         b = Beacon('my_analysis','subject_4')
         if not b.exists():
             # there are no "my_analysis" scripts running "subject_4" right now
@@ -362,17 +362,17 @@ class Beacon(Thread):
         if packet_path==None:
             self.packet_path = tempfile.gettempdir()
         self.poll_time = poll_time
-    
+
     def exists(self):
         '''Returns a ``bool`` of whether this analysis is already running somewhere else'''
         return not self.check_packet()
-    
+
     def thread_safe(self):
         '''Use in a ``with`` statement to run code within a thread-safe context. When the ``with`` statement
         enters, this will create the lock file, and it will automatically stop and delete it when the ``with``
         block finishes'''
         return ThreadSafe(self)
-        
+
     def packet(self):
         return {
             'app_name':self.app_name,
@@ -380,14 +380,14 @@ class Beacon(Thread):
             'poll_time':self.poll_time,
             'last_time':time.time()
         }
-    
+
     def packet_file(self):
         return os.path.join(self.packet_path,self.filename)
-        
+
     def write_packet(self):
         with open(self.packet_file(),'w') as f:
             f.write(json.dumps(self.packet()))
-    
+
     def check_packet(self):
         '''is there a valid packet (from another thread) for this app/instance?'''
         if not os.path.exists(self.packet_file()):
@@ -408,7 +408,7 @@ class Beacon(Thread):
                 # Failed to read file... try again in a second
                 time.sleep(random.random()*2)
                 return self.check_packet()
-    
+
     def run(self):
         while not self.stop_event.wait(self.poll_time):
             self.write_packet()
@@ -417,12 +417,12 @@ class Beacon(Thread):
                 os.remove(self.packet_file())
             except:
                 pass
-    
+
     def stop(self):
         self.stop_event.set()
 
 def strip_rows(array,invalid=None):
-    '''takes a ``list`` of ``list``s and removes corresponding indices containing the 
+    '''takes a ``list`` of ``list``s and removes corresponding indices containing the
     invalid value (default ``None``). '''
     array = np.array(array)
     none_indices = np.where(np.any(np.equal(array,invalid),axis=0))

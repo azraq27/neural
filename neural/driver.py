@@ -23,8 +23,7 @@ def set_thresh(thresh,p=False,hostname=None):
 
 class coord:
     '''enum of coordinate types'''
-    dicom = 'DICOM_XYZ'
-    rai = 'DICOM_XYZ'
+    dicom = rai = 'DICOM_XYZ'
     spm = 'SPM_XYZ'
     ijk = 'IJK'
 
@@ -40,3 +39,11 @@ for v in ["OFF", "SINGLE", "MULTI", "LR_AP", "LR_IS", "AP_IS", "LR", "AP", "IS"]
 
 def set_xhairs(value=xhairs.off):
     driver_send("SET_XHAIRS A.%s" % value)
+
+class dset:
+    '''enum for defining underlay/overlay'''
+    anatomy = underlay = "ANATOMY"
+    functional = function = overlay = "FUNCTION"
+
+def set_dset(filename,type=dset.overlay):
+    driver_send("SET_%s %s" % (type,filename))
