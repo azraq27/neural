@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-version = '1.2.3'
+version = '1.2.4'
 
 setup(
   name = 'neural-fmri',
@@ -20,14 +20,14 @@ In comparison to other Python libraries designed to interact with fMRI data
 the data in any way, just to provide helpful wrapper functions and shortcut methods to
 make your life easier.
 
-Since the author uses primarily AFNI, most of the functions are written that way, 
+Since the author uses primarily AFNI, most of the functions are written that way,
 but don't specifically have to be that way...
 
 ''',
   author = 'Bill Gross',
   author_email = 'bill.gross@me.com',
   url = 'https://github.com/azraq27/neural',
-  download_url = 'https://github.com/azraq27/neural/tarball/'+version, 
+  download_url = 'https://github.com/azraq27/neural/tarball/'+version,
   keywords = ['neuroimaging', 'afni', 'fsl', 'fmri'],
   classifiers = [
       'Topic :: Scientific/Engineering',
@@ -43,4 +43,3 @@ but don't specifically have to be that way...
       'numpy'
   ]
 )
-

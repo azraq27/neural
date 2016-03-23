@@ -3,7 +3,7 @@
 Library to provide helper functions to make analyzing
 neuroimaging data in python a little easier'''
 
-version = '1.2.3'
+version = '1.2.4'
 
 #! flag to indicate whether most functions should be verbose or not
 verbose = True
@@ -49,7 +49,7 @@ try:
             notify('## Update to neural available on PyPI (current version: %s; latest version: %s)' % (version,latest[0]),level=level.debug)
 except:
     pass
-    
+
 
 # user customization
 import sys
