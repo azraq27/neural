@@ -415,6 +415,44 @@ class DeconStim(object):
                 return None
         return decon_stim
 
+def stack_decon_stims(stim_list):
+    '''take a ``list`` (in order of runs) of ``dict``s of stim_name:DeconStim and stack them together. returns
+    a single ``dict`` of stim_name:decon_stim
+    
+    As in, takes:
+    [
+        # Run 1
+        { "stim1": decon_stim1a, "stim2": decon_stim2a },
+        # Run 2
+        { "stim1": decon_stim1b, "stim2": decon_stim2b, "stim3": decon_stim3 }
+    ]
+    
+    And makes:
+        { "stim1": decon_stim1, "stim2": decon_stim2, "stim3": decon_stim3 }
+        
+    If a stimulus is not present in a run, it will fill that run with an empty stimulus
+    '''
+    stim_names = list(set(nl.flatten([stims.keys() for stims in stim_list])))
+
+    stim_dict = {}
+    for stim_name in stim_names:
+        types = list(set([stims[stim_name].type() for stims in stim_list if stim_name in stims]))
+        if len(types)>1:
+            nl.notify('Error: Trying to stack stimuli of different types! (%s)' % stim_name,level=nl.level.error)
+            return None
+        type = types[0]
+        
+        stim_stack = []
+        for i in xrange(len(stim_list)):
+            if stim_name in stim_list[i]:
+                stim_stack.append(stim_list[i][stim_name])
+            else:
+                stim_stack.append(stim_list[i].values()[0].blank_stim(type=type))
+        stim_dict[stim_name] = copy.copy(stim_stack[0])
+        for stim in stim_stack[1:]:
+            stim_dict[stim_name] = stim_dict[stim_name].concat_stim(stim)
+    return stim_dict.values()
+
 def smooth_decon_to_fwhm(decon,fwhm,cache=True):
     '''takes an input :class:`Decon` object and uses ``3dBlurToFWHM`` to make the output as close as possible to ``fwhm``
     returns the final measured fwhm. If ``cache`` is ``True``, will save the blurred input file (and use it again in the future)'''
