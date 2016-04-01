@@ -2,6 +2,9 @@ import os,subprocess
 import neural as nl
 
 freesurfer_home = None
+if 'FREESURFER_HOME' in os.environ:
+    freesurfer_home = os.environ['FREESURFER_HOME']
+
 subjects_dir = '.'
 
 #: parent of parent directory of file: e.g., this_dir/other_dir/filename
@@ -24,7 +27,7 @@ class FreesurferDir(object):
         self.subj_id = subj_id
         #: The individual subject's directory (i.e., "[subj_dir]/[subj_id]")
         self.dir_name = os.path.join(subj_dir,subj_id)
-        
+
         #: Path to the skull-stripped anatomy
         self.skull_strip = if_exists(os.path.join(self.dir_name,'mri','brainmask.auto.mgz'))
 
