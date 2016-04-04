@@ -41,11 +41,11 @@ def available_method(method_name):
 
 def calc(dsets,expr,prefix=None,datum=None):
     ''' returns a string of an inline ``3dcalc``-style expression
-    
+
     ``dsets`` can be a single string, or list of strings. Each string in ``dsets`` will
     be labeled 'a','b','c', sequentially. The expression ``expr`` is used directly
-    
-    If ``prefix`` is not given, will return a 3dcalc string that can be passed to another 
+
+    If ``prefix`` is not given, will return a 3dcalc string that can be passed to another
     AFNI program as a dataset. Otherwise, will create the dataset with the name ``prefix``'''
     return available_method('calc')(dsets,expr,prefix,datum)
 
@@ -54,8 +54,8 @@ def cdf(dset,p):
     return available_method('cdf')(dset,p)
 
 def thresh(dset,p,positive_only=False,prefix=None):
-    ''' returns a string containing an inline ``3dcalc`` command that thresholds the 
-        given dataset at the specified *p*-value, or will create a new dataset if a 
+    ''' returns a string containing an inline ``3dcalc`` command that thresholds the
+        given dataset at the specified *p*-value, or will create a new dataset if a
         suffix or prefix is given '''
     return available_method('thresh')(dset,p,positive_only,prefix)
 
@@ -76,7 +76,7 @@ def blur(dset,fwhm,prefix=None):
 def roi_stats(mask,dset):
     '''returns ROI stats on ``dset`` using ``mask`` as the ROI mask
     returns a dictionary with the structure::
-    
+
         {
             ROI: {
                 {keys: stat}
@@ -84,9 +84,9 @@ def roi_stats(mask,dset):
             },
             ...
         }
-    
+
     keys::
-    
+
         :mean:
         :median:
         :mode:
@@ -108,10 +108,10 @@ def roi_stats(mask,dset):
 def tshift(dset,suffix='_tshft',initial_ignore=3):
     '''applies slice-time based interpolation of raw data'''
     return available_method('tshift')(dset,suffix,initial_ignore)
-    
-def skull_strip(dset,suffix='_ns'):
+
+def skull_strip(dset,suffix='_ns',prefix=None,unifize=True):
     '''attempts to cleanly remove skull from ``dset``'''
-    return available_method('skull_strip')(dset,suffix)
+    return available_method('skull_strip')(dset,suffix,prefix,unifize)
 
 def segment(dset):
     '''segment ``dset`` into WM/GM/CSF'''

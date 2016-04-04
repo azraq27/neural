@@ -80,11 +80,13 @@ def roi_stats(mask,dset):
 def tshift(dset,suffix='_tshift',initial_ignore=3):
     nl.run(['3dTshift','-prefix',nl.suffix(dset,suffix),'-ignore',initial_ignore,dset],products=nl.suffix(dset,suffix))
 
-def skull_strip(dset,suffix='_ns'):
+def skull_strip(dset,suffix='_ns',prefix=None,unifize=True):
+    if prefix==None:
+        prefix = nl.suffix(dset,suffix)
     nl.run([
         '3dSkullStrip',
         '-input', dset,
-        '-prefix', nl.suffix(dset,suffix),
+        '-prefix', prefix,
         '-niter', '400',
         '-ld', '40'
     ],products=nl.suffix(dset,suffix))
