@@ -51,26 +51,26 @@ def is_nifti(filename):
 def is_afni(filename):
     '''return True/False if this looks like an AFNI dset'''
     return re.match(afni_dset_regex,filename)!=None
-    
+
 def is_dset(filename):
     '''just checks if the filename has the format of an fMRI dataset'''
     return nl.is_nifti(filename) or is_afni(filename)
 
 class temp_afni_copy:
     ''' used within a ``with`` block, will create a temporary ``+orig`` copy of dataset
-    
+
     When invoked in a ``with`` block, will make a ``+orig`` copy of the given dataset
     and return the filename as a string.
-    
+
     On exiting the block, it will delete the ``+orig`` copy. If out_dsets is a string
-    or list of strings, it will try to make nifti copies of all datasets listed 
+    or list of strings, it will try to make nifti copies of all datasets listed
     and then delete the original version if successful. AFNI datasets should be specified
     with the ``+view``.
-    
+
     Example usage::
         with temp_afni_copy('dataset.nii.gz') as dset_afni:
             do_something_with_a_dset(dset_afni)
-        
+
         with temp_afni_copy('dataset.nii.gz','output_dataset+orig') as dset_afni:
             do_something_with_a_dset(dset_afni,output='output_dataset')
     '''
@@ -89,7 +89,7 @@ class temp_afni_copy:
             return self.afni_filenames[0]
 
     def __exit__(self, type, value, traceback):
-        for afni_filename in self.afni_filenames:   
+        for afni_filename in self.afni_filenames:
             for dset in glob.glob(afni_filename + '.*'):
                 try:
                     os.remove(dset)
@@ -122,7 +122,7 @@ def dset_copy(dset,to_dir):
 
 class DsetInfo:
     '''Container for dset meta-data
-    
+
     All lists are returned in RAI order (i.e., a list of 3 numbers refers to the R-L axis,
     A-P axis, then I-S axis)'''
     def __init__(self):
@@ -135,7 +135,7 @@ class DsetInfo:
         self.slice_timing = None
         self.TR = None
         self.orient = None
-    
+
     def subbrick_labeled(self,label):
         for i in xrange(len(self.subbricks)):
             if self.subbricks[i]['label']==label:
@@ -166,14 +166,14 @@ def _dset_info_afni(dset):
                 'max': float(brick[5])
             })
         if brick[6]!='':
-            brick_info.update({            
+            brick_info.update({
                 'stat': brick[7],
                 'params': brick[8].split()
             })
         info.subbricks.append(brick_info)
     info.reps = len(info.subbricks)
     # Dimensions:
-    
+
     orient = re.search('\[-orient ([A-Z]+)\]',raw_info)
     if orient:
         info.orient = orient.group(1)
@@ -186,14 +186,14 @@ def _dset_info_afni(dset):
             info.voxel_dims.append(float(m.group(4)))
     if len(info.voxel_size)==3:
         info.voxel_volume = reduce(mul,info.voxel_size)
-    
+
     slice_timing = re.findall('-time:[tz][tz] \d+ \d+ [0-9.]+ (.*?) ',raw_info)
     if len(slice_timing):
         info.slice_timing = slice_timing[0]
     TR = re.findall('Time step = ([0-9.]+)s',raw_info)
     if len(TR):
         info.TR = float(TR[0])
-    
+
     # Other info..
     details_regex = {
         'identifier': r'Identifier Code:\s+(.*)',
@@ -204,7 +204,7 @@ def _dset_info_afni(dset):
         m = re.search(details_regex[d],raw_info)
         if m:
             setattr(info,d,m.group(1))
-    
+
     return info
 
 def dset_info(dset):
@@ -221,22 +221,22 @@ def auto_polort(dset):
 
 def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False,number_only=False):
     ''' returns a string referencing the given subbrick within a dset
-    
+
     This method reads the header of the dataset ``dset``, finds the subbrick whose
     label matches ``label`` and returns a string of type ``dataset[X]``, which can
     be used by most AFNI programs to refer to a subbrick within a file
-    
+
     The options coef, tstat, fstat, and rstat will add the suffix that is
     appended to the label by 3dDeconvolve
-    
+
     :coef:  "#0_Coef"
     :tstat: "#0_Tstat"
     :fstat: "_Fstat"
     :rstat: "_R^2"
-    
+
     if ``number_only`` is set to ``True``, will only return the subbrick number instead of a string
     '''
-    
+
     if coef:
         label += "#0_Coef"
     elif tstat:
@@ -245,7 +245,7 @@ def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False,number_on
         label += "_Fstat"
     elif rstat:
         label += "_R^2"
-    
+
     info = nl.dset_info(dset)
     if info==None:
         nl.notify('Error: Couldn\'t get info from dset "%s"'%dset,level=nl.level.error)
@@ -266,7 +266,7 @@ def dset_grids_equal(dsets):
 def resample_dset(dset,template,prefix=None,resam='NN'):
     '''Resamples ``dset`` to the grid of ``template`` using resampling mode ``resam``.
     Default prefix is to suffix ``_resam`` at the end of ``dset``
-    
+
     Available resampling modes:
         :NN:    Nearest Neighbor
         :Li:    Linear
@@ -276,3 +276,25 @@ def resample_dset(dset,template,prefix=None,resam='NN'):
     if prefix==None:
         prefix = nl.suffix(dset,'_resam')
     nl.run(['3dresample','-master',template,'-rmode',resam,'-prefix',prefix,'-inset',dset])
+
+def ijk_to_xyz(dset,ijk):
+    '''convert the dset indices ``ijk`` to RAI coordinates ``xyz``'''
+    i = nl.dset_info(dset)
+    orient_codes = [int(x) for x in nl.run(['@AfniOrient2RAImap',i.orient]).output.split()]
+    orient_is = [abs(x)-1 for x in orient_codes]
+    rai = []
+    for rai_i in xrange(3):
+         ijk_i = orient_is[rai_i]
+         if orient_codes[rai_i] > 0:
+             rai.append(ijk[ijk_i]*i.voxel_size[rai_i] + i.spatial_from[rai_i])
+         else:
+             rai.append(i.spatial_to[rai_i] - ijk[ijk_i]*i.voxel_size[rai_i])
+    return rai
+
+def bounding_box(dset):
+    '''return the coordinates (in RAI) of the corners of a box enclosing the data in ``dset``'''
+    o = nl.run(["3dAutobox","-input",dset])
+    ijk_coords = re.findall(r'[xyz]=(\d+)\.\.(\d+)',o.output)
+    from_rai = ijk_to_xyz(dset,[float(x[0]) for x in ijk_coords])
+    to_rai = ijk_to_xyz(dset,[float(x[1]) for x in ijk_coords])
+    return (from_rai,to_rai)
