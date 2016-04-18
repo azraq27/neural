@@ -298,3 +298,8 @@ def bounding_box(dset):
     from_rai = ijk_to_xyz(dset,[float(x[0]) for x in ijk_coords])
     to_rai = ijk_to_xyz(dset,[float(x[1]) for x in ijk_coords])
     return (from_rai,to_rai)
+
+def value_at_coord(dset,coords):
+    '''returns value at specified coordinate in ``dset``'''
+    return nl.numberize(nl.run(['3dmaskave','-q','-dbox'] + list(coords) + [dset],stderr=None).output)
+
