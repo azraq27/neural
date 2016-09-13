@@ -33,8 +33,8 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
     if max_exclude and perc_outliers(outcount) > max_exclude:
         nl.notify('Error: Found %f outliers in dset %s' % (perc_outliers(outcount),input_dset),level=nl.level.error)
         return False
+    binary_outcount = binarize(outcount,fraction)
     if clip_to:
-        binary_outcount = binarize(outcount,fraction)
         while perc_outliers(outcount) > clip_to:
             best_outlier = min([(outcount[i],i) for i in range(len(outcount)) if binary_outcount[i]])
             binary_outcount[best_outlier[1]] = False
