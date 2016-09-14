@@ -1,7 +1,7 @@
 import neural as nl
 import subprocess
 
-def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_exclude=0.3,motion_file=None,motion_exclude=0.5):
+def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_exclude=0.3,motion_file=None,motion_exclude=1.0):
     '''create a binary censor file using 3dToutcount
 
     :input_dset:        the input dataset
@@ -26,7 +26,7 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
         with open(motion_file,'Ur') as f:
             motion = [max([float(y) for y in x.strip().split()]) for x in f.read().split('\n') if len(x.strip())>0 and x.strip()[0]!='#']
             motion_1D = [x for x in binarize(motion,motion_exclude)]
-            if perc_outliers(motion_1D) > max_exclude or perc_outliers(motion_1D)>clip_to:
+            if perc_outliers(motion_1D) > max_exclude:
                 nl.notify('Error: Too many points excluded because of motion (%.2f) in dset %s' % (perc_outliers(motion_1D),input_dset),level=nl.level.error)
                 return False
             outcount = [outcount[i] if motion_1D[i] else 1. for i in range(len(outcount))]
