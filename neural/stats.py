@@ -1,10 +1,18 @@
 '''calculate statistics off of datasets'''
 import neural as nl
 import subprocess
+import nibabel as nib
+
+def max(dset):
+    '''max value of dataset
+
+    Calculated by reading the dataset. If it's in the header, you can also read
+    this from `dset_info`'''
+    return nib.load(dset).get_data().max()
 
 def voxel_count(dset,p=None,positive_only=False,mask=None,ROI=None):
     ''' returns the number of non-zero voxels
-    
+
     :p:             threshold the dataset at the given *p*-value, then count
     :positive_only: only count positive values
     :mask:          count within the given mask
@@ -17,7 +25,7 @@ def voxel_count(dset,p=None,positive_only=False,mask=None,ROI=None):
     else:
         if positive_only:
             dset = nl.calc(dset,'step(a)')
-    
+
     count = 0
     devnull = open(os.devnull,"w")
     if mask:
