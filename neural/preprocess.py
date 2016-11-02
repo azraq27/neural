@@ -44,3 +44,4 @@ def create_censor_file(input_dset,out_prefix=None,fraction=0.1,clip_to=0.1,max_e
         out_prefix = nl.prefix(input_dset) + '.1D'
     with open(out_prefix,'w') as f:
         f.write('\n'.join([str(int(x)) for x in binary_outcount]))
+    return True
