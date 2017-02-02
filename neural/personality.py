@@ -35,7 +35,11 @@ def banner():
 		return version_string
 
 def display(name):
-    user = getpass.getuser()
+    try:
+        user = getpass.getuser()
+    except:
+        # Sometimes this seems to fail for no apparent reason
+        user = "none"
     if compress(user) in faces:
         nl.notify(decompress(faces[compress(user)][name]))
 

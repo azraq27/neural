@@ -251,12 +251,11 @@ class Decon:
     def run(self):
         '''runs 3dDeconvolve through the neural.utils.run shortcut'''
         out = nl.run(self.command_list(),products=self.prefix)
-        # Not sure where the SDs went in the deconvolve output... but they aren't there for me now
-        '''if out and out.output:
-            stim_sds_list = [x.split() for x in out.output.strip().split('\n\n')]
+        if out and out.output:
+            sds_list = re.findall(r'Stimulus: (.*?) *\n +h\[ 0\] norm\. std\. dev\. = +(\d+\.\d+)',out.output)
             self.stim_sds = {}
-            for stim in stim_sds_list:
-                self.stim_sds[stim[1]] = float(stim[-1])'''
+            for s in sds_list:
+                self.stim_sds[s[0]] = float(s[1])
 
 class DeconStim(object):
     '''encapsulates the definition of any arbitrary stimulus, along with all of its 3dDeconvolve options
