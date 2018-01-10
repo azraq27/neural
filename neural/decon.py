@@ -1,4 +1,4 @@
-import os,shutil,tempfile,re,multiprocessing,copy
+import os,shutil,tempfile,re,multiprocessing,copy,datetime
 import neural as nl
 
 class Decon:
@@ -161,13 +161,14 @@ class Decon:
 
         cmd += ['-num_stimts',len(all_stims)]
 
+        stimautoname = lambda d,s: 'stimfile_auto-%d-%s_' % (d,s.name) + str(datetime.datetime.now()).replace(" ","_").replace(":",".")
+
         for stim in all_stims:
             column_file = stim.column_file
             if stim.column!=None:
-                with tempfile.NamedTemporaryFile(delete=False) as f:
+                column_file = stimautoname(stim_num,stim)
+                with open(column_file,"w") as f:
                     f.write('\n'.join([str(x) for x in stim.column]))
-                    column_file = f.name
-                    self._del_files.append(f.name)
             if column_file:
                 cmd += ['-stim_file',stim_num,column_file,'-stim_label',stim_num,stim.name]
                 if stim.base:
@@ -180,10 +181,9 @@ class Decon:
                 if '__iter__' not in dir(times[0]):
                     # a single list
                     times = [times]
-                with tempfile.NamedTemporaryFile(delete=False) as f:
+                times_file = stimautoname(stim_num,stim)
+                with open(times_file,"w") as f:
                     f.write('\n'.join([' '.join([str(x) for x in y]) for y in times]))
-                    times_file = f.name
-                    self._del_files.append(f.name)
             if times_file:
                 opt = '-stim_times'
                 if stim.AM1:
