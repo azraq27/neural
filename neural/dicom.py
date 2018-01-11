@@ -24,28 +24,28 @@ _dicom_hdr = 'dicom_hdr'
 
 class DicomInfo:
     '''container for header information from DICOM file
-    
+
     Header frames are dictionaries with the following values:
-    
+
     :addr:      tuple of (group,element) tags in hex
     :label:     description
     :offset:    offset of data
     :size:      size of data
     :value:     data value
     '''
-    
+
     def __init__(self,frames=[],sex_info={},slice_times=[]):
         self.raw_frames = frames    #! list of dictionaries containing information on each frame
         self.sex_info = sex_info    #! dictinary with Siemen's extra info fields
-        self.slice_times = slice_times #! list of Siemen's slice timing information     
-    
+        self.slice_times = slice_times #! list of Siemen's slice timing information
+
     def addr(self,address):
         '''returns dictionary with frame information for given address (a tuple of two hex numbers)'''
         if isinstance(address,basestring):
             # If you just gave me a single string, assume its "XXXX XXXX"
             addr = address.split()
         else:
-            addr = list(address)            
+            addr = list(address)
         # Convert to actual hex if you give me strings
         for i in xrange(len(addr)):
             if isinstance(addr[i],basestring):
@@ -53,7 +53,7 @@ class DicomInfo:
         for frame in self.raw_frames:
             if frame['addr']==address:
                 return frame
-    
+
     def label(self,label):
         '''returns dictionary with frame information for a given text label'''
         for frame in self.raw_frames:
@@ -85,9 +85,9 @@ def info(filename):
 
 def info_for_tags(filename,tags):
     '''return a dictionary for the given ``tags`` in the header of the DICOM file ``filename``
-    
+
     ``tags`` is expected to be a list of tuples that contains the DICOM address in hex values.
-    
+
     basically a rewrite of :meth:`info` because it's so slow. This is a lot faster and more reliable'''
     if isinstance(tags,tuple):
         tags = [tags]
@@ -108,14 +108,14 @@ def info_for_tags(filename,tags):
 
 def scan_dir(dirname,tags=None,md5_hash=False):
     '''scans a directory tree and returns a dictionary with files and key DICOM tags
-    
+
     return value is a dictionary absolute filenames as keys and with dictionaries of tags/values
     as values
-    
-    the param ``tags`` is the list of DICOM tags (given as tuples of hex numbers) that 
+
+    the param ``tags`` is the list of DICOM tags (given as tuples of hex numbers) that
     will be obtained for each file. If not given,
     the default list is:
-    
+
     :0008 0021:     Series date
     :0008 0031:     Series time
     :0008 103E:     Series description
@@ -123,7 +123,7 @@ def scan_dir(dirname,tags=None,md5_hash=False):
     :0010 0020:     Patient ID
     :0028 0010:     Image rows
     :0028 0011:     Image columns
-    
+
     If the param ``md5_hash`` is ``True``, this will also return the MD5 hash of the file. This is useful
     for detecting duplicate files
     '''
@@ -137,9 +137,9 @@ def scan_dir(dirname,tags=None,md5_hash=False):
             (0x0028, 0x0010),
             (0x0028, 0x0011),
         ]
-    
-    return_dict = {}    
-    
+
+    return_dict = {}
+
     for root,dirs,files in os.walk(dirname):
         for filename in files:
             fullname = os.path.join(root,filename)
@@ -152,7 +152,7 @@ def scan_dir(dirname,tags=None,md5_hash=False):
 valid = '_.' + string.ascii_letters + string.digits
 def scrub_fname(fname):
     return ''.join(c for c in fname.replace(' ','_') if c in valid).replace('__','_')
-    
+
 def find_dups(file_dict):
     '''takes output from :meth:`scan_dir` and returns list of duplicate files'''
     found_hashes = {}
@@ -168,7 +168,7 @@ def find_dups(file_dict):
 
 def cluster_files(file_dict):
     '''takes output from :meth:`scan_dir` and organizes into lists of files with the same tags
-    
+
     returns a dictionary where values are a tuple of the unique tag combination and values contain
     another dictionary with the keys ``info`` containing the original tag dict and ``files`` containing
     a list of files that match'''
@@ -185,7 +185,7 @@ def cluster_files(file_dict):
 
 def max_diff(dset1,dset2):
     '''calculates maximal voxel-wise difference in datasets (in %)
-    
+
     Useful for checking if datasets have the same data. For example, if the maximum difference is
     < 1.0%, they're probably the same dataset'''
     for dset in [dset1,dset2]:
@@ -219,11 +219,11 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None,force_slice
     }
     with nl.notify('Trying to create datasets from %s' % directory):
         directory = os.path.abspath(directory)
-            
+
         if not os.path.exists(directory):
             nl.notify('Error: could not find %s' % directory,level=nl.level.error)
             return False
-        
+
         out_file = '%s.nii.gz' % nl.prefix(os.path.basename(directory))
         if os.path.exists(out_file):
             nl.notify('Error: file "%s" already exists!' % out_file,level=nl.level.error)
@@ -235,7 +235,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None,force_slice
             with nl.run_in(sorted_dir):
                 file_list = glob.glob(directory + '/*')
                 num_reps = None
-                
+
                 new_file_list = []
                 for f in file_list:
                     try:
@@ -248,14 +248,14 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None,force_slice
                 if len(file_list)==0:
                     nl.notify('Error: Couldn\'t find any valid DICOM images',level=nl.level.error)
                     return False
-                
+
                 with open('file_list.txt','w') as f:
                     f.write('\n'.join(file_list))
                 try:
                     subprocess.check_output([
                     'Dimon',
                     '-infile_list','file_list.txt',
-                    '-dicom_org', 
+                    '-dicom_org',
                     '-save_details','details',
                     '-max_images','100000',
                     '-fast','-no_wait',
@@ -269,9 +269,9 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None,force_slice
                             file_list = [x[0] for x in details]
                     else:
                         nl.notify('Warning: Dimon didn\'t return expected output, unable to sort images',level=nl.level.warning)
-                
+
                 cmd = ['to3d','-skip_outliers','-quit_on_err','-prefix',out_file]
-                
+
                 num_reps = None
                 i = info_for_tags(file_list[0],[tags['num_reps'],tags['acq_time'],tags['TR']])
                 if tags['num_reps'] in i and i[tags['num_reps']]>1:
@@ -289,7 +289,7 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None,force_slice
                             # "zt" sounds like a good default
                             if sort_order==None:
                                 sort_order='zt'
-                
+
                 if num_reps:
                     # This is a time-dependent dataset
                     cmd += ['-time:' + sort_order]
@@ -304,56 +304,60 @@ def _create_dset_dicom(directory,slice_order='alt+z',sort_order=None,force_slice
                             if tags['num_frames'] in num_frames_info and not isinstance(num_frames_info[tags['num_frames']],basestring):
                                 num_files += num_frames_info[tags['num_frames']] - 1
                             if tags['siemens_slices'] in num_frames_info and not isinstance(num_frames_info[tags['siemens_slices']],basestring):
-                                num_files += num_frames_info[tags['siemens_slices']] - 1                            
+                                num_files += num_frames_info[tags['siemens_slices']] - 1
                         num_slices = num_files/num_reps
                     if sort_order=='zt':
                         cmd += [str(num_slices),str(num_reps)]
                     else:
                         cmd += [str(num_reps),str(num_slices)]
                     cmd += [str(i[tags['TR']]),slice_order]
-                
+
                 cmd += ['-@']
                 p = subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
                 out = p.communicate('\n'.join(file_list))
-                
+
                 if os.path.exists(out_file):
                     shutil.copy(out_file,cwd)
                     return out_file
                 nl.notify('Error: Failed to create dataset\nStdout:\n%s\nStderr:\n%s' % out,level=nl.level.error)
-                
+
                 return False
         finally:
             shutil.rmtree(sorted_dir)
-            
+
 def create_dset_to3d(prefix,file_list,file_order='zt',num_slices=None,num_reps=None,TR=None,slice_order='alt+z',only_dicoms=True,sort_filenames=False):
     '''manually create dataset by specifying everything (not recommended, but necessary when autocreation fails)
-    
+
     If `num_slices` or `num_reps` is omitted, it will be inferred by the number of images. If both are omitted,
     it assumes that this it not a time-dependent dataset
-    
+
     :only_dicoms:       filter the given list by readable DICOM images
     :sort_filenames:    sort the given files by filename using the right-most number in the filename'''
-    
+
     tags = {
         'num_rows': (0x0028,0x0010),
+        'num_reps': (0x0020,0x0105),
         'TR': (0x0018,0x0080)
     }
     with nl.notify('Trying to create dataset %s' % prefix):
         if os.path.exists(prefix):
             nl.notify('Error: file "%s" already exists!' % prefix,level=nl.level.error)
             return False
-        
+
+        tagvals = {}
+        for f in file_list:
+            try:
+                tagvals[f] = info_for_tags(f,tags.values())
+            except:
+                pass
         if only_dicoms:
             new_file_list = []
             for f in file_list:
-                try:
-                    if len(info_for_tags(f,tags['num_rows']))>0:
-                        # Only include DICOMs that actually have image information
-                        new_file_list.append(f)
-                except:
-                    pass
+                if f in tagvals and len(tagvals[f][tags['num_rows']])>0:
+                    # Only include DICOMs that actually have image information
+                    new_file_list.append(f)
             file_list = new_file_list
-        
+
         if sort_filenames:
             def file_num(fname):
                 try:
@@ -362,11 +366,11 @@ def create_dset_to3d(prefix,file_list,file_order='zt',num_slices=None,num_reps=N
                 except:
                     return fname
             file_list = sorted(file_list,key=file_num)
-        
+
         if len(file_list)==0:
             nl.notify('Error: Couldn\'t find any valid DICOM images',level=nl.level.error)
             return False
-        
+
 
         cmd = ['to3d','-skip_outliers','-quit_on_err','-prefix',prefix]
 
@@ -378,14 +382,16 @@ def create_dset_to3d(prefix,file_list,file_order='zt',num_slices=None,num_reps=N
                     return False
                 num_slices = len(file_list)/num_reps
             if num_reps==None:
-                if len(file_list)%num_slices!=0:
+                if len(file_list)%num_slices==0:
+                    num_reps = len(file_list)/num_slices
+                elif len(file_list)==1 and tags['num_reps'] in tagvals[file_list[0]]:
+                    num_reps = tagvals[file_list[0]][tags['num_reps']]
+                else:
                     nl.notify('Error: trying to guess # of reps, but %d (number for files) doesn\'t divide evenly into %d (number of slices)' % (len(file_list),num_slices),level=nl.level.error)
                     return False
-                num_reps = len(file_list)/num_slices
-        
+
             if TR==None:
-                i = info_for_tags(file_list[0],[tags['TR']])
-                TR = i[tags['TR']]
+                TR = tagvals[file_list[0]][tags['TR']]
             cmd += ['-time:%s'%file_order]
             if file_order=='zt':
                 cmd += [num_slices,num_reps]
@@ -432,9 +438,9 @@ def date_for_image(image_fname):
 
 def organize_dir(orig_dir):
     '''scans through the given directory and organizes DICOMs that look similar into subdirectories
-    
+
     output directory is the ``orig_dir`` with ``-sorted`` appended to the end'''
-    
+
     tags = [
         (0x10,0x20),    # Subj ID
         (0x8,0x21),     # Date
@@ -453,7 +459,7 @@ def organize_dir(orig_dir):
             except IOError:
                 nl.notify('\t[failed]')
             del(files[each_dup])
-    
+
     clustered = cluster_files(files)
     output_dir = '%s-sorted' % orig_dir
     for key in clustered:
@@ -484,17 +490,17 @@ def organize_dir(orig_dir):
             dname = os.path.join(r,d)
             if len(os.listdir(dname))==0:
                 os.remove(dname)
-                
+
 def classify(label_dict,image_fname=None,image_label=None):
     '''tries to classify a DICOM image based on known string patterns (with fuzzy matching)
-    
+
     Takes the label from the DICOM header and compares to the entries in ``label_dict``. If it finds something close
     it will return the image type, otherwise it will return ``None``. Alternatively, you can supply your own string, ``image_label``,
     and it will try to match that.
-    
+
     ``label_dict`` is a dictionary where the keys are dataset types and the values are lists of strings that match that type.
     For example::
-    
+
         {
             'anatomy': ['SPGR','MPRAGE','anat','anatomy'],
             'dti': ['DTI'],
@@ -534,7 +540,7 @@ def reconstruct_files(input_dir):
 
 def unpack_archive(fname,out_dir):
     '''unpacks the archive file ``fname`` and reconstructs datasets into ``out_dir``
-    
+
     Datasets are reconstructed and auto-named using :meth:`create_dset`. The raw directories
     that made the datasets are archive with the dataset name suffixed by ``tgz``, and any other
     files found in the archive are put into ``other_files.tgz``'''
