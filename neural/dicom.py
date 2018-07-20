@@ -5,8 +5,7 @@ import subprocess,re,os,multiprocessing,glob,itertools,tempfile,shutil
 from datetime import datetime
 import neural as nl
 import string
-# No, I'm not importing myself... this is actually the pydicom library
-import dicom as pydicom
+import pydicom
 from fuzzywuzzy import process
 import nibabel as nib
 import numpy as np
