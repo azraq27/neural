@@ -115,7 +115,7 @@ def affine_apply(dset_from,affine_1D,master,affine_suffix='_aff',interp='NN',inv
             affine_1D_use = temp.name
     if prefix==None:
         prefix = nl.suffix(dset_from,affine_suffix)
-    nl.run(['3dAllineate','-1Dmatrix_apply',affine_1D_use,'-input',dset_from,'-prefix',prefix,'-master',master,'-final',interp],products=nl.suffix(dset_from,affine_suffix))
+    nl.run(['3dAllineate','-1Dmatrix_apply',affine_1D_use,'-input',dset_from,'-prefix',prefix,'-master',master,'-final',interp],products=prefix)
 
 def convert_coord(coord_from,matrix_file,base_to_aligned=True):
     '''Takes an XYZ array (in DICOM coordinates) and uses the matrix file produced by 3dAllineate to transform it. By default, the 3dAllineate
