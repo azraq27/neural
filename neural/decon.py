@@ -183,7 +183,7 @@ class Decon:
                     times = [times]
                 times_file = stimautoname(stim_num,stim)
                 with open(times_file,"w") as f:
-                    f.write('\n'.join([' '.join([str(x) for x in y]) for y in times]))
+                    f.write('\n'.join([' '.join([str(x) for x in y]) if len(y)>0 else '*' for y in times]))
             if times_file:
                 opt = '-stim_times'
                 if stim.AM1:
