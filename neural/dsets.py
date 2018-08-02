@@ -234,13 +234,20 @@ def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False,number_on
     :fstat: "_Fstat"
     :rstat: "_R^2"
 
+    If ``coef`` or ``tstat`` are set to a number, it will use that parameter number
+    (instead of 0), for models that use multiple parameters (e.g., "TENT").
+
     if ``number_only`` is set to ``True``, will only return the subbrick number instead of a string
     '''
 
-    if coef:
-        label += "#0_Coef"
-    elif tstat:
-        label += "#0_Tstat"
+    if coef != False:
+        if coef==True:
+            coef = 0
+        label += "#%d_Coef" % coef
+    elif tstat != False:
+        if tstat==True:
+            tstat = 0
+        label += "#%d_Tstat" % tstat
     elif fstat:
         label += "_Fstat"
     elif rstat:
