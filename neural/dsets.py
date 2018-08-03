@@ -240,8 +240,8 @@ def subbrick(dset,label,coef=False,tstat=False,fstat=False,rstat=False,number_on
     if ``number_only`` is set to ``True``, will only return the subbrick number instead of a string
     '''
 
-    if coef != False:
-        if coef==True:
+    if coef is not False:
+        if coef is True:
             coef = 0
         label += "#%d_Coef" % coef
     elif tstat != False:
