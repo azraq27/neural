@@ -92,6 +92,7 @@ class Decon:
         self.stim_sds = None
         self.errts = None
         self.partial = {}
+        self.validate_glts = True
 
         self._del_files = []
 
@@ -196,19 +197,22 @@ class Decon:
                     cmd += ['-stim_base',stim_num]
                 stim_num += 1
 
-        strip_number = r'[-+]?(\d+)?\s*\*\s*?(\w+)(\[.*?\])?'
+        strip_number = r'[-+]?(\d+)?\*?(\w+)(\[.*?\])?'
         all_glts = {}
         stim_names = [stim.name for stim in all_stims]
-        for glt in self.glts:
-            ok = True
-            for stim in self.glts[glt].split():
-                m = re.match(strip_number,stim)
-                if m:
-                    stim = m.group(2)
-                if stim not in stim_names:
-                    ok = False
-            if ok:
-                all_glts[glt] = self.glts[glt]
+        if self.validate_glts:
+            for glt in self.glts:
+                ok = True
+                for stim in self.glts[glt].split():
+                    m = re.match(strip_number,stim)
+                    if m:
+                        stim = m.group(2)
+                    if stim not in stim_names:
+                        ok = False
+                if ok:
+                    all_glts[glt] = self.glts[glt]
+        else:
+            all_glts = self.glts
 
         cmd += ['-num_glt',len(all_glts)]
 
