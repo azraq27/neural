@@ -196,7 +196,7 @@ class Decon:
                     cmd += ['-stim_base',stim_num]
                 stim_num += 1
 
-        strip_number = r'[-+]?(\d+)?\*?(.*)'
+        strip_number = r'[-+]?(\d+)?\s*\*\s*?(\w+)(\[.*?\])?'
         all_glts = {}
         stim_names = [stim.name for stim in all_stims]
         for glt in self.glts:
